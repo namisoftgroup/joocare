@@ -1,9 +1,6 @@
-import Image from "next/image";
 import logo from "@/assets/logo_1.svg";
+import Image from "next/image";
 import Link from "next/link";
-import { Button, buttonVariants } from "../ui/button";
-import { ChevronRight, Search } from "lucide-react";
-import { LanguageToggle } from "../LanguageToggle";
 import HeaderActionsButtons from "./HeaderActionsButtons";
 
 const Header = () => {
@@ -46,51 +43,6 @@ const Header = () => {
             </li>
           </ul>
         </nav>
-
-        {/* Action Buttons */}
-        {/* <div
-          className="flex justify-center items-center space-x-4"
-          role="region"
-          aria-label="User Actions"
-        >
-          <Button
-            className={buttonVariants({
-              variant: "outline",
-              size: "icon-circle",
-            })}
-            aria-label="Search"
-          >
-            <Search />
-          </Button>
-
-          <Button
-            onClick={() => router}
-            variant="default"
-            hoverStyle="slideSecondary"
-            size="pill"
-          >
-            Login
-          </Button>
-
-          <Button variant="outline" hoverStyle="slidePrimary" size="pill">
-            Join Now
-          </Button>
-
-          <LanguageToggle aria-label="Toggle Language" />
-
-          <Link
-            href="/employer"
-            className={`flex items-center text-lg text-secondary justify-center ${buttonVariants(
-              {
-                variant: "outline",
-                size: "xl",
-                hoverStyle: "hoverBorder",
-              },
-            )}`}
-          >
-            For Employer <ChevronRight size={24} />
-          </Link>
-        </div> */}
 
         <HeaderActionsButtons />
       </div>
