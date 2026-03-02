@@ -7,21 +7,17 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { Globe } from "lucide-react";
-import { Button } from "./ui/button";
+import { buttonVariants } from "./ui/button";
 
 export function LanguageToggle() {
   return (
     <Select defaultValue="EN">
-      <Button
-        variant="ghost"
-        hoverStyle="slidePrimary"
-        className="rounded-full min-h-13 "
+      <SelectTrigger
+        className={`${buttonVariants({ variant: "ghost", hoverStyle: "slidePrimary" })} border-0 text-secondary shadow-none bg-transparent flex items-center gap-2 rounded-full min-h-13  `}
       >
-        <SelectTrigger className="border-0 text-secondary shadow-none bg-transparent flex items-center gap-2">
-          <Globe color="var(--secondary)" />
-          <SelectValue placeholder="EN" />
-        </SelectTrigger>
-      </Button>
+        <Globe color="var(--secondary)" />
+        <SelectValue placeholder="EN" />
+      </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           <SelectItem value="EN">EN</SelectItem>
