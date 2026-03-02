@@ -51,8 +51,9 @@ const FormEmployerLogin = () => {
       <div className="flex justify-center">
         <Button
           variant={"secondary"}
-          hoverStyle={"slide"}
+          hoverStyle={"slidePrimary"}
           className="w-1/3"
+          size={"pill"}
           type="submit"
         >
           Login

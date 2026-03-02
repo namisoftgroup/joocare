@@ -1,7 +1,7 @@
 // libraries
+import FormEmployerLogin from "@/features/auth/components/login-content/FormEmployerLogin";
+import SocialLoginButtons from "@/features/auth/components/login-content/SocialLoginButtons";
 import Link from "next/link";
-import FormEmployerLogin from "../../../components/login-content/FormEmployerLogin";
-import SocialLoginButtons from "../../../components/login-content/SocialLoginButtons";
 
 //components
 
@@ -11,7 +11,7 @@ const LoginEmployerPage = () => {
     <div className="h-[calc(100vh-75px)] flex items-center justify-center gap-4 ">
       <div className="w-3/4 mx-auto p-4">
         {/* header text */}
-              <h1>Welcome back,<br /> business.</h1>
+      <h1>Welcome back,<br /> business.</h1>
       <p className="text-[clamp(.8rem,4vw,1rem)]">
         Manage your job posts and candidates
       </p>

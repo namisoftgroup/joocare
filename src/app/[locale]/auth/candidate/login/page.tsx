@@ -1,9 +1,10 @@
 // libraries
 import Link from "next/link";
-import HeaderLoginContent from "../../../components/login-content/HeaderLoginContent";
-import FormEmployerLogin from "../../../components/login-content/FormEmployerLogin";
-import SocialLoginButtons from "../../../components/login-content/SocialLoginButtons";
+
 import { Section } from "lucide-react";
+import HeaderLoginContent from "@/features/auth/components/login-content/HeaderLoginContent";
+import FormEmployerLogin from "@/features/auth/components/login-content/FormEmployerLogin";
+import SocialLoginButtons from "@/features/auth/components/login-content/SocialLoginButtons";
 
 //components
 

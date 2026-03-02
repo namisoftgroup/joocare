@@ -19,8 +19,9 @@ const AuthHeader = () => {
         />
       </Link>   
          <nav className="flex items-center gap-2 md:gap-4">
-                <Button aria-label="Switch to candidate mode">
+                <Button size="pill" variant="secondary" aria-label="Switch to candidate mode">
  For Candidate</Button>
+
         <LanguageToggle />
       </nav>
     </header>
