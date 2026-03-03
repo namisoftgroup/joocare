@@ -10,7 +10,7 @@ const AuthLayout = ({ children }: { children: ReactNode }) => {
   return (
     <>
       <AuthHeader />
-      <main className="grid grid-cols-2 bg-background">
+      <main className="md:grid grid-cols-2 bg-background">
         <SideContent />
         {children}
       </main>
