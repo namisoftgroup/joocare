@@ -22,9 +22,9 @@ const buttonVariants = cva(
       hoverStyle: {
         hoverBorder: "hover:border-primary  hover:bg-transparent",
         slideSecondary:
-          "relative overflow-hidden before:absolute before:inset-0 before:bg-secondary before:translate-y-full before:transition-transform before:duration-300 before:ease-out hover:before:translate-y-0 z-2 before:z-[-1]",
+          "relative overflow-hidden before:absolute before:inset-0 before:bg-secondary before:translate-y-[103%] before:transition-transform before:duration-300 before:ease-out hover:before:translate-y-0 z-2 before:z-[-1]",
         slidePrimary:
-          "relative overflow-hidden before:absolute before:inset-0 before:bg-primary before:translate-y-full before:transition-transform before:duration-300 before:ease-out hover:before:translate-y-0 z-2 before:z-[-1] hover:text-primary-foreground",
+          "relative overflow-hidden before:absolute before:inset-0 before:bg-primary before:translate-y-[103%] before:transition-transform before:duration-300 before:ease-out hover:before:translate-y-0 z-2 before:z-[-1] hover:text-primary-foreground",
       },
       size: {
         default:

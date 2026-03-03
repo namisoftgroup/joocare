@@ -1,54 +1,94 @@
 "use client";
-import { ChevronRight, Search } from "lucide-react";
+import { Bell, ChevronRight, Search } from "lucide-react";
 import Link from "next/link";
 import { LanguageToggle } from "../LanguageToggle";
 import { Button, buttonVariants } from "../ui/button";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import UserDropDown from "./UserDropDown";
 
 function HeaderActionsButtons() {
   const router = useRouter();
+  const [isAuthed, setIsAuthed] = useState(true);
   return (
     <div
-      className="flex justify-center items-center space-x-4"
+      className="flex justify-center items-center space-x-0 md:space-x-4"
       role="region"
       aria-label="User Actions"
     >
-      <Button variant="outline" size="icon-circle" aria-label="Search">
+      {/* <Button variant="outline" size="icon-circle" aria-label="Search">
         <Search />
-      </Button>
+      </Button> */}
 
-      <Button
-        onClick={() => router.push("/auth/candidate/login")}
-        variant="default"
-        hoverStyle="slideSecondary"
-        size="pill"
-      >
-        Login
-      </Button>
+      {!isAuthed && (
+        <>
+          {" "}
+          <Button
+            onClick={() => router.push("/auth/candidate/login")}
+            variant="default"
+            hoverStyle="slideSecondary"
+            size="pill"
+            className="hidden md:flex"
+          >
+            Login
+          </Button>
+          <Button
+            onClick={() => router.push("/auth/candidate/register")}
+            variant="outline"
+            hoverStyle="slidePrimary"
+            size="pill"
+            className="hidden md:flex"
+          >
+            Join Now
+          </Button>{" "}
+        </>
+      )}
+      {isAuthed && (
+        <div className=" items-center gap-4  hidden md:flex">
+          <Button
+            variant="outline"
+            className="border-border  relative"
+            size="icon-circle"
+            aria-label="Notifications"
+          >
+            <Bell className="w-5 h-5" />
 
-      <Button
-        onClick={() => router.push("/auth/candidate/register")}
-        variant="outline"
-        hoverStyle="slidePrimary"
-        size="pill"
-      >
-        Join Now
-      </Button>
-
+            {/* Badge with number */}
+            <span className="absolute top-0 right-0 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center px-1">
+              3
+            </span>
+          </Button>
+          <UserDropDown />{" "}
+        </div>
+      )}
       <LanguageToggle aria-label="Toggle Language" />
-
-      <Link
-        href="/employer"
-        className={`flex items-center text-lg text-secondary justify-center ${buttonVariants(
-          {
-            variant: "outline",
-            size: "xl",
-            hoverStyle: "hoverBorder",
-          },
-        )}`}
+      <Button
+        variant="outline"
+        className="border-border  md:hidden relative"
+        size="icon-circle"
+        aria-label="Notifications"
       >
-        For Employer <ChevronRight size={24} />
-      </Link>
+        <Bell className="w-3 h-3" size={12} />
+
+        {/* Badge with number */}
+        <span className="absolute top-0 right-0 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center px-1">
+          3
+        </span>
+      </Button>
+      {!isAuthed && (
+        <Link
+          href="/employer"
+          className={`flex items-center text-lg text-secondary justify-center ${buttonVariants(
+            {
+              variant: "outline",
+              size: "xl",
+              hoverStyle: "hoverBorder",
+            },
+          )}`}
+        >
+          For Employer <ChevronRight size={24} />
+        </Link>
+      )}
     </div>
   );
 }
