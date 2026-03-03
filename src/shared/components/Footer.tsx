@@ -1,6 +1,4 @@
 "use client";
-import logo from "@/assets/logo-light.svg";
-import footer1 from "@/assets/footer1.svg";
 
 import {
   ArrowUp,
@@ -28,7 +26,12 @@ const Footer = () => {
           {/* Column 1: Brand Info */}
           <div className="space-y-6">
             <div className="flex items-center gap-2">
-              <Image src={logo} alt="Joo Care Logo" width={140} height={60} />
+              <Image
+                src="/assets/logo-light.svg"
+                alt="Joo Care Logo"
+                width={140}
+                height={60}
+              />
             </div>
             <p className="text-gray-300 text-sm leading-relaxed max-w-xs">
               An AI-powered healthcare recruitment platform supporting
@@ -145,7 +148,7 @@ const Footer = () => {
           </div>
           <div className="relative col-span-4 h-7  w-full">
             <Image
-              src={footer1}
+              src="/assets/footer1.svg"
               alt="Joo Care Logo"
               fill
               className="ml-4 md:ml-0"

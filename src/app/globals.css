@@ -186,7 +186,7 @@
   min-width: 24px;
   height: 100%;
   inset-inline-start: 0;
-  background-image: url("../assets/footer2.svg");
+  background-image: url("../../public/assets/footer2.svg");
   background-size: cover;
   background-position: center;
   opacity: 1;
