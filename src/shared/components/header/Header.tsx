@@ -1,8 +1,6 @@
+
 import Image from "next/image";
 import Link from "next/link";
-import { Button, buttonVariants } from "../ui/button";
-import { ChevronRight, Search } from "lucide-react";
-import { LanguageToggle } from "../LanguageToggle";
 import HeaderActionsButtons from "./HeaderActionsButtons";
 
 const Header = () => {
