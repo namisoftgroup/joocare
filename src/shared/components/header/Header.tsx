@@ -1,4 +1,4 @@
-import logo from "@/assets/logo_1.svg";
+
 import Image from "next/image";
 import Link from "next/link";
 import HeaderActionsButtons from "./HeaderActionsButtons";
@@ -10,7 +10,7 @@ const Header = () => {
         {/* Logo */}
         <Link href="/" aria-label="Go to homepage">
           <Image
-            src={logo}
+            src="/assets/logo_1.svg"
             alt="Joo Care Logo"
             width={100}
             height={100}

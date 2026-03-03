@@ -22,12 +22,13 @@ const FormEmployerLogin = () => {
   });
   const onSubmit: SubmitHandler<TLoginEmployerSchema> = (data) =>
     console.log(data);
+
+  
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col gap-4 mt-6"
     >
-      <div>
         <InputField
           id="email"
           label="Email"
@@ -36,7 +37,6 @@ const FormEmployerLogin = () => {
           {...register("email")}
           error={errors.email?.message}
         />
-      </div>
       <InputField
         id="password"
         type="password"
@@ -50,9 +50,9 @@ const FormEmployerLogin = () => {
       </Link>
       <div className="flex justify-center">
         <Button
-          variant={"secondary"}
-          hoverStyle={"slide"}
+          hoverStyle={"slideSecondary"}
           className="w-1/3"
+          size={"pill"}
           type="submit"
         >
           Login
