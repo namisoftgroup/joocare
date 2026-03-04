@@ -1,11 +1,11 @@
 "use client";
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LanguageToggle } from "../LanguageToggle";
 import { Button, buttonVariants } from "../ui/button";
 import UserDropDown from "./UserDropDown";
+import { Link } from "@/i18n/navigation";
 
 function HeaderActionsButtons({ isAuthed }: { isAuthed: boolean }) {
   const router = useRouter();

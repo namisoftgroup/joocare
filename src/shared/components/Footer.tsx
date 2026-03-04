@@ -2,8 +2,8 @@
 
 import { Facebook, Ghost, Instagram, Linkedin, Twitter } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import BackToTopButton from "./BackToTopButton";
+import { Link } from "@/i18n/navigation";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
