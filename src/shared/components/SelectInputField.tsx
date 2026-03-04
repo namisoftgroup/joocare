@@ -1,17 +1,17 @@
 "use client";
 
 import * as React from "react";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "../lib/utils";
 import Image from "next/image";
 import {
   Combobox,
   ComboboxContent,
   ComboboxEmpty,
-  ComboboxInput,
+  // ComboboxInput,
   ComboboxItem,
   ComboboxList,
   ComboboxTrigger,
-  ComboboxValue,
+  // ComboboxValue,
 } from "./ui/combobox";
 import { Button } from "./ui/button";
 
@@ -24,7 +24,7 @@ type Option = {
 type SelectInputFieldProps = {
   label: string;
   id: string;
-  error?: string;
+  error?: string | boolean;
   options: Option[];
   placeholder?: string;
   value?: Option;
@@ -58,6 +58,7 @@ export const SelectInputField = React.forwardRef<
         </label>
 
         <Combobox
+          id={id}
           items={options}
           value={value}
           onValueChange={(value) => onChange?.(value as Option)}

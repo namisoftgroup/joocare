@@ -1,18 +1,19 @@
-// import libraries
-import AuthHeader from "@/features/auth/components/header/AuthHeader";
-import SideContent from "@/features/auth/components/side-content/SideContent";
 import { ReactNode } from "react";
 
-// import components
+import AuthHeader from "@/features/auth/components/header/AuthHeader";
+import SideContent from "@/features/auth/components/side-content/SideContent";
+
 
 
 const AuthLayout = ({ children }: { children: ReactNode }) => {
   return (
     <>
       <AuthHeader />
-      <main className="md:grid grid-cols-2 bg-background">
+      <main className="md:grid grid-cols-2 bg-background h-[calc(100vh-75px)]">
         <SideContent />
-        {children}
+        <div className="overflow-y-auto">
+          {children}
+        </div>
       </main>
     </>
   );
