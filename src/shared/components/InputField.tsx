@@ -6,7 +6,7 @@ import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { cn } from "../lib/utils";
 
 type InputFieldProps = {
-  label: string;
+  label?: string;
   id: string;
   error?: string | boolean;
 } & React.ComponentProps<"input">;

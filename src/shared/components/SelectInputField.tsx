@@ -22,7 +22,7 @@ type Option = {
 };
 
 type SelectInputFieldProps = {
-  label: string;
+  label?: string;
   id: string;
   error?: string | boolean;
   options: Option[];
