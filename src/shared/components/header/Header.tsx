@@ -9,12 +9,13 @@ import HeaderActionsButtons from "./HeaderActionsButtons";
 
 const Header = () => {
   const [toggleSideMenu, setToggleSideMenu] = useState(false);
+  const [isAuthed, setIsAuthed] = useState(false);
   const handleToggleMenu = () => {
     setToggleSideMenu((prev) => !prev);
   };
   return (
     <>
-      <header className="flex sticky top-0 justify-between items-center py-4  px-3 md:px-0 w-full shadow-header">
+      <header className="flex sticky top-0 justify-between bg-white z-30 items-center py-4  px-3 md:px-0 w-full shadow-header">
         <div className="container mx-auto flex justify-between items-center">
           {/* Logo */}
           <Link
@@ -74,13 +75,14 @@ const Header = () => {
               </li>
             </ul>
           </nav>
-          <HeaderActionsButtons />
+          <HeaderActionsButtons isAuthed={isAuthed} />
         </div>
       </header>
       {toggleSideMenu && (
         <ResponsiveNavigationBar
           toggleSideMenu={toggleSideMenu}
           setToggleSideMenu={setToggleSideMenu}
+          isAuthed={isAuthed}
         />
       )}
     </>

@@ -1,15 +1,15 @@
 "use client";
-import { Bell, ChevronRight, Search } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LanguageToggle } from "../LanguageToggle";
 import { Button, buttonVariants } from "../ui/button";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import UserDropDown from "./UserDropDown";
 
-function HeaderActionsButtons() {
+function HeaderActionsButtons({ isAuthed }: { isAuthed: boolean }) {
   const router = useRouter();
-  const [isAuthed, setIsAuthed] = useState(true);
+
   return (
     <div
       className="flex justify-center items-center space-x-0 md:space-x-4"
@@ -51,7 +51,12 @@ function HeaderActionsButtons() {
             size="icon-circle"
             aria-label="Notifications"
           >
-            <Bell className="w-5 h-5" />
+            <Image
+              src="/assets/icons/notification.svg"
+              width={24}
+              height={24}
+              alt="Notification Icon"
+            />
 
             {/* Badge with number */}
             <span className="absolute top-0 right-0 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center px-1">
@@ -64,14 +69,20 @@ function HeaderActionsButtons() {
       <LanguageToggle aria-label="Toggle Language" />
       <Button
         variant="outline"
-        className="border-border  md:hidden relative"
+        className="border-border   md:hidden relative w-8 h-8"
         size="icon-circle"
         aria-label="Notifications"
       >
-        <Bell className="w-3 h-3" size={12} />
+        <Image
+          src="/assets/icons/notification.svg"
+          width={14}
+          height={14}
+          alt="Notification Icon"
+        />
+        {/* <Bell className="w-3 h-3" size={12} /> */}
 
         {/* Badge with number */}
-        <span className="absolute top-0 right-0 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center px-1">
+        <span className="absolute top-0 right-0 w-3 h-3 bg-primary text-white text-[8px] font-bold rounded-full flex items-center justify-center px-1">
           3
         </span>
       </Button>
