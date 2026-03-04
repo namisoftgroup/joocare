@@ -1,14 +1,14 @@
 "use client";
 import * as React from "react";
 
-import { cn } from "@/shared/lib/utils";
 import { Input } from "./ui/input";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { cn } from "../lib/utils";
 
 type InputFieldProps = {
   label?: string;
   id: string;
-  error?: string; containerStyles?: string;
+  error?: string | boolean;
 } & React.ComponentProps<"input">;
 
 export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(

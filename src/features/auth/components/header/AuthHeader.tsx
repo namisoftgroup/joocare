@@ -8,21 +8,23 @@ import { Link } from "@/i18n/navigation";
 
 const AuthHeader = () => {
   return (
-    <header className="px-[clamp(.2rem,5vw,3rem)] mx-auto  py-4 flex justify-between items-center shadow-lg bg-white">
-      <Link href="/" aria-label="Homepage">
-        <Image
-          src="/assets/logo_1.svg"
-          alt="Joocare Logo"
-          width={100}
-          height={40}
-          priority
-        />
-      </Link>
-      <nav className="flex items-center gap-2 md:gap-4">
-        <DynamicLink />
+    <header className="sticky top-0 bg-white px-[clamp(.1rem,2vw,3rem)] py-4 w-full shadow-header z-3">
+      <div className="container mx-auto flex justify-between items-center">
+        <Link href="/" aria-label="Homepage">
+          <Image
+            src="/assets/logo_1.svg"
+            alt="Joocare Logo"
+            width={100}
+            height={40}
+            priority
+          />
+        </Link>
+        <nav className="flex items-center gap-2 md:gap-4">
+          <DynamicLink />
 
-        <LanguageToggle />
-      </nav>
+          <LanguageToggle />
+        </nav>
+      </div>
     </header>
   );
 };

@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { buttonVariants } from "@/shared/components/ui/button";
 import { Link } from "@/i18n/navigation";
 
-
 const DynamicLink = () => {
   const pathname = usePathname();
 
@@ -15,6 +14,7 @@ const DynamicLink = () => {
 
   return (
     <Link
+      prefetch
       href={href}
       className={buttonVariants({
         size: "pill",
