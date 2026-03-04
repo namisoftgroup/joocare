@@ -16,6 +16,7 @@ export default function ResponsiveNavigationBar({
 }: {
   toggleSideMenu: boolean;
   setToggleSideMenu: React.Dispatch<React.SetStateAction<boolean>>;
+  isAuthed: boolean;
 }) {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
