@@ -12,7 +12,7 @@ type InputFieldProps = {
 } & React.ComponentProps<"input">;
 
 export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
-  ({ label, id, type = "password", className, error, ...props }, ref) => {
+  ({ label, id, type = "text", className, error, ...props }, ref) => {
     const [showPassword, setShowPassword] = React.useState(false);
 
     const isPassword = type === "password";
@@ -20,7 +20,7 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
 
     return (
       <div className={cn("flex flex-col w-full", className)}>
-        <label htmlFor={id} className="mb-1 font-semibold">
+        <label htmlFor={id} className="mb-1 mx-1 font-semibold">
           {label}
         </label>
 

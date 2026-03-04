@@ -83,7 +83,7 @@ const FormEmployerRegister = () => {
 
       <>
         {" "}
-        <label htmlFor={"phoneCode"} className="-mb-5 font-semibold">
+        <label htmlFor={"phoneCode"} className="-mb-5 mx-1 font-semibold">
           Contact person _ Phone number
         </label>
         <div className="flex items-center gap-2">
@@ -101,7 +101,7 @@ const FormEmployerRegister = () => {
                 }
                 onChange={(option) => field.onChange(option?.value)}
                 error={!!errors.phoneCode}
-                showPlaceholderImage={true}
+                showPlaceholderImage={"/assets/flag.svg"}
                 className="min-w-29 w-29"
                 options={[
                   { label: "+999", value: "+999", image: "/assets/flag.svg" },

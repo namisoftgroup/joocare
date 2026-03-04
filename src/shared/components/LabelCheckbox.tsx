@@ -29,7 +29,7 @@ const LabelCheckbox = ({
           checked={checked}
           onCheckedChange={onCheckedChange}
         />
-        <Label className={"flex flex-wrap"} htmlFor={id}>
+        <Label className={"flex flex-wrap font-normal"} htmlFor={id}>
           {children}
         </Label>
       </div>
