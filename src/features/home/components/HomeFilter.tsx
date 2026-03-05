@@ -54,7 +54,7 @@ export default function HomeFilter() {
   const [category, setCategory] = useState<Option | undefined>();
 
   return (
-    <form className="bg-border flex w-full items-center justify-center gap-2 rounded-full p-2">
+    <form className="bg-border flex w-full flex-wrap items-center justify-center gap-2 rounded-lg p-2 md:flex-nowrap md:rounded-full">
       <InputField
         className="grow bg-white"
         containerStyles="w-auto grow"
