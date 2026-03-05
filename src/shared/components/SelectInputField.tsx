@@ -25,6 +25,7 @@ type SelectInputFieldProps = {
   label?: string;
   id: string;
   error?: string | boolean;
+  containerStyles?: string;
   options: Option[];
   placeholder?: string;
   value?: Option;
@@ -48,12 +49,13 @@ export const SelectInputField = React.forwardRef<
       onChange,
       className,
       showPlaceholderImage,
+      containerStyles,
     },
     ref,
   ) => {
     return (
-      <div className={cn("flex flex-col w-full", className)}>
-        <label htmlFor={id} className="mb-1 mx-1 font-semibold">
+      <div className={cn("flex w-full flex-col", containerStyles)}>
+        <label htmlFor={id} className="mx-1 mb-1 font-semibold">
           {label}
         </label>
 
@@ -69,9 +71,10 @@ export const SelectInputField = React.forwardRef<
               <Button
                 variant="outline"
                 className={cn(
-                  "w-full justify-between rounded-full h-13 bg-muted border-input px-4 text-sm font-normal",
+                  "bg-muted border-input h-13 w-full justify-between rounded-full px-4 text-sm font-normal",
                   "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
                   error && "border-destructive",
+                  className,
                 )}
                 aria-invalid={!!error}
               ></Button>
@@ -131,7 +134,7 @@ export const SelectInputField = React.forwardRef<
         </Combobox>
 
         {error && (
-          <span className="text-red-500 text-[12px] mt-1">{error}</span>
+          <span className="mt-1 text-[12px] text-red-500">{error}</span>
         )}
       </div>
     );

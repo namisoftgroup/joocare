@@ -9,13 +9,10 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-secondary text-white py-12 px-3 lg:px-2 ">
-      <div className="container mx-auto relative">
+    <footer className="bg-secondary px-3 py-12 text-white lg:px-2">
+      <div className="relative container mx-auto">
         {/* Top Section: Links & Info */}
-        <div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-12 
-          pb-12 relative"
-        >
+        <div className="relative grid grid-cols-1 gap-4 pb-12 md:grid-cols-2 lg:grid-cols-5 lg:gap-12">
           {/* Column 1: Brand Info */}
           <div className="space-y-6">
             <div className="flex items-center gap-2">
@@ -26,7 +23,7 @@ const Footer = () => {
                 height={60}
               />
             </div>
-            <p className="text-gray-300 text-sm leading-relaxed max-w-xs">
+            <p className="max-w-xs text-sm leading-relaxed text-gray-300">
               An AI-powered healthcare recruitment platform supporting
               compliant, data-driven hiring across medical and life sciences
               sectors.
@@ -36,24 +33,24 @@ const Footer = () => {
           {/* Column 2: Candidates */}
           <div className="bg-before">
             <h4>For Candidates</h4>
-            <ul className="space-y-4 text-gray-300 text-md">
+            <ul className="text-md space-y-4 text-gray-300">
               <li>
-                <Link href="/jobs" className="hover:text-white transition">
+                <Link href="/jobs" className="transition hover:text-white">
                   Explore Jobs
                 </Link>
               </li>
               <li>
-                <Link href="/profile" className="hover:text-white transition">
+                <Link href="/profile" className="transition hover:text-white">
                   Create Profile
                 </Link>
               </li>
               <li>
-                <Link href="/resources" className="hover:text-white transition">
+                <Link href="/resources" className="transition hover:text-white">
                   Career Resources
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="hover:text-white transition">
+                <Link href="/faq" className="transition hover:text-white">
                   FAQ
                 </Link>
               </li>
@@ -63,16 +60,16 @@ const Footer = () => {
           {/* Column 3: Employers */}
           <div className="bg-before">
             <h4>For Employers</h4>
-            <ul className="space-y-4 text-gray-300 text-md">
+            <ul className="text-md space-y-4 text-gray-300">
               <li>
-                <Link href="/employers" className="hover:text-white transition">
+                <Link href="/employers" className="transition hover:text-white">
                   For Employers
                 </Link>
               </li>
               <li>
                 <Link
                   href="/how-it-works"
-                  className="hover:text-white transition"
+                  className="transition hover:text-white"
                 >
                   How It Works
                 </Link>
@@ -80,7 +77,7 @@ const Footer = () => {
               <li>
                 <Link
                   href="/ai-solutions"
-                  className="hover:text-white transition"
+                  className="transition hover:text-white"
                 >
                   AI Hiring Solutions
                 </Link>
@@ -91,19 +88,19 @@ const Footer = () => {
           {/* Column 4: Company*/}
           <div className="bg-before">
             <h4>Company & Trust</h4>
-            <ul className="space-y-4 text-gray-300 text-md mb-8">
+            <ul className="text-md mb-8 space-y-4 text-gray-300">
               <li>
-                <Link href="/about" className="hover:text-white transition">
+                <Link href="/about" className="transition hover:text-white">
                   About Joocare
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="hover:text-white transition">
+                <Link href="/privacy" className="transition hover:text-white">
                   Data Privacy & Security
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="hover:text-white transition">
+                <Link href="/terms" className="transition hover:text-white">
                   Terms & Conditions
                 </Link>
               </li>
@@ -112,10 +109,10 @@ const Footer = () => {
           {/* Column5:  Contact */}
           <div className="bg-before">
             <h4>Get in Touch</h4>
-            <ul className="space-y-4 text-gray-300 text-md mb-8">
+            <ul className="text-md mb-8 space-y-4 text-gray-300">
               <li>
                 {" "}
-                <Link href="/terms" className="hover:text-white transition">
+                <Link href="/terms" className="transition hover:text-white">
                   Contacat us
                 </Link>
               </li>
@@ -124,33 +121,33 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section: Socials & Copyright */}
-        <div className="grid grid-cols-1  lg:grid-cols-5 gap-4 lg:gap-12  pb-12 relative">
+        <div className="relative grid grid-cols-1 gap-4 pb-12 lg:grid-cols-5 lg:gap-12">
           {/* Social Icons */}
-          <div className="flex justify-center items-center col-span-1 order-last lg:order-first gap-2 lg:gap-4">
+          <div className="order-last col-span-1 flex items-center justify-center gap-2 lg:order-first lg:gap-4">
             {[Linkedin, Facebook, Instagram, Twitter, Ghost].map(
               (Icon, idx) => (
                 <Link
                   key={idx}
                   href="#"
-                  className="w-7 h-7 rounded-full border border-white/20 flex items-center  bg-white justify-center hover:bg-white/20 transition"
+                  className="flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-white transition hover:bg-white/20"
                 >
                   <Icon size={14} color="var(--secondary)" />
                 </Link>
               ),
             )}
           </div>
-          <div className="relative col-span-1  lg:col-span-4 h-7  w-full">
+          <div className="relative col-span-1 h-7 w-full lg:col-span-4">
             <Image
               src="/assets/footer1.svg"
               alt="Joo Care Logo"
               fill
-              className="ml-0 lg:ml-4"
+              className="ml-0"
             />
           </div>{" "}
         </div>
       </div>{" "}
       {/* Copyright */}
-      <p className="text-white  text-lg  text-center pt-4  border-[#0D0D0D73] border-t relative">
+      <p className="relative border-t border-[#0D0D0D73] pt-4 text-center text-lg text-white">
         All rights reserved - JooCare © {currentYear} <BackToTopButton />
       </p>
     </footer>
