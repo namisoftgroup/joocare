@@ -24,17 +24,19 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className="flex flex-col items-center justify-center gap-8 bg-white py-10 pt-30 pb-20 text-center">
-      <div className="flex max-w-108 flex-col items-center justify-center gap-4 leading-tight">
-        <SectionTitle sectionTitle="How it works" />
-        <h3 className="text-secondary text-[28px] font-semibold">
-          A Structured, AI-Driven Hiring Process in 3 Clear Steps
-        </h3>
-      </div>
-      <section className="flex flex-col gap-6 md:flex-row">
-        {steps.map((step) => (
-          <HowItWorksCard key={step.title} {...step} />
-        ))}
+    <section className="bg-white">
+      <section className="container mx-auto flex flex-col items-center justify-center gap-8 px-3 py-10 pt-30 pb-20 text-center lg:px-0">
+        <section className="flex max-w-108 flex-col items-center justify-center gap-4 leading-tight">
+          <SectionTitle sectionTitle="How it works" />
+          <h3 className="text-secondary text-[28px] font-semibold">
+            A Structured, AI-Driven Hiring Process in 3 Clear Steps
+          </h3>
+        </section>
+        <section className="flex flex-col gap-6 md:flex-row">
+          {steps.map((step) => (
+            <HowItWorksCard key={step.title} {...step} />
+          ))}
+        </section>
       </section>
     </section>
   );
