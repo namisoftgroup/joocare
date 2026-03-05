@@ -10,13 +10,13 @@ const steps = [
   },
   {
     icon: "/assets/icons/intelligent-match.svg",
-    title: "Smart Matching",
+    title: "Intelligent Matching",
     description:
       "Our AI matches candidates to roles using multiple clinical and professional data points, ensuring accurate role and institutional fit.",
   },
   {
     icon: "/assets/icons/verified-placement.svg",
-    title: "Smart Matching",
+    title: "Verified Placement",
     description:
       "Only qualified and pre-assessed candidates are introduced, enabling faster decisions and more reliable hiring outcomes.",
   },
