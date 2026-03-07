@@ -1,19 +1,14 @@
 import { Button } from "@/shared/components/ui/button";
-import {
-  ArrowRight,
-  CircleArrowDown,
-  CircleArrowRight,
-  MoveRight,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import PopularSearchItem from "./PopularSearchItem";
 
 export default function PopularSearches() {
   return (
-    <section className="flex items-start gap-2 w-full">
-      <h4 className="whitespace-nowrap text-xl font-semibold  text-foreground">
+    <section className="flex w-full flex-col items-start gap-2 md:flex-row">
+      <h4 className="text-foreground text-xl font-semibold whitespace-nowrap">
         Popular Searches
       </h4>
-      <ul className="flex flex-wrap  gap-2 grow">
+      <ul className="flex grow flex-wrap gap-2">
         <li>
           <PopularSearchItem label="Plastic Surgeon" />
         </li>
@@ -56,13 +51,13 @@ export default function PopularSearches() {
         variant="outline"
         size="pill"
         hoverStyle="slidehorizontalPrimary"
-        className="text-muted-foreground font-normal text-md flex items-center gap-2 border-none  group"
+        className="text-muted-foreground text-md group flex items-center gap-2 border-none font-normal"
       >
         Show more
         <ArrowRight
           size={28}
           strokeWidth={1.5}
-          className="size-7  border-muted-foreground border rounded-full  transition-transform -rotate-45 group-hover:rotate-0 bg-white text-muted-foreground"
+          className="border-muted-foreground text-muted-foreground size-7 -rotate-45 rounded-full border bg-white transition-transform group-hover:rotate-0"
         />
       </Button>
     </section>

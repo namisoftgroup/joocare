@@ -17,8 +17,10 @@ export default function Hero() {
           services
         </p>
       </div>
-      <HomeFilter />
-      <PopularSearches />
+      <div className="flex w-full max-w-7xl flex-col items-center gap-18 px-3">
+        <HomeFilter />
+        <PopularSearches />
+      </div>
     </section>
   );
 }
