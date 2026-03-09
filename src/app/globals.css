@@ -44,6 +44,7 @@
   --color-warning-foreground: var(--warning-foreground);
   --shadow-header: 0 12px 24px 0 oklch(0 0 0 / 5%);
   --color-soft-overlay: var(--soft-overlay);
+  --color-body-bg: var(--body-bg);
 }
 
 /* ════════════════════════════════════════
@@ -84,6 +85,7 @@
   --input: oklch(0.089 0 0 / 8%);
   --ring: oklch(0.285 0.082 252); /* focus ring = primary */
   --soft-overlay: oklch(0.18 0 0 / 0.02); /* #12121205 */
+  --body-bg: #f7faf7;
 
   /* Semantic */
   --destructive: oklch(0.577 0.245 27); /* #dc2626 */
@@ -132,6 +134,7 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.55 0.1 252);
+  --body-bg: "#F7FAF7";
 
   --destructive: oklch(0.65 0.22 27);
   --success: oklch(0.6 0.14 162);
@@ -199,4 +202,10 @@
   background-position: center;
   opacity: 1;
   z-index: 1;
+}
+.bg-container {
+  background-image: url("../../public/assets/container.svg");
+}
+.bg-container-gray {
+  background-image: url("../../public/assets/why.svg");
 }
