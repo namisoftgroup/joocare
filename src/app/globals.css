@@ -28,6 +28,7 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-primary-bg: var(--primary-bg);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -41,8 +42,10 @@
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
   --color-warning-foreground: var(--warning-foreground);
   --shadow-header: 0 12px 24px 0 oklch(0 0 0 / 5%);
+  --shadow-soft: 0 0 20px var(--shadow-soft);
   --color-soft-overlay: var(--soft-overlay);
   --color-body-bg: var(--body-bg);
 }
@@ -69,6 +72,7 @@
 
   /* Secondary — green #09760a */
   --primary: oklch(0.468 0.148 145);
+  --primary-bg: #09760a14;
   --primary-soft: oklch(0.61 0.09 219 / 0.1);
   --primary-foreground: oklch(1 0 0); /* white text on green */
 
@@ -92,6 +96,7 @@
   --success: oklch(0.448 0.118 162); /* #047857 */
   --success-foreground: oklch(1 0 0);
   --warning: oklch(0.748 0.157 66); /* #f59e0b */
+  --warning-bg: #f59e0b0d;
   --warning-foreground: oklch(0.089 0 0);
 
   /* Sidebar */
@@ -103,6 +108,8 @@
   --sidebar-accent-foreground: oklch(0.468 0.148 145);
   --sidebar-border: oklch(0.089 0 0 / 8%);
   --sidebar-ring: oklch(0.285 0.082 252);
+
+  --shadow-soft: #0000000d;
 }
 
 /* ════════════════════════════════════════
@@ -123,6 +130,7 @@
   --secondary-foreground: oklch(1 0 0);
 
   --primary: oklch(0.55 0.13 145); /* lighter green */
+  --primary-bg: #09760a14;
   --primary-foreground: oklch(1 0 0);
 
   --muted: oklch(1 0 0 / 8%);
@@ -140,6 +148,7 @@
   --success: oklch(0.6 0.14 162);
   --success-foreground: oklch(1 0 0);
   --warning: oklch(0.8 0.16 66);
+  --warning-bg: #f59e0b0d;
   --warning-foreground: oklch(0.089 0 0);
 
   --sidebar: oklch(0.17 0 0);
@@ -207,6 +216,7 @@
   opacity: 1;
   z-index: 1;
 }
+
 .bg-container {
   background-image: url("../../public/assets/container.svg");
   background-color: var(--color-primary);
@@ -215,3 +225,22 @@
   background-image: url("../../public/assets/why.svg");
   background-color: var(--color-gray);
 }
+
+
+.filepond--credits {
+  display: none;
+}
+.filepond--root .filepond--drop-label {
+  background: #e8ece8;
+  border: #d5dad5 1px solid;
+  border-radius: 16px;
+}
+.filepond--root {
+  background: transparent;
+}
+/* .filepond--drop-label{
+  background: #f7faf7;
+  border: 1px solid var(--input);
+  border-radius: 120px;
+} */
+
