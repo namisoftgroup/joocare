@@ -166,6 +166,10 @@
     font-size: clamp(1.5rem, 4vw, 3rem);
     @apply text-secondary font-bold;
   }
+  h2 {
+    font-size: clamp(1.25rem, 2vw, 1.75rem);
+    @apply text-secondary font-semibold;
+  }
 }
 
 @layer components {
@@ -205,7 +209,9 @@
 }
 .bg-container {
   background-image: url("../../public/assets/container.svg");
+  background-color: var(--color-primary);
 }
 .bg-container-gray {
   background-image: url("../../public/assets/why.svg");
+  background-color: var(--color-gray);
 }

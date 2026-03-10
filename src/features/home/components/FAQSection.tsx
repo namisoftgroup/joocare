@@ -27,14 +27,12 @@ export default function FAQSection() {
   const displayData = [...faqData, ...faqData, ...faqData];
 
   return (
-    <section className="bg-white px-4 pt-16 pb-48">
-      <div className="mx-auto max-w-7xl">
+    <section className="bg-white pt-10 pb-10 md:pt-16 md:pb-48">
+      <div className="container mx-auto px-3 lg:px-2">
         <div className="mb-8 flex flex-col items-center space-y-4">
           {/* Decorative Badge */}
           <SectionTitle sectionTitle="FAQ" />
-          <h2 className="text-secondary text-center text-3xl font-bold md:text-4xl">
-            Frequently Asked Questions
-          </h2>
+          <h2>Frequently Asked Questions</h2>
         </div>
 
         <Accordion type="single" collapsible>

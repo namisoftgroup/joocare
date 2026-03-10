@@ -4,7 +4,7 @@ import SectionTitle from "./SectionTitle";
 
 export default function Cons() {
   return (
-    <>
+    <div className="">
       <SectionTitle sectionTitle="The Legacy Model" />
       <h3 className="text-secondary mt-2 text-xl font-semibold">
         A Volume-Driven Approach to Healthcare Recruitment
@@ -58,6 +58,6 @@ export default function Cons() {
           </div>
         </li>
       </ul>
-    </>
+    </div>
   );
 }
