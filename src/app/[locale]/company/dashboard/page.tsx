@@ -2,7 +2,7 @@
 const DashboardPage = () => {
     return (
         <div>
-            DashboardPage
+            DashboardPage Content
         </div>
     )
 }

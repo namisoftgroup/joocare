@@ -6,8 +6,10 @@ import { Button } from "@/shared/components/ui/button";
 const CompanySidebarContent = () => {
   return (
     <aside className="flex flex-col gap-4 pt-6 pb-2 px-3
-      w-[300px] h-[calc(100vh-87px)] bg-white"
+      w-[300px] h-[calc(100vh-87px)] bg-white overflow-y-auto no-scrollbar"
     >
+      <AccountUnderReview />
+      <AccountUnderReview />
       <AccountUnderReview />
       <CompleteDetails />
       <SidebarLinks />

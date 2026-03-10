@@ -197,6 +197,15 @@
   }
 }
 
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
 /* globals.css or your component CSS file */
 .bg-before {
   position: relative; /* parent needs to be relative */
@@ -226,7 +235,6 @@
   background-color: var(--color-gray);
 }
 
-
 .filepond--credits {
   display: none;
 }
@@ -243,4 +251,3 @@
   border: 1px solid var(--input);
   border-radius: 120px;
 } */
-

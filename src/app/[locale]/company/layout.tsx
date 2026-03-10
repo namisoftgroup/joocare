@@ -14,7 +14,6 @@ const CompanyLayout = ({ children }: { children: React.ReactNode }) => {
                 <CompanySidebar />
 
                 <section className="flex-1 bg-background">
-
                     {children}
                 </section>
 
