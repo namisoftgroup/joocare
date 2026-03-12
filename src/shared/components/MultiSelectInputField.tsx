@@ -7,37 +7,30 @@ import {
   Combobox,
   ComboboxContent,
   ComboboxEmpty,
-  // ComboboxInput,
   ComboboxItem,
   ComboboxList,
   ComboboxTrigger,
-  // ComboboxValue,
 } from "./ui/combobox";
 import { Button } from "./ui/button";
+import { Option } from "./SelectInputField";
 
-export type Option = {
-  label: string;
-  value: string | null;
-  image?: string;
-};
-
-type SelectInputFieldProps = {
+type MultiSelectInputFieldProps = {
   label?: string;
   id: string;
   error?: string | boolean;
   containerStyles?: string;
   options: Option[];
   placeholder?: string;
-  value?: string | null;
-  onChange?: (value: string | null) => void;
+  value?: string[];
+  onChange?: (value: string[]) => void;
   className?: string;
-  showPlaceholderImage?: string;
   disabled?: boolean;
+  hint?: string;
 };
 
-export const SelectInputField = React.forwardRef<
+export const MultiSelectInputField = React.forwardRef<
   HTMLButtonElement,
-  SelectInputFieldProps
+  MultiSelectInputFieldProps
 >(
   (
     {
@@ -46,34 +39,48 @@ export const SelectInputField = React.forwardRef<
       error,
       options,
       placeholder,
-      value,
+      value = [],
       onChange,
       className,
-      showPlaceholderImage,
       containerStyles,
       disabled = false,
+      hint,
       ...props
     },
     ref,
   ) => {
-    const selectedOption = options.find((o) => o.value === value);
-    console.log("selc", selectedOption);
+    const selectedOptions = options.filter((o) =>
+      value.includes(o.value ?? ""),
+    );
+
+    console.log(props);
+
+    console.log(selectedOptions);
 
     return (
       <div className={cn("flex w-full flex-col", containerStyles)}>
         {label && (
           <label htmlFor={id} className="mx-1 mb-1 font-semibold">
-            {label}
+            {label}{" "}
+            {hint && (
+              <span className="text-muted-foreground mx-1 text-sm font-normal">
+                {hint}
+              </span>
+            )}
           </label>
         )}
 
         <Combobox
           id={id}
           items={options}
-          value={options.find((o) => o.value === value) ?? null}
-          onValueChange={(option) =>
-            onChange?.((option as Option)?.value ?? null)
-          }
+          multiple
+          value={selectedOptions}
+          onValueChange={(raw) => {
+            console.log(raw);
+
+            const selected = (raw as Option[]).map((o) => o.value ?? "");
+            onChange?.(selected);
+          }}
           disabled={disabled}
         >
           <ComboboxTrigger
@@ -81,53 +88,41 @@ export const SelectInputField = React.forwardRef<
             {...props}
             render={
               <Button
-                // variant="outline"
+                variant="outline"
                 className={cn(
+                  // ── identical base styles to SelectInputField ──
                   "bg-muted border-input h-13 w-full justify-between rounded-full px-4 text-sm font-normal",
                   "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-                  "disabled:bg-disabled text-foreground",
+                  "disabled:bg-disabled",
+                  // expand height when chips wrap
+                  selectedOptions.length > 0 && "h-auto min-h-13 py-2",
                   error && "border-destructive",
                   className,
                 )}
                 aria-invalid={!!error}
-              ></Button>
+              />
             }
           >
-            {selectedOption ? (
-              <>
-                {showPlaceholderImage && selectedOption.image && (
-                  <Image
-                    src={selectedOption.image}
-                    alt={selectedOption.label}
-                    width={30}
-                    height={15}
-                  />
-                )}
-                <span>{selectedOption.label}</span>
-              </>
-            ) : (
-              <span className="text-muted-foreground flex gap-1">
-                {showPlaceholderImage && (
-                  <Image
-                    src={showPlaceholderImage}
-                    alt="flag assets"
-                    width={30}
-                    height={15}
-                  />
-                )}
-                {placeholder || "Select an option"}
+            {selectedOptions.length > 0 ? (
+              <span className="flex flex-wrap gap-1">
+                {selectedOptions.map((o) => (
+                  <span
+                    key={o.value}
+                    className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs font-medium"
+                  >
+                    {o.label}
+                  </span>
+                ))}
               </span>
-            )}{" "}
+            ) : (
+              <span className="text-muted-foreground">
+                {placeholder || "Select options"}
+              </span>
+            )}
           </ComboboxTrigger>
 
           <ComboboxContent>
-            {/* <ComboboxInput
-              showTrigger={false}
-              placeholder="Search..."
-            /> */}
-
             <ComboboxEmpty>No results found.</ComboboxEmpty>
-
             <ComboboxList>
               {(item) => (
                 <ComboboxItem key={item.value} value={item}>
@@ -154,4 +149,4 @@ export const SelectInputField = React.forwardRef<
   },
 );
 
-SelectInputField.displayName = "SelectInputField";
+MultiSelectInputField.displayName = "MultiSelectInputField";

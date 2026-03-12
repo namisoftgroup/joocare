@@ -25,6 +25,7 @@
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
+  --color-gray-45: var(--gray-45);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-08: var(--secondary-08);
@@ -82,6 +83,7 @@
   /* Muted — for subtle backgrounds, disabled states */
   --muted: oklch(0.089 0 0 / 5%); /* #0d0d0d0d — input-bg */
   --muted-foreground: oklch(0.089 0 0 / 65%); /* #0d0d0da6 — gray */
+  --gray-45: #0d0d0d73; /*  — grayLight */
 
   /* Accent — lighter green tint for hover/active states */
   --accent: oklch(0.468 0.148 145 / 8%); /* second-color08 */
@@ -140,6 +142,7 @@
 
   --muted: oklch(1 0 0 / 8%);
   --muted-foreground: oklch(1 0 0 / 55%);
+  --gray-45: #0d0d0d73; /*  — grayLight */
 
   --accent: oklch(0.55 0.13 145 / 12%);
   --accent-foreground: oklch(0.55 0.13 145);
@@ -252,6 +255,82 @@
   border: #d5dad5 1px solid;
   border-radius: 16px;
 }
-.file-pond-style-custom  .filepond--drop-label {
+.file-pond-style-custom .filepond--drop-label {
   background: white;
+}
+
+/* Main editor container */
+.job-editor .ck-editor {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f9fafb;
+}
+
+/* Toolbar styling */
+.job-editor .ck-toolbar {
+  background: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 8px;
+}
+
+/* Editable area */
+.job-editor .ck-editor__editable_inline {
+  min-height: 600px;
+  padding: 20px;
+  background-color: #0d0d0d0d !important;
+  color: #374151;
+  font-size: 14px;
+  line-height: 1.7;
+  border: none !important;
+}
+.ck.ck-editor__editable.ck-focused:not(.ck-editor__nested-editable) {
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+}
+.ck-toolbar {
+  padding: 0px !important;
+  border: none !important;
+}
+
+.ck-toolbar__items {
+  background-color: #0d0d0d0d !important;
+}
+.ck-toolbar__separator {
+  display: none !important;
+}
+
+.ck-sticky-panel__content {
+  border: none !important;
+}
+/* Remove default focus border */
+.job-editor .ck-editor__editable:focus {
+  box-shadow: none;
+  border: none;
+}
+
+/* Headings */
+.job-editor .ck-content h2,
+.job-editor .ck-content h3 {
+  font-weight: 600;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+/* Lists */
+.job-editor .ck-content ul {
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.job-editor .ck-content ol {
+  padding-left: 20px;
+  list-style: decimal;
+}
+
+/* Links */
+.job-editor .ck-content a {
+  color: #2563eb;
+  text-decoration: underline;
 }
