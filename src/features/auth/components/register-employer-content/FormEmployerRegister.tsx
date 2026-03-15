@@ -1,19 +1,22 @@
 "use client";
 
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
 import { InputField } from "@/shared/components/InputField";
-import { Button } from "@/shared/components/ui/button";
-import { SelectInputField } from "@/shared/components/SelectInputField";
 import LabelCheckbox from "@/shared/components/LabelCheckbox";
+import { SelectInputField } from "@/shared/components/SelectInputField";
+import { Button } from "@/shared/components/ui/button";
+import { useState } from "react";
 import {
   RegisterEmployerSchema,
   TRegisterEmployerSchema,
 } from "../../validation/employer-register-schema";
+import { OTPModal } from "../forget-password/OtpModal";
 
 const FormEmployerRegister = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const {
     register,
     control,
@@ -23,10 +26,12 @@ const FormEmployerRegister = () => {
     resolver: zodResolver(RegisterEmployerSchema),
     mode: 'onChange'
   });
-  const onSubmit: SubmitHandler<TRegisterEmployerSchema> = (data) =>
+  const onSubmit: SubmitHandler<TRegisterEmployerSchema> = (data) => {
     console.log(data);
+    setIsModalOpen(true)
+  }
 
-  return (
+  return (<>
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="mt-6 flex flex-col gap-5"
@@ -183,7 +188,12 @@ const FormEmployerRegister = () => {
           Register
         </Button>
       </div>
+
     </form>
+    {/* Otp modal  */}
+    <OTPModal  open={isModalOpen} onOpenChange={setIsModalOpen} />
+  </>
+
   );
 };
 
