@@ -334,3 +334,7 @@
   color: #2563eb;
   text-decoration: underline;
 }
+
+.country-flag-size svg{
+  width: 30px !important;
+}

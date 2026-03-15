@@ -14,6 +14,7 @@ import {
   TRegisterEmployerSchema,
 } from "../../validation/employer-register-schema";
 import { OTPModal } from "../forget-password/OtpModal";
+import { PhoneInputCode } from "@/shared/components/PhoneInputCode";
 
 const FormEmployerRegister = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -81,7 +82,7 @@ const FormEmployerRegister = () => {
         error={errors.personFullName?.message}
       />
 
-      <>
+      {/* <>
         {" "}
         <label htmlFor={"phoneCode"} className="mx-1 -mb-4 font-semibold">
           Contact person _ Phone number
@@ -123,8 +124,29 @@ const FormEmployerRegister = () => {
               : errors.phoneCode?.message || errors.phoneNumber?.message}
           </span>
         )}
-      </>
+      </> */}
 
+      <label htmlFor="phoneNumber" className="mx-1 -mb-4 font-semibold">
+        Contact person _ Phone number
+      </label>
+      <Controller
+        name="phoneNumber"
+        control={control}
+        render={({ field }) => (
+          <PhoneInputCode
+            {...field}
+            id="phoneNumber"
+            className="w-full"
+            placeholder="Enter phone number"
+            onChange={(value) => field.onChange(value)}
+          />
+        )}
+      />
+      {errors.phoneNumber && (
+        <span className="-mt-4 text-[12px] text-red-500">
+          {errors.phoneNumber.message}
+        </span>
+      )}
       <InputField
         id="createPassword"
         type="password"
@@ -191,7 +213,7 @@ const FormEmployerRegister = () => {
 
     </form>
     {/* Otp modal  */}
-    <OTPModal  open={isModalOpen} onOpenChange={setIsModalOpen} />
+    <OTPModal open={isModalOpen} onOpenChange={setIsModalOpen} />
   </>
 
   );
