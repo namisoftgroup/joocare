@@ -11,11 +11,22 @@ type InputFieldProps = {
   error?: string | boolean;
   containerStyles?: string;
   disable?: boolean;
+  hint?: string;
 } & React.ComponentProps<"input">;
 
 export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
   (
-    { label, id, type = "text", className, error, containerStyles, disabled = false, ...props },
+    {
+      label,
+      id,
+      type = "text",
+      className,
+      error,
+      containerStyles,
+      disabled = false,
+      hint,
+      ...props
+    },
     ref,
   ) => {
     const [showPassword, setShowPassword] = React.useState(false);
@@ -24,10 +35,16 @@ export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
     const inputType = isPassword && showPassword ? "text" : type;
 
     return (
-      <div className={cn("flex flex-col w-full", containerStyles)}>
+      <div className={cn("flex w-full flex-col", containerStyles)}>
         {label && (
           <label htmlFor={id} className="mb-1 font-semibold">
-            {label}
+            {label}{" "}
+            {hint && (
+              <span className="text-muted-foreground text-sm font-normal">
+                {" "}
+                {hint}{" "}
+              </span>
+            )}
           </label>
         )}
 
