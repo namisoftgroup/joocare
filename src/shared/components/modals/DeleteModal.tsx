@@ -1,5 +1,6 @@
 "use client";
 
+import { Button, buttonVariants } from "@/shared/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,11 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
-import React, { useRef } from "react";
-import { Button, buttonVariants } from "../ui/button";
-import animationData from "../../../../public/assets/lottie/warning.json";
-import Lottie, { LottieRefCurrentProps } from "lottie-react";
 import { VariantProps } from "class-variance-authority";
+import Lottie, { LottieRefCurrentProps } from "lottie-react";
+import { useRef } from "react";
+import animationData from "../../../../public/assets/lottie/delete.json";
 
 type ConfirmDialogProps = {
   open: boolean;
@@ -26,16 +26,15 @@ type ConfirmDialogProps = {
   onCancel?: () => void;
   isLoading?: boolean;
 };
-
-export default function AlertModal({
+export default function DeleteModal({
   open,
   onOpenChange,
   title,
   description,
-  confirmLabel = "Confirm",
+  confirmLabel = "Confirm deletion",
   cancelLabel = "Back",
   onConfirm,
-  confirmButtonVariant = "default",
+  confirmButtonVariant = "destructive",
   onCancel,
   isLoading = false,
 }: ConfirmDialogProps) {
@@ -44,7 +43,6 @@ export default function AlertModal({
     onCancel?.();
     onOpenChange(false);
   };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-175 rounded-2xl p-8 text-center">
