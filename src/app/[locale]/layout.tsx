@@ -45,9 +45,7 @@ export default async function RootLayout({ children, params }: Props) {
     <html lang={locale} className={`${outfit.variable} ${notoSans.variable}`}>
       <body className={`antialiased ${outfit.className}`}>
         <MainProviders locale={locale}>
-          <Header />
           <main className="min-h-screen">{children}</main>
-          <Footer />
         </MainProviders>
       </body>
     </html>
