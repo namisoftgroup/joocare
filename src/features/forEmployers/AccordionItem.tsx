@@ -21,8 +21,9 @@ export function AccordionItem({
           type="button"
           aria-expanded={isOpen}
           onClick={() => setOpenIndex(isOpen ? null : index)}
-          className="flex w-full items-center justify-between px-6 py-4 text-left hover:bg-gray-50"
+          className="flex w-full justify-between px-6 py-4 text-left hover:bg-gray-50"
         >
+          
           <span className="text-base font-medium text-secondary">{item.q}</span>
 
           <span className="ml-4">
