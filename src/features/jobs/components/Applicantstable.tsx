@@ -9,7 +9,7 @@ import { Applicant } from "../index.types";
 import ApplicantRow from "./ApplicantRow";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type ApplicantsTableProps = {
+type applicantsTableProps = {
   applicants: Applicant[];
   onDownload?: (applicant: Applicant) => void;
   onView?: (applicant: Applicant) => void;
@@ -19,16 +19,16 @@ export default function ApplicantsTable({
   applicants,
   onDownload,
   onView,
-}: ApplicantsTableProps) {
+}: applicantsTableProps) {
   return (
     <div className="border-border mt-4 w-full overflow-x-auto rounded-2xl border bg-white">
       <Table>
         <TableHeader>
-          <TableRow className="border-b border-[#E4E5E8] bg-white hover:bg-white">
+          <TableRow className="border-border border-b bg-white hover:bg-white">
             {["#", "Name", "Email", "Phone", "Date", "Cv"].map((col) => (
               <TableHead
                 key={col}
-                className="px-4 py-5 text-sm font-semibold text-[#18191C]"
+                className="text-foreground px-4 py-5 text-sm font-semibold"
               >
                 {col}
               </TableHead>

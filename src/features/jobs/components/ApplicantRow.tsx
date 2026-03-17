@@ -16,7 +16,7 @@ export default function ApplicantRow({
   onView?: (a: Applicant) => void;
 }) {
   return (
-    <TableRow className="odd:bg-muted border-b border-[#E4E5E8] bg-white transition-colors">
+    <TableRow className="odd:bg-muted border-border border-b bg-white transition-colors">
       <TableCell className="text-muted-foreground w-12 px-4 py-5 font-medium">
         #{applicant.id}
       </TableCell>
