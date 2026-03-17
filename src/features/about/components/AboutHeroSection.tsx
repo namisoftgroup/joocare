@@ -66,7 +66,7 @@ export default function AboutHeroSection() {
         </div>
       </div>
 
-      <div className="relative sticky top-30 mx-auto flex w-full max-w-[340px] justify-center sm:max-w-[520px] lg:max-w-none">
+      <div className="relative mx-auto flex w-full max-w-[340px] justify-center sm:max-w-[520px] lg:max-w-none">
         <div className="relative h-[380px] w-[300px] overflow-hidden rounded-[30px] sm:h-[460px] sm:w-[380px] sm:rounded-[40px]">
           <Image
             src="/assets/about/doctor2.jpg"
