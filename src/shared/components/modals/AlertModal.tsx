@@ -8,8 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
-import React, { useRef } from "react";
 import { Button, buttonVariants } from "../ui/button";
+import { useRef } from "react";
 import animationData from "../../../../public/assets/lottie/warning.json";
 import Lottie, { LottieRefCurrentProps } from "lottie-react";
 import { VariantProps } from "class-variance-authority";

@@ -33,11 +33,11 @@ export default function ApplicantRow({
         {applicant.date}
       </TableCell>
       <TableCell>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 md:gap-2">
           <Button
             size="sm"
             variant="secondary"
-            className="flex items-center gap-1.5 rounded-full px-4"
+            className="flex items-center gap-1.5 rounded-full px-2 md:px-4"
             onClick={() => onDownload?.(applicant)}
           >
             <Image
@@ -51,7 +51,7 @@ export default function ApplicantRow({
           <Button
             size="sm"
             variant="outline"
-            className="border-secondary text-secondary flex items-center gap-1.5 rounded-full px-4"
+            className="border-secondary text-secondary flex items-center gap-1.5 rounded-full px-2 md:px-4"
             onClick={() => onView?.(applicant)}
           >
             <Eye className="h-4 w-4" />
