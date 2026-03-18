@@ -262,7 +262,7 @@
   background-image: url("../../public/assets/why.svg");
   background-color: var(--color-gray);
 }
-
+/* file pond */
 .filepond--credits {
   display: none;
 }
@@ -274,8 +274,17 @@
   border: #d5dad5 1px solid;
   border-radius: 16px;
 }
+
 .file-pond-style-custom .filepond--drop-label {
   background: white;
+}
+
+.filepond--error .filepond--drop-label {
+  color: red;
+}
+
+#filepond-error .filepond--drop-label {
+  border: 1px solid red;
 }
 
 /* Main editor container */
@@ -360,12 +369,4 @@
 
 .react-datepicker-popper {
   transform: translate(0px, 62px) !important;
-}
-
-.filepond--error .filepond--panel-root {
-  border: 1px solid red;
-}
-
-.filepond--error .filepond--drop-label {
-  color: red;
 }

@@ -7,14 +7,17 @@ import {
     DialogHeader,
     DialogTitle
 } from "@/shared/components/ui/dialog"
-import FormForgetPassword from "./FormForgetPassword"
+import FormUpdateEmail from "@/features/accout-settings/components/FormUpdateEmail"
 
 interface EnterEmailModalProps {
     open: boolean
     onOpenChange: (open: boolean) => void
+    setIsModalOtpOpen: (x: boolean) => void
+    email?: string
+    setUserEmail: React.Dispatch<React.SetStateAction<string>>
 }
 
-export function EnterEmailModal({ open, onOpenChange }: EnterEmailModalProps) {
+export function EnterEmailModal({ open, onOpenChange, email, setUserEmail, setIsModalOtpOpen }: EnterEmailModalProps) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -26,7 +29,8 @@ export function EnterEmailModal({ open, onOpenChange }: EnterEmailModalProps) {
                     </DialogDescription>
                 </DialogHeader>
                 {/* form  */}
-                <FormForgetPassword btnLabel='Send Verification' />
+                <FormUpdateEmail setUserEmail={setUserEmail} open={open} onOpenChange={onOpenChange} email={email} btnLabel='Send Verification'
+                    setIsModalOtpOpen={setIsModalOtpOpen} />
             </DialogContent>
         </Dialog>
     )

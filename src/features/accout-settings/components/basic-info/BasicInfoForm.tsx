@@ -8,22 +8,29 @@ import { SelectInputField } from "@/shared/components/SelectInputField";
 import { Button } from "@/shared/components/ui/button";
 import { useState } from "react";
 
-import { OTPModal } from "@/features/auth/components/forget-password/OtpModal";
-import { PhoneInputCode } from "@/shared/components/PhoneInputCode";
-import { BasicInfoSchema, TBasicInfoSchema } from "../../validation/basic-info-schema";
-import { YearPicker } from "@/shared/components/YearPicker";
 import { EnterEmailModal } from "@/features/auth/components/forget-password/EnterEmailModal";
+import { PhoneInputCode } from "@/shared/components/PhoneInputCode";
+import { YearPicker } from "@/shared/components/YearPicker";
+import { BasicInfoSchema, TBasicInfoSchema } from "../../validation/basic-info-schema";
+import { OTPModal } from "@/features/auth/components/forget-password/OtpModal";
 
 const BasicInfoForm = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOtpOpen, setIsModalOtpOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+
   const {
     register,
     control,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<TBasicInfoSchema>({
     resolver: zodResolver(BasicInfoSchema),
     mode: 'onChange',
+    defaultValues: {
+      officialEmail: "ahmed@gmail.com"
+    }
   });
   const onSubmit: SubmitHandler<TBasicInfoSchema> = (data) => {
     console.log(data);
@@ -209,8 +216,16 @@ const BasicInfoForm = () => {
       </div>
 
     </form>
+    {/* enter email modal */}
+    <EnterEmailModal
+      setUserEmail={setUserEmail} email={watch("officialEmail")}
+      open={isModalOpen} onOpenChange={setIsModalOpen}
+      setIsModalOtpOpen={setIsModalOtpOpen} />
+
     {/* Otp modal  */}
-    <EnterEmailModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+    <OTPModal
+      email={userEmail}
+      open={isModalOtpOpen} onOpenChange={setIsModalOtpOpen} />
   </>
 
   );

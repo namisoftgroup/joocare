@@ -36,6 +36,7 @@ export function FilepondUpload({
   error,
   hint
 }: FilepondUploadProps) {
+
   return (
     <div className={`w-full space-y-2 ${className}`} >
       {label && (
@@ -51,7 +52,9 @@ export function FilepondUpload({
         </label>
       )}
 
+
       <FilePond
+        id={error ? "filepond-error" : ""}
         files={files}
         onupdatefiles={(fileItems) => {
           const files = fileItems.map((item) => item.file as File);
