@@ -23,12 +23,6 @@ const locations: Option[] = [
   { label: "Saudi Arabia", value: "ksa" },
 ];
 
-const categories: Option[] = [
-  { label: "Frontend", value: "frontend" },
-  { label: "Backend", value: "backend" },
-  { label: "UI/UX", value: "uiux" },
-];
-
 export default function CandidatesFilter() {
   const [jobType, setJobType] = useState<Option | undefined>();
   const [location, setLocation] = useState<Option | undefined>();

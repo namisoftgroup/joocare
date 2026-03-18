@@ -1,4 +1,4 @@
-import Applicantstable from "@/features/jobs/components/Applicantstable";
+import ApplicantsClient from "@/features/jobs/components/ApplicantsClient";
 import CandidatesFilter from "@/features/jobs/components/CandidatesFilter";
 import PositionCard from "@/features/jobs/components/PositionCard";
 import { Applicant } from "@/features/jobs/index.types";
@@ -14,7 +14,7 @@ const MOCK_APPLICANTS: Applicant[] = Array.from({ length: 6 }, (_, i) => ({
 
 export default function page() {
   return (
-    <section className="overflow-hidden">
+    <section className="grid grid-cols-1">
       <PositionCard
         logoSrc="/assets/comp-logo.svg"
         title="Senior Specialist Physician"
@@ -22,7 +22,7 @@ export default function page() {
         employmentType="FULL-TIME"
       />
       <CandidatesFilter />
-      <Applicantstable applicants={MOCK_APPLICANTS} />
+      <ApplicantsClient applicants={MOCK_APPLICANTS} />
     </section>
   );
 }
