@@ -2,7 +2,7 @@
 import ContactLayout from "@/features/contact/ContactLayout";
 
 export default function ContactPage() {
-  const isLoggedIn = false; // غيرها حسب auth
+  const isLoggedIn = true; // غيرها حسب auth
 
   return <ContactLayout isLoggedIn={isLoggedIn} />;
 }
