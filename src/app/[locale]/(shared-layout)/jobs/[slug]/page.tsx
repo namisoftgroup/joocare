@@ -18,22 +18,24 @@ export default function page() {
           { label: "Job Details", href: "" },
         ]}
       />
-      <section className="container mx-auto -mt-20 px-3 lg:px-25">
-        <JobDetailsHeader />
-        <div className="grid grid-cols-1 gap-5 pt-7 md:grid-cols-3">
-          <div className="col-span-2 flex flex-col gap-8">
-            <JobDescriptionCard />
-            <AboutEmployer />
+      <section className="px-3 lg:px-25">
+        <section className="container mx-auto -mt-20">
+          <JobDetailsHeader />
+          <div className="grid grid-cols-1 gap-5 pt-7 md:grid-cols-3">
+            <div className="col-span-2 flex flex-col gap-8">
+              <JobDescriptionCard />
+              <AboutEmployer />
+            </div>
+            <div className="col-span-1 flex flex-col gap-8">
+              <JobLocationAndSalaryCard />
+              <JobOverviewCard />
+              <JobEducationAndCertificationsCard />
+              <JobShareCard />
+            </div>
           </div>
-          <div className="col-span-1 flex flex-col gap-8">
-            <JobLocationAndSalaryCard />
-            <JobOverviewCard />
-            <JobEducationAndCertificationsCard />
-            <JobShareCard />
-          </div>
-        </div>
-        <SimilarJobsSection />
-      </section>{" "}
+          <SimilarJobsSection />
+        </section>{" "}
+      </section>
     </section>
   );
 }
