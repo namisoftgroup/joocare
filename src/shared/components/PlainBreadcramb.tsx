@@ -11,8 +11,8 @@ export default function PlainBreadcrumb({ items }: { items: Crumb[] }) {
   const title = items[last]?.label || "";
 
   return (
-    <div className="border-b border-[#e6e6e6] bg-[#0D0D0D0D]">
-      <div className="container mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
+    <div className="border-b border-[#e6e6e6] bg-[#0D0D0D0D] px-3 lg:px-25">
+      <div className="container mx-auto flex items-center justify-between py-3">
         <h1 className="text-lg font-semibold text-black">{title}</h1>
 
         <nav aria-label="Breadcrumb">
