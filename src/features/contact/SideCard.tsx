@@ -56,7 +56,7 @@ export default function SideCard({
         </h2>
       </div>
       <section className="flex w-full grow flex-col items-center justify-center gap-2">
-        <div className="relative w-full lg:h-48 xl:h-95">
+        <div className="relative h-48 w-full xl:h-95">
           <Image src={resolvedImageSrc} alt={imageAlt} fill />
         </div>
         <Button size="pill" className="w-full">
