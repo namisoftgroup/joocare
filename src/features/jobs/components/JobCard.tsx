@@ -47,8 +47,8 @@ export default function JobCard({ resumeMatch }: { resumeMatch?: boolean }) {
   };
   return (
     <>
-      <Card>
-        <CardHeader className="flex gap-2">
+      <Card className="max-lg:py-2">
+        <CardHeader className="flex gap-2 max-lg:px-2">
           <Image
             width={52}
             height={46}
@@ -96,13 +96,10 @@ export default function JobCard({ resumeMatch }: { resumeMatch?: boolean }) {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <p className="text-secondary text-[12px]">
-              Resume Match
-            </p>
+            <p className="text-secondary text-[12px]">Resume Match</p>
           )}
-
         </CardHeader>
-        <CardContent>
+        <CardContent className="max-lg:px-2">
           <div className="border-b-border flex flex-col gap-4 border-b pb-4">
             <ul className="items-cente flex gap-2">
               <li className="text-secondary flex items-center gap-1 text-sm font-normal">
@@ -134,22 +131,24 @@ export default function JobCard({ resumeMatch }: { resumeMatch?: boolean }) {
             </div>{" "}
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col gap-4">
-          <div className="flex w-full items-center gap-2">
+        <CardFooter className="flex flex-col gap-4 max-lg:px-2">
+          <div className="flex w-full flex-col gap-2 md:flex-row md:items-center">
             <Link
-              className={`grow ${buttonVariants({
+              className={`lg-max:py-2 lg-max:px-4 lg-max:grow ${buttonVariants({
                 variant: "secondary",
                 size: "pill",
-              })}`}
+              })} `}
               href="/company/job/candidates"
             >
               View Candidates 280
             </Link>
             <Link
-              className={`flex items-center gap-2 ${buttonVariants({
-                variant: "default",
-                size: "pill",
-              })}`}
+              className={`lg-max:py-2 lg-max:px-4 flex items-center gap-2 ${buttonVariants(
+                {
+                  variant: "default",
+                  size: "pill",
+                },
+              )}`}
               href="/company/job/medical"
             >
               View Details

@@ -5,8 +5,8 @@ import CandidateJobDetailsCardActions from "./CandidateJobDetailsCardActions";
 
 export default function JobDetailsHeader() {
   return (
-    <section className="flex items-center justify-between rounded-2xl bg-white p-4">
-      <div className="flex items-center gap-6">
+    <section className="flex flex-col items-center justify-between rounded-2xl bg-white p-4 lg:flex-row">
+      <div className="flex items-center gap-2 lg:gap-6">
         <Image
           src="/assets/comp-logo.svg"
           alt={`company logo`}
@@ -15,12 +15,15 @@ export default function JobDetailsHeader() {
         />
         <div>
           <h6 className="text-foreground flex items-center gap-4 text-2xl font-semibold">
-            <span> Senior Specialist Physician </span>
+            <span className="max-md:text-[16px]">
+              {" "}
+              Senior Specialist Physician{" "}
+            </span>
             <span className="bg-accent text-primary flex items-center gap-1 rounded-[12px] p-2 text-sm font-semibold">
               <Sparkles size={16} /> 90 %
             </span>
           </h6>
-          <p className="flex items-center gap-2">
+          <p className="flex items-center gap-2 max-lg:mt-2">
             <div className="text-muted-foreground text-lg font-normal">
               <span> at Health care </span>
             </div>

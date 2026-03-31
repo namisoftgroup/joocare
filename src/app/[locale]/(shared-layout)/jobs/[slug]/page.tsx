@@ -19,7 +19,7 @@ export default function page() {
         ]}
       />
       <section className="px-3 lg:px-25">
-        <section className="container mx-auto -mt-20">
+        <section className="container mx-auto mt-4 lg:-mt-20">
           <JobDetailsHeader />
           <div className="grid grid-cols-1 gap-5 pt-7 md:grid-cols-3">
             <div className="col-span-2 flex flex-col gap-8">

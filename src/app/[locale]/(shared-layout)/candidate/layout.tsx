@@ -2,25 +2,27 @@ import CandidateSideContentLinks from "@/features/candidate-profile/components/S
 import PlainBreadcrumb from "@/shared/components/PlainBreadcramb";
 
 export default function CandidateProfileLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-    return (<main className=" bg-body-bg min-h-dvh">
-        <PlainBreadcrumb
-            items={[{ label: "Home", href: "/" }, { label: "Overview" }]}
-        />
-        <main className="container mx-auto px-3 lg:px-0 grid grid-cols-12 py-12 gap-8 items-start ">
-
-            <section className="col-span-3">
-                <CandidateSideContentLinks />
+  return (
+    <section className="bg-body-bg min-h-dvh">
+      <PlainBreadcrumb
+        items={[{ label: "Home", href: "/" }, { label: "Overview" }]}
+      />
+      <main className="px-3 lg:px-25">
+        <section className="container mx-auto">
+          {" "}
+          <section className="mt-4 grid grid-cols-12 items-start gap-4 lg:mt-6">
+            <section className="col-span-12 lg:col-span-3">
+              <CandidateSideContentLinks />
             </section>
 
-            <section className="col-span-9">
-                {children}
-            </section>
-
-        </main>
-    </main>
-    );
+            <section className="col-span-12 lg:col-span-9">{children}</section>
+          </section>
+        </section>
+      </main>
+    </section>
+  );
 }
