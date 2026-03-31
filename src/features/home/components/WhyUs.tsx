@@ -16,7 +16,7 @@ export default function WhyUs() {
         <div className="bg-container-gray container mx-auto flex flex-col px-3 py-10 md:py-20 lg:flex-row lg:px-25 lg:pl-22">
           <Cons />
         </div>
-        <div className="relative hidden w-70 shrink-0 lg:flex">
+        <div className="relative hidden w-70 shrink-0 xl:flex">
           <Image
             src="/assets/why-container.svg"
             fill

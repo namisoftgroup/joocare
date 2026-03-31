@@ -21,7 +21,7 @@ import Image from "next/image";
 export default function CandidateJobCard() {
   return (
     <Card>
-      <CardHeader className="flex gap-2">
+      <CardHeader className="flex gap-2 max-lg:px-2">
         <Image
           width={52}
           height={46}
@@ -37,9 +37,9 @@ export default function CandidateJobCard() {
             21 December 2026 , 4:00AM
           </time>
         </div>
-        <p>Resume Match</p>
+        <p className="max-lg:text-[10px]">Resume Match</p>
       </CardHeader>
-      <CardContent>
+      <CardContent className="max-lg:px-2">
         <div className="border-b-border flex flex-col gap-4 border-b pb-4">
           <ul className="items-cente flex gap-2">
             <li className="text-secondary flex items-center gap-1 text-sm font-normal">
@@ -71,7 +71,7 @@ export default function CandidateJobCard() {
           </div>{" "}
         </div>
       </CardContent>
-      <CardFooter className="flex flex-col gap-4">
+      <CardFooter className="flex flex-col gap-4 max-lg:px-2">
         <div className="flex w-full items-center justify-between gap-2">
           <div className="flex gap-2">
             <Button

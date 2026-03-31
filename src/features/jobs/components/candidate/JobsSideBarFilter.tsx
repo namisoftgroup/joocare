@@ -94,6 +94,7 @@ const INITIAL_STATE: FilterState = {
 export default function JobFilterSidebar() {
   const [filters, setFilters] = useState<FilterState>(INITIAL_STATE);
   const [openSections, setOpenSections] = useState<Set<string>>(DEFAULT_OPEN);
+  const [filter, setIsOpen] = useState<Set<string>>(DEFAULT_OPEN);
 
   // ── Handlers ────────────────────────────────────────────────────────────────
 
@@ -127,7 +128,7 @@ export default function JobFilterSidebar() {
   }
 
   return (
-    <aside className="bg-card shadow-card flex h-fit w-full flex-col rounded-2xl px-4 py-2">
+    <aside className="bg-card shadow-card hidden h-fit w-full flex-col rounded-2xl px-4 py-2 lg:flex">
       {/* Accordion sections */}
       {ACCORDION_SECTIONS.map((section) => (
         <FilterAccordion

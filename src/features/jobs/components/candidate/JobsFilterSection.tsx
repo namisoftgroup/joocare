@@ -38,7 +38,7 @@ export default function JobsFilterSection() {
   const [location, setLocation] = useState<Option | undefined>();
   return (
     <section className="px-3 lg:px-25">
-      <section className="container mx-auto -mt-24">
+      <section className="container mx-auto mt-4 lg:-mt-24">
         <section className="rounded-2xl bg-white p-4">
           <form className="bg-border mx-auto mb-4 flex w-full max-w-5xl flex-wrap items-center justify-center gap-2 rounded-lg p-2 md:flex-nowrap md:rounded-full">
             <InputField
