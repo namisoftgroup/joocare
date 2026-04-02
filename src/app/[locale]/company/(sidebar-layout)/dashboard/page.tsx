@@ -5,6 +5,7 @@ import { activeJobType } from "@/features/company-dashboard/index.type";
 import Image from "next/image";
 
 const MOCK_ACTIVE_JOBS: activeJobType[] = Array.from({ length: 6 }, (_, i) => ({
+  id: i + 1,
   jobTitle: "Consultant Internist",
   jobViews: 12,
   applicants: 2,

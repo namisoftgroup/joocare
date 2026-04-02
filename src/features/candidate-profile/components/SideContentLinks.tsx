@@ -5,7 +5,7 @@ import { links } from "../constants";
 
 const CandidateSideContentLinks = () => {
   return (
-    <aside className="no-scrollbar flex flex-col gap-2 overflow-y-auto rounded-2xl bg-white px-3 py-6 shadow lg:min-h-[calc(100vh-250px)] lg:gap-5">
+    <aside className="no-scrollbar flex flex-col gap-2 overflow-y-auto rounded-2xl bg-white px-3 py-6 shadow lg:min-h-dvh lg:gap-5">
       <SidebarLinks links={links} />
 
       <section className="mt-2 flex flex-col gap-3 rounded-2xl bg-[#DC26260D] px-4 py-3 lg:mt-auto">

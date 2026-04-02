@@ -1,37 +1,50 @@
-"use client"
+"use client";
 
-import { usePathname } from "@/i18n/navigation"
-import { Link } from "@/i18n/navigation"
-import { buttonVariants } from "@/shared/components/ui/button"
+import { usePathname } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
+import { buttonVariants } from "@/shared/components/ui/button";
 
+import { Swiper, SwiperSlide } from "swiper/react";
+import { FreeMode } from "swiper/modules";
 
-const HeaderLayout = ({ navLinks }: {
-    navLinks: { href: string; label: string }[]
+import "swiper/css";
+
+const HeaderLayout = ({
+  navLinks,
+}: {
+  navLinks: { href: string; label: string }[];
 }) => {
-    const pathname = usePathname()
+  const pathname = usePathname();
 
-    return (
-        <header className="p-2 rounded-xl sm:rounded-full shadow bg-white w-full sm:w-fit flex items-center justify-center sm:justify-start flex-wrap gap-3">
+  return (
+    <header className="w-full rounded-full p-2 shadow sm:w-fit sm:pe-0">
+      <Swiper
+        modules={[FreeMode]}
+        freeMode={true}
+        slidesPerView="auto"
+        spaceBetween={8}
+        className="flex items-center justify-center"
+      >
+        {navLinks.map(({ href, label }) => {
+          const isActive = pathname === href;
 
-            {navLinks.map(({ href, label }) => {
-                const isActive = pathname === href
+          return (
+            <SwiperSlide key={href} className="!w-auto">
+              <Link
+                href={href}
+                className={`${buttonVariants({
+                  variant: isActive ? "default" : "outline",
+                  size: "pill",
+                })}`}
+              >
+                {label}
+              </Link>
+            </SwiperSlide>
+          );
+        })}
+      </Swiper>
+    </header>
+  );
+};
 
-                return (
-                    <Link
-                        key={href}
-                        href={href}
-                        className={`${buttonVariants({
-                            variant: isActive ? "default" : "outline",
-                            size: "pill",
-                        })}`}
-                    >
-                        {label}
-                    </Link>
-                )
-            })}
-        </header>
-
-    )
-}
-
-export default HeaderLayout
+export default HeaderLayout;

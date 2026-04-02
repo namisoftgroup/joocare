@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import { Button } from "../ui/button";
 import UserProfileCard from "./UserProfileCard";
+import { useState } from "react";
 
 export default function ResponsiveNavigationBar({
   toggleSideMenu,
@@ -22,7 +23,7 @@ export default function ResponsiveNavigationBar({
   const router = useRouter();
 
   return createPortal(
-    <section className="fixed inset-0 z-50 flex h-dvh flex-col gap-6 bg-white px-4 py-6">
+    <section className="fixed inset-0 z-50 flex h-dvh flex-col gap-6 bg-white px-4 py-6 lg:hidden">
       <header className="flex w-full items-center justify-between">
         <Image src="/assets/logo_1.svg" width={70} height={30} alt="Logo" />
         <button
@@ -35,22 +36,38 @@ export default function ResponsiveNavigationBar({
       <nav aria-label="Main Navigation" className="flex flex-1">
         <ul className="flex flex-col space-y-4">
           <li>
-            <Link className="nav-link" href="/">
+            <Link
+              className="nav-link"
+              href="/"
+              onClick={() => setToggleSideMenu(false)}
+            >
               Home
             </Link>
           </li>
           <li>
-            <Link href="/about" className="nav-link">
+            <Link
+              href="/about"
+              className="nav-link"
+              onClick={() => setToggleSideMenu(false)}
+            >
               About
             </Link>
           </li>
           <li>
-            <Link href="/jobs" className="nav-link">
+            <Link
+              href="/jobs"
+              className="nav-link"
+              onClick={() => setToggleSideMenu(false)}
+            >
               Jobs
             </Link>
           </li>
           <li>
-            <Link href="/contact" className="nav-link">
+            <Link
+              href="/contact"
+              className="nav-link"
+              onClick={() => setToggleSideMenu(false)}
+            >
               Contact
             </Link>
           </li>

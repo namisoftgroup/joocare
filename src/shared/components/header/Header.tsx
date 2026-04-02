@@ -13,10 +13,12 @@ const Header = () => {
   const [isAuthed, setIsAuthed] = useState(true);
   const path = usePathname();
   const companyHeader = path.includes("/company");
+  const isActive = (pathname: string) => path === pathname;
 
   const handleToggleMenu = () => {
     setToggleSideMenu((prev) => !prev);
   };
+
   return (
     <>
       <header className="shadow-header sticky top-0 z-30 flex min-h-21.75 w-full items-center justify-between bg-white px-3 py-4 lg:px-25">
@@ -60,24 +62,44 @@ const Header = () => {
           >
             <ul className="flex justify-center space-x-4">
               <li>
-                <Link className="nav-link" href="/">
+                <Link
+                  className={`nav-link ${
+                    isActive("/") ? "text-primary border-primary" : ""
+                  }`}
+                  href="/"
+                >
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="nav-link">
+                <Link
+                  className={`nav-link ${
+                    isActive("/about") ? "text-primary border-primary" : ""
+                  }`}
+                  href="/about"
+                >
                   About
                 </Link>
               </li>
-              {/* {!companyHeader && ( */}
+              {!companyHeader && (
+                <li>
+                  <Link
+                    className={`nav-link ${
+                      isActive("/jobs") ? "text-primary border-primary" : ""
+                    }`}
+                    href="/jobs"
+                  >
+                    Jobs
+                  </Link>
+                </li>
+              )}
               <li>
-                <Link href="/jobs" className="nav-link">
-                  Jobs
-                </Link>
-              </li>
-              {/* )} */}
-              <li>
-                <Link href="/contact" className="nav-link">
+                <Link
+                  className={`nav-link ${
+                    isActive("/contact") ? "text-primary border-primary" : ""
+                  }`}
+                  href="/contact"
+                >
                   Contact
                 </Link>
               </li>

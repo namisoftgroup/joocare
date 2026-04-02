@@ -203,6 +203,9 @@
   .nav-link:hover {
     @apply text-primary border-primary;
   }
+  .nav-link:active {
+    @apply text-primary border-primary;
+  }
 
   .edu-certificate {
     @apply bg-secondary-08 text-secondary w-fit rounded-sm px-3 py-1 text-xs;

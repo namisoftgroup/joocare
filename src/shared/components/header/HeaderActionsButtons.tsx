@@ -81,7 +81,7 @@ function HeaderActionsButtons({
         {isAuthed && (
           <Button
             variant="outline"
-            className="border-border relative h-8 w-8 lg:hidden"
+            className="border-border relative h-8 w-8 md:hidden"
             size="icon-circle"
             aria-label="Notifications"
           >

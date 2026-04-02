@@ -11,7 +11,7 @@ export default function CandidateProfileLayout({
       <PlainBreadcrumb
         items={[{ label: "Home", href: "/" }, { label: "Overview" }]}
       />
-      <main className="px-3 lg:px-25">
+      <main className="px-3 pb-12 lg:px-25">
         <section className="container mx-auto">
           {" "}
           <section className="mt-4 grid grid-cols-12 items-start gap-4 lg:mt-6">
