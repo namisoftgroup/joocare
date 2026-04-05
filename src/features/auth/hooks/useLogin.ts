@@ -10,6 +10,7 @@ export const useLogin = () => {
       email,
       password,
       redirect: false,
+      callbackUrl: "/"
     });
 
     console.log("LOGIN RESPONSE:", res);
