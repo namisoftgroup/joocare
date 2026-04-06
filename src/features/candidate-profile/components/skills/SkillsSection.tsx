@@ -4,16 +4,18 @@ import { useState } from "react"
 import OneSkillSection from "./OneSkillSection"
 import { AddSkillsModal } from "./AddSkillsModal"
 import { EditSkillsModal } from "./EditSkillsModal"
+import { CandidateProfileViewModel } from "../../services/profile.service"
 
 
-const SkillsSection = () => {
+const SkillsSection = ({
+    profile,
+}: {
+    profile: CandidateProfileViewModel | null
+}) => {
     const [addOpen, setAddOpen] = useState(false)
     const [editOpen, setEditOpen] = useState(false)
 
-    const [skills, setSkills] = useState<string[]>(["Pulmonology",
-        "Radiology",
-        "Nephrology",
-        "Gastroenterology"])
+    const [skills, setSkills] = useState<string[]>(profile?.skills ?? [])
     return (
         <>
             <section className="rounded-2xl bg-white flex flex-col gap-5 p-4 border">
@@ -27,9 +29,11 @@ const SkillsSection = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                    {skills.map((skill) => (
+                    {skills.length > 0 ? skills.map((skill) => (
                         <OneSkillSection key={skill} label={skill} />
-                    ))}
+                    )) : (
+                        <p className="text-sm text-muted-foreground">No skills added yet.</p>
+                    )}
                 </div>
             </section>
 

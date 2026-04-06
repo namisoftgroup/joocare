@@ -5,9 +5,14 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { EducationModal } from './EducationModal'
 import DeleteModal from '@/shared/components/modals/DeleteModal'
+import type { CandidateEducationViewModel } from '../../services/profile.service'
 
 
-const OneEducationSection = () => {
+const OneEducationSection = ({
+    education,
+}: {
+    education: CandidateEducationViewModel
+}) => {
     const [open, setOpen] = useState(false)
     const [deleteEducation, setDeleteEducation] = useState(false);
     const handleDeleteEducation = () => {
@@ -20,9 +25,13 @@ const OneEducationSection = () => {
                     <Image src={'/assets/building-office-2.svg'} alt="building image" width={24} height={24} />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <h3 className="text-lg font-semibold">Tanta University</h3>
-                    <p className="text-sm font-normal text-muted-foreground">Bachelor&apos;s degree, Medicine and Surgery</p>
-                    <span className="text-sm font-normal text-muted-foreground">2017 - 2021</span>
+                    <h3 className="text-lg font-semibold">{education.university}</h3>
+                    <p className="text-sm font-normal text-muted-foreground">
+                        {education.degree ?? "No degree details added yet."}
+                    </p>
+                    <span className="text-sm font-normal text-muted-foreground">
+                        {education.period ?? "No period added yet."}
+                    </span>
                 </div>
             </div>
 
