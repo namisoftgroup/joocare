@@ -6,6 +6,7 @@ import TanstackQueryProvider from "./tanstack-query/TanstackQueryProvider";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import NextAuthProvider from "./next-auth-provider/next-auth.provider";
+import { Toaster } from "sonner";
 
 export default function MainProviders({
   children,
@@ -18,7 +19,10 @@ export default function MainProviders({
     <NextIntlClientProvider locale={locale}>
       <TanstackQueryProvider>
         <NextAuthProvider>
-          <Provider store={store}>{children}</Provider>
+          <Provider store={store}>
+            {children}
+            <Toaster position="top-right" richColors closeButton />
+          </Provider>
         </NextAuthProvider>
       </TanstackQueryProvider>
     </NextIntlClientProvider>

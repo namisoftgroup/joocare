@@ -10,7 +10,6 @@ import ResponsiveNavigationBar from "./ResponsiveNavigationBar";
 
 const Header = () => {
   const [toggleSideMenu, setToggleSideMenu] = useState(false);
-  const [isAuthed, setIsAuthed] = useState(true);
   const path = usePathname();
   const companyHeader = path.includes("/company");
   const isActive = (pathname: string) => path === pathname;
@@ -106,16 +105,13 @@ const Header = () => {
             </ul>
           </nav>
           <HeaderActionsButtons
-            isAuthed={isAuthed}
             companyHeader={companyHeader}
           />
         </div>
       </header>
       {toggleSideMenu && (
         <ResponsiveNavigationBar
-          toggleSideMenu={toggleSideMenu}
           setToggleSideMenu={setToggleSideMenu}
-          isAuthed={isAuthed}
           companyHeader={companyHeader}
         />
       )}

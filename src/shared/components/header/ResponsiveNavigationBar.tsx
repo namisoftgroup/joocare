@@ -4,23 +4,21 @@ import { Link } from "@/i18n/navigation";
 import { X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { createPortal } from "react-dom";
 import { Button } from "../ui/button";
 import UserProfileCard from "./UserProfileCard";
-import { useState } from "react";
 
 export default function ResponsiveNavigationBar({
-  toggleSideMenu,
   setToggleSideMenu,
-  isAuthed,
   companyHeader,
 }: {
-  toggleSideMenu: boolean;
   setToggleSideMenu: React.Dispatch<React.SetStateAction<boolean>>;
-  isAuthed: boolean;
   companyHeader: boolean;
 }) {
   const router = useRouter();
+  const { status } = useSession();
+  const isAuthed = status === "authenticated";
 
   return createPortal(
     <section className="fixed inset-0 z-50 flex h-dvh flex-col gap-6 bg-white px-4 py-6 lg:hidden">

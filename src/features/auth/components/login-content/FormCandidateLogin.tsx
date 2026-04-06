@@ -14,19 +14,22 @@ import {
 import { useLogin } from "../../hooks/useLogin";
 
 const FormCandidateLogin = () => {
-  const { login } = useLogin();
+  const { login } = useLogin("candidate");
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<TLoginCandidateSchema>({
     resolver: zodResolver(loginCandidateSchema),
   });
 
   const onSubmit: SubmitHandler<TLoginCandidateSchema> = async (data) => {
-    await login(data.email, data.password)
-
+    try {
+      await login(data.email, data.password);
+    } catch {
+      // Toast feedback is handled in the login hook.
+    }
   };
 
   return (
@@ -51,7 +54,7 @@ const FormCandidateLogin = () => {
         error={errors.password?.message}
       />
       <Link href="/auth/candidate/forget-password" className="text-xs hover:text-primary">
-        Forgot password?d
+        Forgot password?
       </Link>
       <div className="flex justify-center">
         <Button
@@ -59,8 +62,9 @@ const FormCandidateLogin = () => {
           className="w-1/3"
           size={"pill"}
           type="submit"
+          disabled={isSubmitting}
         >
-          Login
+          {isSubmitting ? "Logging in..." : "Login"}
         </Button>
       </div>
     </form>

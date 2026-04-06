@@ -1,24 +1,50 @@
 "use client";
 
 import { useRouter } from "@/i18n/navigation";
-import { signIn } from "next-auth/react";
+import { useLocale } from "next-intl";
+import { useSearchParams } from "next/navigation";
+import { getSession, signIn } from "next-auth/react";
+import { toast } from "sonner";
 
-export const useLogin = () => {
+type LoginRole = "candidate" | "employer";
+
+const providerByRole: Record<LoginRole, string> = {
+  candidate: "candidate-credentials",
+  employer: "employer-credentials",
+};
+
+const defaultRedirectByRole: Record<LoginRole, string> = {
+  candidate: "/",
+  employer: "/company/company-profile",
+};
+
+export const useLogin = (role: LoginRole) => {
   const router = useRouter();
+  const locale = useLocale();
+  const searchParams = useSearchParams();
+
   const login = async (email: string, password: string) => {
-    const res = await signIn("credentials", {
+    const callbackUrl =
+      searchParams.get("callbackUrl") ?? defaultRedirectByRole[role];
+
+    const res = await signIn(providerByRole[role], {
       email,
       password,
+      locale,
       redirect: false,
-      callbackUrl: "/"
+      callbackUrl,
     });
 
-    console.log("LOGIN RESPONSE:", res);
-
     if (!res?.ok) {
-      throw new Error(res?.error || "Login failed");
+      const message = res?.error || "Login failed";
+      toast.error(message);
+      throw new Error(message);
     }
-    router.push("/");
+
+    const session = await getSession();
+    toast.success(session?.authMessage || "Logged in successfully.");
+    router.push(callbackUrl);
+    router.refresh();
     return res;
   };
 
