@@ -19,24 +19,33 @@
 //   }
 // }
 // next-auth.d.ts
-import { IUser } from "@/shared/types";
+import { AuthSessionUser } from "@/shared/types";
+
+type AuthRole = "candidate" | "employer";
 
 declare module "next-auth" {
   interface Session {
-    user: IUser;
+    user: AuthSessionUser;
     accessToken: string;
+    authRole?: AuthRole;
+    authMessage?: string;
   }
 
   interface User {
-    user: IUser;
+    user: AuthSessionUser;
     accessToken: string;
+    authRole: AuthRole;
+    authMessage?: string;
+    id: string;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    user?: IUser;
+    user?: AuthSessionUser;
     accessToken?: string;
     id?: string;
+    authRole?: AuthRole;
+    authMessage?: string;
   }
 }

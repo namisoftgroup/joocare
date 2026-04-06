@@ -14,6 +14,8 @@ import {
   TRegisterCandidateSchema,
 } from "../../validation/candidate-register-schema";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useLocale } from "next-intl";
 import { OTPModal } from "../forget-password/OtpModal";
 import { PhoneInputCode } from "@/shared/components/PhoneInputCode";
 import { parsePhoneNumber } from "react-phone-number-input";
@@ -310,7 +312,13 @@ const FormCandidateRegister = () => {
         </Button>
       </div>
     </form>
-    <OTPModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+    <OTPModal
+      open={isModalOpen}
+      onOpenChange={setIsModalOpen}
+      email={verificationEmail}
+      role="candidate"
+      purpose="email-confirm"
+    />
 
   </>
 

@@ -9,6 +9,8 @@ import LabelCheckbox from "@/shared/components/LabelCheckbox";
 import { SelectInputField } from "@/shared/components/SelectInputField";
 import { Button } from "@/shared/components/ui/button";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useLocale } from "next-intl";
 import {
   RegisterEmployerSchema,
   TRegisterEmployerSchema,
@@ -195,6 +197,7 @@ const FormEmployerRegister = () => {
           className="w-1/3"
           size={"pill"}
           type="submit"
+          disabled={isSubmitting}
         >
           {isPending ? "Registering..." : "Register"}
         </Button>

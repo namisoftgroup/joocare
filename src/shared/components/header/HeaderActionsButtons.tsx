@@ -2,6 +2,7 @@
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { LanguageToggle } from "../LanguageToggle";
 import { Button, buttonVariants } from "../ui/button";
 import UserDropDown from "./UserDropDown";
@@ -10,14 +11,14 @@ import { useState } from "react";
 import { DrawerScrollableContent } from "./DrawerScrollableContent";
 
 function HeaderActionsButtons({
-  isAuthed,
   companyHeader,
 }: {
-  isAuthed: boolean;
   companyHeader: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const { status } = useSession();
+  const isAuthed = status === "authenticated";
 
   return (
     <>
@@ -32,7 +33,6 @@ function HeaderActionsButtons({
 
         {!isAuthed && (
           <>
-            {" "}
             <Button
               onClick={() => router.push("/auth/candidate/login")}
               variant="default"

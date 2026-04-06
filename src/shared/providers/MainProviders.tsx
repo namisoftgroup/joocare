@@ -19,8 +19,10 @@ export default function MainProviders({
     <NextIntlClientProvider locale={locale}>
       <TanstackQueryProvider>
         <NextAuthProvider>
-          <Provider store={store}>{children}</Provider>
-          <Toaster />
+          <Provider store={store}>
+            {children}
+            <Toaster position="top-right" richColors closeButton />
+          </Provider>
         </NextAuthProvider>
       </TanstackQueryProvider>
     </NextIntlClientProvider>
