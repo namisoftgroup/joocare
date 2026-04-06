@@ -15,22 +15,47 @@ import {
 } from "../../validation/employer-register-schema";
 import { OTPModal } from "../forget-password/OtpModal";
 import { PhoneInputCode } from "@/shared/components/PhoneInputCode";
+import { useRegisterEmployer } from "../../hooks/useRegisterEmployer";
+import { parsePhoneNumber } from "react-phone-number-input";
+import useGetJobTitles from "@/shared/hooks/useGetJobTitles";
 
 const FormEmployerRegister = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { jobTitles, isLoading, error, hasNextPage, fetchNextPage, isFetchingNextPage } = useGetJobTitles();
+
   const {
     register,
     control,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<TRegisterEmployerSchema>({
     resolver: zodResolver(RegisterEmployerSchema),
-    mode: 'onChange'
+    mode: "onChange",
   });
-  const onSubmit: SubmitHandler<TRegisterEmployerSchema> = (data) => {
-    console.log(data);
+  const email = watch("officialEmail");
+  const jobTitleOptions = jobTitles.map((jt: { id: number | string; name?: string; title?: string }) => ({
+    label: jt.name ?? jt.title ?? String(jt.id),
+    value: String(jt.id),
+  }));
+
+  const { mutate: submitRegister, isPending } = useRegisterEmployer(() =>
     setIsModalOpen(true)
-  }
+  );
+
+  const onSubmit: SubmitHandler<TRegisterEmployerSchema> = (data) => {
+    const parsed = parsePhoneNumber(data.phoneNumber);
+
+    submitRegister({
+      name: data.companyName,
+      email: data.officialEmail,
+      domain_id: Number(data.domain),
+      password: data.createPassword,
+      person_name: data.personFullName,
+      person_phone: parsed?.nationalNumber ?? "",
+      person_phone_code: `+${parsed?.countryCallingCode ?? ""}`,
+    });
+  };
 
   return (<>
     <form
@@ -64,12 +89,12 @@ const FormEmployerRegister = () => {
             label="Domain"
             placeholder="ex: Hospital"
             {...field}
-            error={errors.domain?.message}
-            options={[
-              { label: "Hospital", value: "hospital" },
-              { label: "Software", value: "software" },
-              { label: "Company", value: "company" },
-            ]}
+            error={errors.domain?.message ?? (error instanceof Error ? error.message : undefined)}
+            options={jobTitleOptions}
+            disabled={isLoading}
+            onReachEnd={() => fetchNextPage()}
+            hasNextPage={!!hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
           />
         )}
       />
@@ -82,51 +107,6 @@ const FormEmployerRegister = () => {
         error={errors.personFullName?.message}
       />
 
-      {/* <>
-        {" "}
-        <label htmlFor={"phoneCode"} className="mx-1 -mb-4 font-semibold">
-          Contact person _ Phone number
-        </label>
-        <div className="flex items-center gap-2">
-          <Controller
-            name="phoneCode"
-            control={control}
-            render={({ field }) => (
-              <SelectInputField
-                id="phoneCode"
-                placeholder="+999"
-                {...field}
-                error={!!errors.phoneCode}
-                showPlaceholderImage={"/assets/flag.svg"}
-                className="w-29 min-w-29"
-                containerStyles="w-fit"
-
-                options={[
-                  { label: "+999", value: "+999", image: "/assets/flag.svg" },
-                  { label: "+24", value: "+24", image: "/assets/logo_1.svg" },
-                  { label: "+55", value: "+55", image: "/assets/flag.svg" },
-                ]}
-              />
-            )}
-          />
-          <InputField
-            id="phoneNumber"
-            type="text"
-            placeholder="ex:52 987 6543"
-            {...register("phoneNumber")}
-            error={errors.phoneNumber?.message ? true : false}
-          />
-        </div>
-        {(errors.phoneCode || errors.phoneNumber) && (
-          <span className="-mt-4 text-[12px] text-red-500">
-            {errors.phoneCode && errors.phoneNumber
-              ? "Phone code and phone number are required"
-              : errors.phoneCode?.message || errors.phoneNumber?.message}
-          </span>
-        )}
-      </> */}
-
-
       {/* Phone number */}
       <>
         <label htmlFor="phoneNumber" className="mx-1 -mb-4 font-semibold">
@@ -138,7 +118,7 @@ const FormEmployerRegister = () => {
           render={({ field }) => (
             <PhoneInputCode
               {...field}
-              defaultCountry="EG"
+              defaultCountry="AE"
               id="phoneNumber"
               className="w-full"
               placeholder="Enter phone number"
@@ -216,13 +196,13 @@ const FormEmployerRegister = () => {
           size={"pill"}
           type="submit"
         >
-          Register
+          {isPending ? "Registering..." : "Register"}
         </Button>
       </div>
 
     </form>
     {/* Otp modal  */}
-    <OTPModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+    <OTPModal open={isModalOpen} onOpenChange={setIsModalOpen} email={email} />
   </>
 
   );

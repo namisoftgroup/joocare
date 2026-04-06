@@ -92,14 +92,14 @@ export function OTPModal({ open, onOpenChange, email }: OTPModalProps) {
     const onSubmit: SubmitHandler<TPasswordOtpSchema> = (data) => {
         console.log({ otp: data.otp, email: email }); // { otp: "12345" }
         reset()
-        if (forgetPasswordPage) {
-            router.push('/auth/new-password')
-        } else if (basicInfo) {
-            onOpenChange(false)
-        }
-        else {
-            router.push('/')
-        }
+        // if (forgetPasswordPage) {
+        //     router.push('/auth/new-password')
+        // } else if (basicInfo) {
+        //     onOpenChange(false)
+        // }
+        // else {
+        //     router.push('/')
+        // }
     }
 
     useEffect(() => {
