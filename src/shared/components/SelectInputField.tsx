@@ -17,8 +17,9 @@ import { Button } from "./ui/button";
 
 export type Option = {
   label: string;
-  value: string ;
+  value: string;
   image?: string;
+  disabled?: boolean;
 };
 
 type SelectInputFieldProps = {
@@ -28,11 +29,14 @@ type SelectInputFieldProps = {
   containerStyles?: string;
   options: Option[];
   placeholder?: string;
-  value?: string ;
+  value?: string;
   onChange?: (value: string) => void;
   className?: string;
   showPlaceholderImage?: string;
   disabled?: boolean;
+  onReachEnd?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 };
 
 export const SelectInputField = React.forwardRef<
@@ -52,10 +56,29 @@ export const SelectInputField = React.forwardRef<
       showPlaceholderImage,
       containerStyles,
       disabled = false,
+      onReachEnd,
+      hasNextPage,
+      isFetchingNextPage,
       ...props
     },
     ref,
   ) => {
+    const listRef = React.useRef<HTMLDivElement | null>(null);
+    const sentinelRef = React.useRef<HTMLDivElement | null>(null);
+    React.useEffect(() => {
+      if (!listRef.current || !sentinelRef.current) return;
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          if (entry?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+            onReachEnd?.();
+          }
+        },
+        { root: listRef.current, threshold: 0.1 },
+      );
+      observer.observe(sentinelRef.current);
+      return () => observer.disconnect();
+    }, [hasNextPage, isFetchingNextPage, onReachEnd]);
     const selectedOption = options.find((o) => o.value === value);
     // console.log("selectedOption", selectedOption);
 
@@ -128,7 +151,14 @@ export const SelectInputField = React.forwardRef<
 
             <ComboboxEmpty>No results found.</ComboboxEmpty>
 
-            <ComboboxList>
+            <ComboboxList
+              ref={listRef}
+              onScroll={(e) => {
+                const el = e.currentTarget;
+                const remaining = el.scrollHeight - el.scrollTop - el.clientHeight;
+                if (remaining <= 4 && hasNextPage && !isFetchingNextPage) onReachEnd?.();
+              }}
+            >
               {(item) => (
                 <ComboboxItem key={item.value} value={item}>
                   {item.image && (
@@ -143,6 +173,12 @@ export const SelectInputField = React.forwardRef<
                 </ComboboxItem>
               )}
             </ComboboxList>
+            <div ref={sentinelRef} className="h-1 w-full" />
+            {isFetchingNextPage && (
+              <div className="text-muted-foreground px-2 pb-2 text-center text-xs">
+                Loading...
+              </div>
+            )}
           </ComboboxContent>
         </Combobox>
 
