@@ -9,27 +9,45 @@ import LabelCheckbox from "@/shared/components/LabelCheckbox";
 import { SelectInputField } from "@/shared/components/SelectInputField";
 import { Button } from "@/shared/components/ui/button";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useLocale } from "next-intl";
 import {
   RegisterEmployerSchema,
   TRegisterEmployerSchema,
 } from "../../validation/employer-register-schema";
 import { OTPModal } from "../forget-password/OtpModal";
 import { PhoneInputCode } from "@/shared/components/PhoneInputCode";
+import { requestEmailVerification } from "../../lib/email-verification";
 
 const FormEmployerRegister = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState("");
+  const locale = useLocale();
   const {
     register,
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<TRegisterEmployerSchema>({
     resolver: zodResolver(RegisterEmployerSchema),
     mode: 'onChange'
   });
-  const onSubmit: SubmitHandler<TRegisterEmployerSchema> = (data) => {
-    console.log(data);
-    setIsModalOpen(true)
+  const onSubmit: SubmitHandler<TRegisterEmployerSchema> = async (data) => {
+    try {
+      const message = await requestEmailVerification({
+        role: "employer",
+        email: data.officialEmail,
+        locale,
+      });
+
+      toast.success(message);
+      setVerificationEmail(data.officialEmail);
+      setIsModalOpen(true);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to send verification code.",
+      );
+    }
   }
 
   return (<>
@@ -215,14 +233,21 @@ const FormEmployerRegister = () => {
           className="w-1/3"
           size={"pill"}
           type="submit"
+          disabled={isSubmitting}
         >
-          Register
+          {isSubmitting ? "Sending..." : "Register"}
         </Button>
       </div>
 
     </form>
     {/* Otp modal  */}
-    <OTPModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+    <OTPModal
+      open={isModalOpen}
+      onOpenChange={setIsModalOpen}
+      email={verificationEmail}
+      role="employer"
+      purpose="email-confirm"
+    />
   </>
 
   );

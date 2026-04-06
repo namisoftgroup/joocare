@@ -14,11 +14,16 @@ import {
   TRegisterCandidateSchema,
 } from "../../validation/candidate-register-schema";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useLocale } from "next-intl";
 import { OTPModal } from "../forget-password/OtpModal";
 import { PhoneInputCode } from "@/shared/components/PhoneInputCode";
+import { requestEmailVerification } from "../../lib/email-verification";
 
 const FormCandidateRegister = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState("");
+  const locale = useLocale();
 
   const {
     register,
@@ -38,9 +43,22 @@ const FormCandidateRegister = () => {
 
   const confirmRegisterValue = watch("confirmRegister");
 
-  const onSubmit: SubmitHandler<TRegisterCandidateSchema> = (data) => {
-    console.log(data);
-    setIsModalOpen(true)
+  const onSubmit: SubmitHandler<TRegisterCandidateSchema> = async (data) => {
+    try {
+      const message = await requestEmailVerification({
+        role: "candidate",
+        email: data.email,
+        locale,
+      });
+
+      toast.success(message);
+      setVerificationEmail(data.email);
+      setIsModalOpen(true);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to send verification code.",
+      );
+    }
   };
 
   return (<>
@@ -282,7 +300,13 @@ const FormCandidateRegister = () => {
         </Button>
       </div>
     </form>
-    <OTPModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+    <OTPModal
+      open={isModalOpen}
+      onOpenChange={setIsModalOpen}
+      email={verificationEmail}
+      role="candidate"
+      purpose="email-confirm"
+    />
 
   </>
 
