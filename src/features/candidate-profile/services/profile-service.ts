@@ -1,6 +1,13 @@
+import "server-only";
 import { getLocale } from "next-intl/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/auth";
 import { apiFetch, type ApiFetchResponse } from "@/shared/lib/fetch-manager";
-import { getNextAuthToken } from "@/shared/util/auth.util";
+import type {
+  CandidateEducationViewModel,
+  CandidateExperienceViewModel,
+  CandidateProfileViewModel,
+} from "../types/profile.types";
 
 type NamedValue = {
   title?: string | null;
@@ -29,38 +36,27 @@ type CandidateProfileApiUser = {
   skills?: unknown[];
 };
 
-export type CandidateProfileViewModel = {
-  id: number;
-  name: string;
-  email: string;
-  phone: string | null;
-  phoneCode: string | null;
-  fullPhone: string | null;
-  image: string | null;
-  cv: string | null;
-  bio: string | null;
-  age: number | null;
-  location: string | null;
-  jobTitle: string | null;
-  skills: string[];
-  educations: CandidateEducationViewModel[];
-  experiences: CandidateExperienceViewModel[];
-};
-
-export type CandidateEducationViewModel = {
-  id: string;
-  university: string;
-  degree: string | null;
-  period: string | null;
-};
-
-export type CandidateExperienceViewModel = {
-  id: string;
-  title: string;
-  organization: string | null;
-  startDate: string | null;
-  endDate: string | null;
-  bullets: string[];
+type CandidateEducationApiRecord = {
+  id?: number | string | null;
+  university?: string | null;
+  school?: string | null;
+  name?: string | null;
+  degree?: string | null;
+  title?: string | null;
+  specialization?: string | null;
+  field?: string | null;
+  start_date?: string | null;
+  startDate?: string | null;
+  start_year?: string | null;
+  startYear?: string | null;
+  from?: string | null;
+  end_date?: string | null;
+  endDate?: string | null;
+  end_year?: string | null;
+  endYear?: string | null;
+  to?: string | null;
+  country_id?: number | string | null;
+  country?: string | { id?: number | string | null } | null;
 };
 
 function extractCandidateProfileUser(payload: ApiFetchResponse<CandidateProfileApiUser> | null) {
@@ -154,28 +150,56 @@ function normalizeEducationEntry(entry: unknown, index: number): CandidateEducat
     return null;
   }
 
-  const record = entry as Record<string, unknown>;
+  const record = entry as CandidateEducationApiRecord & Record<string, unknown>;
   const university =
     readRecordValue(record, ["university", "university", "school", "name"]) ?? "Education";
   const degree = readRecordValue(record, ["degree", "title", "specialization", "field"]);
+  const startDate = readRecordValue(record, [
+    "start_date",
+    "startDate",
+    "start_year",
+    "startYear",
+    "from",
+  ]);
+  const endDate = readRecordValue(record, [
+    "end_date",
+    "endDate",
+    "end_year",
+    "endYear",
+    "to",
+  ]);
   const startYear = normalizeDateLabel(
-    readRecordValue(record, ["start_date", "startDate", "start_year", "startYear", "from"]),
+    startDate,
   );
   const endYear = normalizeDateLabel(
-    readRecordValue(record, ["end_date", "endDate", "end_year", "endYear", "to"]),
+    endDate,
   );
   const period =
     startYear && endYear ? `${startYear} - ${endYear}` : startYear ?? endYear ?? null;
+  const countryId =
+    typeof record.country_id === "number" || typeof record.country_id === "string"
+      ? String(record.country_id)
+      : record.country && typeof record.country === "object"
+        ? typeof record.country.id === "number" || typeof record.country.id === "string"
+          ? String(record.country.id)
+          : null
+        : null;
 
   return {
     id: String(record.id ?? `education-${index}`),
     university,
     degree,
     period,
+    countryId,
+    startDate,
+    endDate,
   };
 }
 
-function normalizeExperienceEntry(entry: unknown, index: number): CandidateExperienceViewModel | null {
+function normalizeExperienceEntry(
+  entry: unknown,
+  index: number,
+): CandidateExperienceViewModel | null {
   if (!entry || typeof entry !== "object") {
     return null;
   }
@@ -245,9 +269,9 @@ function normalizeAge(age: number | string | null | undefined) {
 }
 
 export async function getCandidateProfile() {
-  const sessionToken = await getNextAuthToken();
+  const session = await getServerSession(authOptions);
 
-  if (!sessionToken?.accessToken || sessionToken.authRole !== "candidate") {
+  if (!session?.accessToken || session.authRole !== "candidate") {
     return null;
   }
 
@@ -257,7 +281,7 @@ export async function getCandidateProfile() {
     {
       method: "GET",
       locale,
-      token: String(sessionToken.accessToken),
+      token: String(session.accessToken),
     },
   );
 
@@ -266,6 +290,7 @@ export async function getCandidateProfile() {
   if (!ok || !user?.id) {
     return null;
   }
+
   const country = readNamedValue(user.country);
   const city = readNamedValue(user.city);
   const jobTitle = readNamedValue(user.job_title);

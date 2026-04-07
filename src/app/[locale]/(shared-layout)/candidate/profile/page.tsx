@@ -3,7 +3,7 @@ import EducationSection from "@/features/candidate-profile/components/education/
 import { ExperienceSectionData } from "@/features/candidate-profile/components/experience/ExperienceSectionData";
 import SideContentInfos from "@/features/candidate-profile/components/SideContentInfos";
 import SkillsSection from "@/features/candidate-profile/components/skills/SkillsSection";
-import { getCandidateProfile } from "@/features/candidate-profile/services/profile.service";
+import { getCandidateProfile } from "@/features/candidate-profile/services/profile-service";
 
 const CandidateProfilePage = async () => {
   const profile = await getCandidateProfile();

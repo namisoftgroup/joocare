@@ -2,7 +2,7 @@
 import { Edit2 } from "lucide-react"
 import { useState } from "react"
 import { EditAboutModal } from "./EditAboutModal"
-import { CandidateProfileViewModel } from "../../services/profile.service"
+import type { CandidateProfileViewModel } from "../../types/profile.types"
 
 const AboutSection = ({
     profile,
@@ -10,8 +10,9 @@ const AboutSection = ({
     profile: CandidateProfileViewModel | null
 }) => {
     const [open, setOpen] = useState(false)
+    const bioText = profile?.bio ?? ""
     const aboutText =
-        profile?.bio ||
+        bioText ||
         "No bio has been added yet."
     return (<>
         <div className="rounded-2xl bg-white flex flex-col gap-4 p-4 border">
@@ -25,7 +26,7 @@ const AboutSection = ({
         </div>
         {open &&
             <EditAboutModal open={open} onOpenChange={setOpen}
-                defaultVal={aboutText}
+                defaultVal={bioText}
             />}
 
     </>

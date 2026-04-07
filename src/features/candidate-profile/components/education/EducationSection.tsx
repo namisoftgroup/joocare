@@ -3,7 +3,7 @@ import { Plus } from "lucide-react"
 import { useState } from "react"
 import { EducationModal } from "./EducationModal"
 import OneEducationSection from "./OneEducationSection"
-import type { CandidateProfileViewModel } from "../../services/profile.service"
+import type { CandidateProfileViewModel } from "../../types/profile.types"
 
 const EducationSection = ({
     profile,
@@ -30,7 +30,7 @@ const EducationSection = ({
             )}
 
         </section>
-        {open && <EducationModal label="Add Education" open={open} onOpenChange={setOpen}
+        {open && <EducationModal label="Add Education" open={open} onOpenChange={setOpen} education={null}
         />}
 
     </>

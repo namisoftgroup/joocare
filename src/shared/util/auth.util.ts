@@ -1,17 +1,19 @@
-import { decode } from "next-auth/jwt";
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/auth";
 
 export async function getNextAuthToken() {
-  const cookiesStore = await cookies();
-  const token = cookiesStore.get(process.env.NEXTAUTH_SESSION_COOKIE!)?.value;
-
   try {
-    const jwt = await decode({
-      token,
-      secret: process.env.NEXTAUTH_SECRET!,
-    })
+    const session = await getServerSession(authOptions);
 
-    return jwt
+    if (!session?.accessToken) {
+      return null;
+    }
+
+    return {
+      accessToken: session.accessToken,
+      authRole: session.authRole,
+      user: session.user,
+    };
   } catch (error) {
     void error;
 

@@ -8,7 +8,7 @@ import {
 } from "@/shared/components/ui/accordion";
 import { CalendarRange, Plus } from "lucide-react";
 import { useState } from "react";
-import { CandidateProfileViewModel } from "../../services/profile.service";
+import type { CandidateProfileViewModel } from "../../types/profile.types";
 import { ExperienceModal } from "./ExperienceModal";
 import ExperienceActions from "./ExperienceActions";
 

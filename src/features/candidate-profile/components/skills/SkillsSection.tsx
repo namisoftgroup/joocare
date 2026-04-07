@@ -4,7 +4,7 @@ import { useState } from "react"
 import OneSkillSection from "./OneSkillSection"
 import { AddSkillsModal } from "./AddSkillsModal"
 import { EditSkillsModal } from "./EditSkillsModal"
-import { CandidateProfileViewModel } from "../../services/profile.service"
+import type { CandidateProfileViewModel } from "../../types/profile.types"
 
 
 const SkillsSection = ({
