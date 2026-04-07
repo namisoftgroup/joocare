@@ -101,10 +101,13 @@ function mapExperience(entry: CandidateProfileApiExperience): CandidateExperienc
     id: String(entry.id),
     title: entry.title || "Experience",
     organization: entry.company,
-    startDate: normalizeDateLabel(entry.start_date),
-    endDate: entry.is_current
-    ? "Present"
+    startDate: entry.start_date,
+    endDate: entry.end_date,
+    startDateLabel: normalizeDateLabel(entry.start_date),
+    endDateLabel: entry.is_current
+      ? "Present"
       : normalizeDateLabel(entry.end_date) ?? "Present",
+    isCurrent: entry.is_current,
     bullets: entry.responsibilities
       .map((responsibility) => responsibility.description)
       .filter(Boolean),

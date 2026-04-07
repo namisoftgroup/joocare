@@ -32,5 +32,8 @@ export type CandidateExperienceViewModel = {
   organization: string | null;
   startDate: string | null;
   endDate: string | null;
+  startDateLabel: string | null;
+  endDateLabel: string | null;
+  isCurrent: boolean;
   bullets: string[];
 };

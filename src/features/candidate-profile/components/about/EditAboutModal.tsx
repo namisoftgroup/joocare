@@ -1,5 +1,6 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/shared/components/ui/button";
 import {
   Dialog,
@@ -13,9 +14,14 @@ import { Textarea } from "@/shared/components/ui/textarea";
 import { useRouter } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { updateCandidateBio } from "../../services/profile-client-service";
+import {
+  aboutModalSchema,
+  type AboutModalFormData,
+} from "../../validation/about-modal-schema";
 
 interface EditAboutModalProps {
   open: boolean;
@@ -30,25 +36,28 @@ export function EditAboutModal({
   const router = useRouter();
   const locale = useLocale();
   const { data: session } = useSession();
-  const [bio, setBio] = useState(defaultVal);
   const [isSaving, setIsSaving] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<AboutModalFormData>({
+    resolver: zodResolver(aboutModalSchema),
+    defaultValues: {
+      bio: defaultVal,
+    },
+  });
 
   useEffect(() => {
     if (open) {
-      setBio(defaultVal);
+      reset({
+        bio: defaultVal,
+      });
     }
-  }, [defaultVal, open]);
+  }, [defaultVal, open, reset]);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const normalizedBio = bio.trim();
-
-    if (!normalizedBio) {
-      toast.error("Please enter your about information.");
-      return;
-    }
-
+  const onSubmit = async ({ bio }: AboutModalFormData) => {
     if (!session?.accessToken) {
       toast.error("Your session has expired. Please log in again.");
       return;
@@ -57,7 +66,7 @@ export function EditAboutModal({
     try {
       setIsSaving(true);
       const response = await updateCandidateBio({
-        bio: normalizedBio,
+        bio: bio.trim(),
         locale,
         token: session.accessToken,
       });
@@ -79,7 +88,7 @@ export function EditAboutModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-w-175 flex-col gap-5">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
           <DialogHeader>
             <DialogTitle className="text-[28px] text-black">
               Edit About
@@ -94,9 +103,11 @@ export function EditAboutModal({
           <Textarea
             className="bg-muted min-h-40 rounded-2xl p-4"
             placeholder="Write a short summary about your experience, skills, and achievements."
-            value={bio}
-            onChange={(event) => setBio(event.target.value)}
+            {...register("bio")}
           />
+          {errors.bio?.message && (
+            <span className="text-[12px] text-red-500">{errors.bio.message}</span>
+          )}
 
           <DialogFooter className="flex justify-center!">
             <Button

@@ -55,14 +55,14 @@ export function ExperienceSection({
                     )}
                     <span className="text-secondary flex items-center gap-1 text-[12px]">
                       <CalendarRange size={16} />
-                      {exp.startDate ?? "Start date"} - {exp.endDate ?? "Present"}
+                      {exp.startDateLabel ?? "Start date"} - {exp.endDateLabel ?? "Present"}
                     </span>
                   </div>
                 </div>
 
                 {/* Right: action buttons + shadcn chevron trigger */}
                 <div className="flex items-center gap-1 lg:gap-4">
-                  <ExperienceActions />
+                  <ExperienceActions experience={exp} />
                   {/* AccordionTrigger scoped to just the chevron */}
                   <AccordionTrigger
                     iconType="arrow"
@@ -98,6 +98,7 @@ export function ExperienceSection({
         label="Add Experience"
         open={open}
         onOpenChange={setOpen}
+        experience={null}
       />
     </>
   );
