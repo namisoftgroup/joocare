@@ -315,7 +315,7 @@ const FormCandidateRegister = () => {
     <OTPModal
       open={isModalOpen}
       onOpenChange={setIsModalOpen}
-      email={verificationEmail}
+      // email={verificationEmail}
       role="candidate"
       purpose="email-confirm"
     />
