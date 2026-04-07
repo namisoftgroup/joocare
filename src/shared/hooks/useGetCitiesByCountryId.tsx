@@ -1,3 +1,4 @@
+import { getBaseApiUrl } from "../lib/api-endpoints";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 export default function useGetCitiesByCountryId(countryId: number) {
@@ -6,7 +7,7 @@ export default function useGetCitiesByCountryId(countryId: number) {
         initialPageParam: 1,
         queryFn: async ({ pageParam }) => {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/cities?page=${pageParam}&pagination=on&limit_per_page=10&country_id=${countryId}`
+                `${getBaseApiUrl()}/cities?page=${pageParam}&pagination=on&limit_per_page=10&country_id=${countryId}`
             );
 
             if (!res.ok) {

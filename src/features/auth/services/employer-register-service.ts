@@ -1,7 +1,8 @@
+import { getCompanyApiUrl } from "@/shared/lib/api-endpoints";
 import { TRegisterEmployerSchema } from "../validation/employer-register-schema";
 
 export const registerEmployerService = async (data: TRegisterEmployerSchema) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_COMPANY_URL}/auth/register`, {
+    const response = await fetch(`${getCompanyApiUrl()}/auth/register`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

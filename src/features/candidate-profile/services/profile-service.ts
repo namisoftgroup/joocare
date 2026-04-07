@@ -2,6 +2,7 @@ import "server-only";
 import { getLocale } from "next-intl/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
+import { getUserApiUrl } from "@/shared/lib/api-endpoints";
 import { apiFetch } from "@/shared/lib/fetch-manager";
 import type {
   CandidateEducationViewModel,
@@ -144,7 +145,7 @@ export async function getCandidateProfile() {
 
   const locale = await getLocale();
   const { ok, data } = await apiFetch<CandidateProfileApiUser>(
-    `${process.env.NEXT_PUBLIC_BASE_USER_URL}/auth/profile`,
+    `${getUserApiUrl()}/auth/profile`,
     {
       method: "GET",
       locale,

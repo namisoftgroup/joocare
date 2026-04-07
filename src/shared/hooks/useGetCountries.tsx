@@ -1,3 +1,4 @@
+import { getBaseApiUrl } from "../lib/api-endpoints";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 export default function useGetCountries(search = "") {
@@ -15,9 +16,7 @@ export default function useGetCountries(search = "") {
                 params.set("search", search.trim());
             }
 
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/countries?${params.toString()}`
-            );
+            const res = await fetch(`${getBaseApiUrl()}/countries?${params.toString()}`);
 
             if (!res.ok) {
                 throw new Error("Network error");

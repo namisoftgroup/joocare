@@ -1,25 +1,10 @@
+import { getBaseApiUrl, getUserApiUrl } from "@/shared/lib/api-endpoints";
 import { apiFetch } from "@/shared/lib/fetch-manager";
 
 type CountryOption = {
   id: string;
   label: string;
 };
-
-function getBaseUrl() {
-  if (!process.env.NEXT_PUBLIC_BASE_URL) {
-    throw new Error("API endpoint is not configured.");
-  }
-
-  return process.env.NEXT_PUBLIC_BASE_URL;
-}
-
-function getUserBaseUrl() {
-  if (!process.env.NEXT_PUBLIC_BASE_USER_URL) {
-    throw new Error("User API endpoint is not configured.");
-  }
-
-  return process.env.NEXT_PUBLIC_BASE_USER_URL;
-}
 
 function normalizeCountryOptions(payload: unknown): CountryOption[] {
   if (!payload || typeof payload !== "object") {
@@ -56,7 +41,7 @@ function normalizeCountryOptions(payload: unknown): CountryOption[] {
 }
 
 export async function getCountryOptions(locale = "en") {
-  const { ok, data, message } = await apiFetch(`${getBaseUrl()}/countries?pagination=off`, {
+  const { ok, data, message } = await apiFetch(`${getBaseApiUrl()}/countries?pagination=off`, {
     method: "GET",
     locale,
   });
@@ -96,7 +81,7 @@ function buildEducationFormData(payload: EducationPayload, includeMethodOverride
 }
 
 export async function createEducation(payload: EducationPayload) {
-  const { ok, data, message } = await apiFetch(`${getUserBaseUrl()}/user-educations`, {
+  const { ok, data, message } = await apiFetch(`${getUserApiUrl()}/user-educations`, {
     method: "POST",
     locale: payload.locale,
     token: payload.token,
@@ -111,7 +96,7 @@ export async function createEducation(payload: EducationPayload) {
 }
 
 export async function updateEducation(id: string, payload: EducationPayload) {
-  const { ok, data, message } = await apiFetch(`${getUserBaseUrl()}/user-educations/${id}`, {
+  const { ok, data, message } = await apiFetch(`${getUserApiUrl()}/user-educations/${id}`, {
     method: "POST",
     locale: payload.locale,
     token: payload.token,
@@ -134,7 +119,7 @@ export async function deleteEducation({
   locale?: string;
   token: string;
 }) {
-  const { ok, data, message } = await apiFetch(`${getUserBaseUrl()}/user-educations/${id}`, {
+  const { ok, data, message } = await apiFetch(`${getUserApiUrl()}/user-educations/${id}`, {
     method: "DELETE",
     locale,
     token,

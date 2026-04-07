@@ -1,21 +1,7 @@
+import { getAuthApiUrl, type AuthApiRole } from "@/shared/lib/api-endpoints";
 import { apiFetch } from "@/shared/lib/fetch-manager";
 
-export type PasswordResetRole = "candidate" | "employer";
-
-const baseUrlByRole: Record<PasswordResetRole, string | undefined> = {
-  candidate: process.env.NEXT_PUBLIC_BASE_USER_URL,
-  employer: process.env.NEXT_PUBLIC_BASE_COMPANY_URL,
-};
-
-function getBaseUrl(role: PasswordResetRole) {
-  const baseUrl = baseUrlByRole[role];
-
-  if (!baseUrl) {
-    throw new Error("Authentication endpoint is not configured.");
-  }
-
-  return baseUrl;
-}
+export type PasswordResetRole = AuthApiRole;
 
 function createFormData(values: Record<string, string>) {
   const formData = new FormData();
@@ -36,7 +22,7 @@ export async function requestPasswordReset({
   email: string;
   locale: string;
 }) {
-  const { ok, message } = await apiFetch(`${getBaseUrl(role)}/auth/forgot-password`, {
+  const { ok, message } = await apiFetch(`${getAuthApiUrl(role)}/auth/forgot-password`, {
     method: "POST",
     locale,
     body: createFormData({ email }),
@@ -60,7 +46,7 @@ export async function verifyPasswordResetOtp({
   otp: string;
   locale: string;
 }) {
-  const { ok, message } = await apiFetch(`${getBaseUrl(role)}/auth/verify-otp`, {
+  const { ok, message } = await apiFetch(`${getAuthApiUrl(role)}/auth/verify-otp`, {
     method: "POST",
     locale,
     body: createFormData({ email, otp }),
@@ -88,7 +74,7 @@ export async function resetPassword({
   passwordConfirmation: string;
   locale: string;
 }) {
-  const { ok, message } = await apiFetch(`${getBaseUrl(role)}/auth/reset-password`, {
+  const { ok, message } = await apiFetch(`${getAuthApiUrl(role)}/auth/reset-password`, {
     method: "POST",
     locale,
     body: createFormData({

@@ -1,3 +1,4 @@
+import { getUserApiUrl } from "@/shared/lib/api-endpoints";
 import { apiFetch } from "@/shared/lib/fetch-manager";
 
 export type SkillOption = {
@@ -10,14 +11,6 @@ export type UserSkillRecord = {
   skillId: string;
   label: string;
 };
-
-function getUserBaseUrl() {
-  if (!process.env.NEXT_PUBLIC_BASE_USER_URL) {
-    throw new Error("User API endpoint is not configured.");
-  }
-
-  return process.env.NEXT_PUBLIC_BASE_USER_URL;
-}
 
 function parseSkillOption(entry: unknown): SkillOption | null {
   if (!entry || typeof entry !== "object") {
@@ -100,7 +93,7 @@ export async function getSkillOptions({
   token: string;
 }) {
   const { ok, data, message } = await apiFetch(
-    `${getUserBaseUrl()}/auth/update-profile/form-data`,
+    `${getUserApiUrl()}/auth/update-profile/form-data`,
     {
       method: "GET",
       locale,
@@ -133,7 +126,7 @@ export async function getUserSkills({
   token: string;
 }) {
   const { ok, data, message } = await apiFetch(
-    `${getUserBaseUrl()}/user-skills?pagination=on&limit_per_page=100&page=1`,
+    `${getUserApiUrl()}/user-skills?pagination=on&limit_per_page=100&page=1`,
     {
       method: "GET",
       locale,
@@ -206,7 +199,7 @@ export async function addUserSkills({
     formData.append("skills[]", id);
   });
 
-  const { ok, data, message } = await apiFetch(`${getUserBaseUrl()}/user-skills`, {
+  const { ok, data, message } = await apiFetch(`${getUserApiUrl()}/user-skills`, {
     method: "POST",
     locale,
     token,

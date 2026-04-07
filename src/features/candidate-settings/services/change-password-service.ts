@@ -1,3 +1,4 @@
+import { getUserApiUrl } from "@/shared/lib/api-endpoints";
 import { apiFetch, type ApiResult } from "@/shared/lib/fetch-manager";
 
 type ChangePasswordPayload = {
@@ -11,7 +12,7 @@ export async function changePasswordService(
     { token }: { token: string },
 ): Promise<ApiResult> {
     const response = await apiFetch(
-        `${process.env.NEXT_PUBLIC_BASE_USER_URL}/auth/change-password`,
+        `${getUserApiUrl()}/auth/change-password`,
         {
             method: "POST",
             headers: {

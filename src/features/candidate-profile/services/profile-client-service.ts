@@ -1,3 +1,4 @@
+import { getUserApiUrl } from "@/shared/lib/api-endpoints";
 import { apiFetch } from "@/shared/lib/fetch-manager";
 
 export async function updateCandidateBio({
@@ -9,16 +10,10 @@ export async function updateCandidateBio({
   locale?: string;
   token: string;
 }) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_USER_URL;
-
-  if (!baseUrl) {
-    throw new Error("User API endpoint is not configured.");
-  }
-
   const formData = new FormData();
   formData.append("bio", bio);
 
-  const { ok, data, message } = await apiFetch(`${baseUrl}/user-bio`, {
+  const { ok, data, message } = await apiFetch(`${getUserApiUrl()}/user-bio`, {
     method: "POST",
     locale,
     token,

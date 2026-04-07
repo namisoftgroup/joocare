@@ -2,6 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import LinkedInProvider from "next-auth/providers/linkedin";
+import { getAuthApiUrl, getCompanyApiUrl, getUserApiUrl } from "./shared/lib/api-endpoints";
 import { AuthSessionUser } from "./shared/types";
 import { apiFetch, ApiFetchResponse } from "./shared/lib/fetch-manager";
 
@@ -136,14 +137,7 @@ async function authorizeWithSocialEndpoint({
   email: string;
   image?: string | null;
 }) {
-  const baseUrl =
-    role === "employer"
-      ? process.env.NEXT_PUBLIC_BASE_COMPANY_URL
-      : process.env.NEXT_PUBLIC_BASE_USER_URL;
-
-  if (!baseUrl) {
-    throw new Error("Authentication endpoint is not configured.");
-  }
+  const baseUrl = getAuthApiUrl(role);
 
   const formData = new FormData();
   formData.append("name", name);
@@ -223,7 +217,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         return authorizeWithEndpoint({
           credentials,
-          baseUrl: process.env.NEXT_PUBLIC_BASE_USER_URL,
+          baseUrl: getUserApiUrl(),
           role: "candidate",
         });
       },
@@ -239,7 +233,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         return authorizeWithEndpoint({
           credentials,
-          baseUrl: process.env.NEXT_PUBLIC_BASE_COMPANY_URL,
+          baseUrl: getCompanyApiUrl(),
           role: "employer",
         });
       },

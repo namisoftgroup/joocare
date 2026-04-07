@@ -1,3 +1,4 @@
+import { getUserApiUrl } from "@/shared/lib/api-endpoints";
 import { apiFetch } from "@/shared/lib/fetch-manager";
 
 type ExperiencePayload = {
@@ -10,14 +11,6 @@ type ExperiencePayload = {
   locale?: string;
   token: string;
 };
-
-function getUserBaseUrl() {
-  if (!process.env.NEXT_PUBLIC_BASE_USER_URL) {
-    throw new Error("User API endpoint is not configured.");
-  }
-
-  return process.env.NEXT_PUBLIC_BASE_USER_URL;
-}
 
 function buildExperienceFormData(
   payload: ExperiencePayload,
@@ -45,7 +38,7 @@ function buildExperienceFormData(
 }
 
 export async function createExperience(payload: ExperiencePayload) {
-  const { ok, data, message } = await apiFetch(`${getUserBaseUrl()}/user-experiences`, {
+  const { ok, data, message } = await apiFetch(`${getUserApiUrl()}/user-experiences`, {
     method: "POST",
     locale: payload.locale,
     token: payload.token,
@@ -60,7 +53,7 @@ export async function createExperience(payload: ExperiencePayload) {
 }
 
 export async function updateExperience(id: string, payload: ExperiencePayload) {
-  const { ok, data, message } = await apiFetch(`${getUserBaseUrl()}/user-experiences/${id}`, {
+  const { ok, data, message } = await apiFetch(`${getUserApiUrl()}/user-experiences/${id}`, {
     method: "POST",
     locale: payload.locale,
     token: payload.token,
@@ -83,7 +76,7 @@ export async function deleteExperience({
   locale?: string;
   token: string;
 }) {
-  const { ok, data, message } = await apiFetch(`${getUserBaseUrl()}/user-experiences/${id}`, {
+  const { ok, data, message } = await apiFetch(`${getUserApiUrl()}/user-experiences/${id}`, {
     method: "DELETE",
     locale,
     token,
