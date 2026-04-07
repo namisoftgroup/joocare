@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Minus, Plus } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, type SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { InputField } from "@/shared/components/InputField";
 import LabelCheckbox from "@/shared/components/LabelCheckbox";
+import { SelectInputField } from "@/shared/components/SelectInputField";
 import { Button } from "@/shared/components/ui/button";
 import {
   Dialog,
@@ -18,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
+import useGetJobTitles from "@/shared/hooks/useGetJobTitles";
 import {
   createExperience,
   updateExperience,
@@ -34,6 +36,7 @@ interface ExperienceModalProps {
 
 const EMPTY_FORM: FormData = {
   jobTitle: "",
+  otherJobTitle: "",
   organizationOrHospitalName: "",
   startDate: "",
   endDate: "",
@@ -48,6 +51,7 @@ function toFormState(experience?: CandidateExperienceViewModel | null): FormData
 
   return {
     jobTitle: experience.title,
+    otherJobTitle: "",
     organizationOrHospitalName: experience.organization ?? "",
     startDate: experience.startDate ?? "",
     endDate: experience.endDate ?? "",
@@ -78,10 +82,19 @@ export function ExperienceModal({
     reset,
     setValue,
     formState: { errors },
-  } = useForm<FormData>({
+} = useForm<FormData>({
     resolver: zodResolver(experienceModalSchema),
     defaultValues,
   });
+  const [dialogContentElement, setDialogContentElement] = useState<HTMLDivElement | null>(null);
+  const {
+    jobTitles,
+    isLoading: isJobTitlesLoading,
+    error: jobTitlesError,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useGetJobTitles();
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -89,6 +102,28 @@ export function ExperienceModal({
   });
 
   const workHere = watch("workHere");
+  const selectedJobTitle = watch("jobTitle");
+  const isOtherJobTitle = selectedJobTitle === "__other__";
+
+  const jobTitleOptions = useMemo(() => {
+    const mappedOptions = jobTitles
+      .map((jobTitle) => ({
+        label: String(jobTitle.title ?? ""),
+        value: String(jobTitle.title ?? ""),
+      }))
+      .filter((jobTitle) => jobTitle.label);
+    const currentTitle = experience?.title?.trim();
+    const hasCurrentTitle =
+      currentTitle && mappedOptions.some((option) => option.value === currentTitle);
+
+    return [
+      ...mappedOptions,
+      ...(currentTitle && !hasCurrentTitle
+        ? [{ label: currentTitle, value: currentTitle }]
+        : []),
+      { label: "Other", value: "__other__" },
+    ];
+  }, [experience?.title, jobTitles]);
 
   useEffect(() => {
     if (open) {
@@ -102,6 +137,16 @@ export function ExperienceModal({
     }
   }, [setValue, workHere]);
 
+  useEffect(() => {
+    if (!isOtherJobTitle) {
+      setValue("otherJobTitle", "");
+    }
+  }, [isOtherJobTitle, setValue]);
+
+  const handleDialogContentRef = useCallback((node: HTMLDivElement | null) => {
+    setDialogContentElement(node);
+  }, []);
+
   const onSubmit: SubmitHandler<FormData> = async (form) => {
     if (!session?.accessToken) {
       toast.error("Your session has expired. Please log in again.");
@@ -112,7 +157,10 @@ export function ExperienceModal({
       setIsSaving(true);
 
       const payload = {
-        title: form.jobTitle.trim(),
+        title:
+          form.jobTitle === "__other__"
+            ? form.otherJobTitle?.trim() ?? ""
+            : form.jobTitle.trim(),
         company: form.organizationOrHospitalName.trim(),
         startDate: form.startDate,
         endDate: form.workHere ? undefined : form.endDate?.trim(),
@@ -146,19 +194,47 @@ export function ExperienceModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-175">
+      <DialogContent ref={handleDialogContentRef} className="max-w-175">
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
           <DialogHeader>
             <DialogTitle className="text-[28px] text-black">{label}</DialogTitle>
           </DialogHeader>
 
-          <InputField
-            id="jobTitle"
-            label="Job title"
-            placeholder="ex: Senior Heart Specialist"
-            {...register("jobTitle")}
-            error={errors.jobTitle?.message}
+          <Controller
+            name="jobTitle"
+            control={control}
+            render={({ field }) => (
+              <SelectInputField
+                id="jobTitle"
+                label="Job title"
+                placeholder={isJobTitlesLoading ? "Loading job titles..." : "Select job title"}
+                options={jobTitleOptions}
+                value={field.value}
+                onChange={field.onChange}
+                disabled={isJobTitlesLoading}
+                withSearchInput
+                searchPlaceholder="Search job titles..."
+                portalContainer={dialogContentElement}
+                onReachEnd={() => void fetchNextPage()}
+                hasNextPage={!!hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                error={
+                  errors.jobTitle?.message ??
+                  (jobTitlesError instanceof Error ? jobTitlesError.message : undefined)
+                }
+              />
+            )}
           />
+
+          {isOtherJobTitle && (
+            <InputField
+              id="otherJobTitle"
+              label="Other job title"
+              placeholder="Enter your job title"
+              {...register("otherJobTitle")}
+              error={errors.otherJobTitle?.message}
+            />
+          )}
 
           <InputField
             id="organizationOrHospitalName"
@@ -195,6 +271,7 @@ export function ExperienceModal({
                 id="workHere"
                 checked={field.value}
                 onCheckedChange={field.onChange}
+                error={errors.workHere?.message}
               >
                 I currently work here
               </LabelCheckbox>
