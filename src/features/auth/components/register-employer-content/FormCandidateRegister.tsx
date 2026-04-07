@@ -18,12 +18,13 @@ import { toast } from "sonner";
 import { useLocale } from "next-intl";
 import { OTPModal } from "../forget-password/OtpModal";
 import { PhoneInputCode } from "@/shared/components/PhoneInputCode";
-import { requestEmailVerification } from "../../lib/email-verification";
+import { parsePhoneNumber } from "react-phone-number-input";
+import { useRegisterCandidate } from "../../hooks/useRegisterCandidate";
+import useGetJobTitles from "@/shared/hooks/useGetJobTitles";
 
 const FormCandidateRegister = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [verificationEmail, setVerificationEmail] = useState("");
-  const locale = useLocale();
+  const { jobTitles, isLoading, error, hasNextPage, fetchNextPage, isFetchingNextPage } = useGetJobTitles();
 
   const {
     register,
@@ -43,24 +44,36 @@ const FormCandidateRegister = () => {
 
   const confirmRegisterValue = watch("confirmRegister");
 
-  const onSubmit: SubmitHandler<TRegisterCandidateSchema> = async (data) => {
-    try {
-      const message = await requestEmailVerification({
-        role: "candidate",
-        email: data.email,
-        locale,
-      });
+  // FormCandidateRegister.tsx
+  const jobTitleOptions = jobTitles.map((jt: { id: number | string; title: string }) => ({
+    label: jt.title,
+    value: String(jt.id),
+  }));
 
-      toast.success(message);
-      setVerificationEmail(data.email);
-      setIsModalOpen(true);
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to send verification code.",
-      );
-    }
+  const { mutate: submitRegister, isPending } = useRegisterCandidate(() =>
+    setIsModalOpen(true)
+  );
+
+  const onSubmit: SubmitHandler<TRegisterCandidateSchema> = (data) => {
+    const parsed = parsePhoneNumber(data.phoneNumber);
+
+    submitRegister({
+      name: data.fullName,
+      email: data.email,
+      phone: parsed?.nationalNumber ?? "",
+      phone_code: `+${parsed?.countryCallingCode ?? ""}`,
+      job_title_id: data.jobTitle,
+      country_id: data.country,
+      city_id: data.city,
+      password: data.createPassword,
+      has_medical_license: data.confirmRegister,
+      license_country_id: data.country,
+      license_title: data.licenseTitle,
+      license_number: data.licenseNumber,
+      cv: data.uploadCV,
+      license: data.uploadLicense,
+    });
   };
-
   return (<>
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -123,12 +136,12 @@ const FormCandidateRegister = () => {
             label="Job Title"
             placeholder="ex: Hospital"
             {...field}
-            error={errors.jobTitle?.message}
-            options={[
-              { label: "Hospital", value: "hospital" },
-              { label: "Software", value: "software" },
-              { label: "Company", value: "company" },
-            ]}
+            error={errors.jobTitle?.message ?? (error instanceof Error ? error.message : undefined)}
+            options={jobTitleOptions}
+            disabled={isLoading}
+            onReachEnd={() => fetchNextPage()}
+            hasNextPage={!!hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
           />
         )}
       />
@@ -149,9 +162,9 @@ const FormCandidateRegister = () => {
                 {...field}
                 error={errors.country?.message}
                 options={[
-                  { label: "egypt", value: "egypt" },
-                  { label: "saudi", value: "saudi" },
-                  { label: "canada", value: "canada" },
+                  { label: "egypt", value: "1" },
+                  { label: "saudi", value: "2" },
+                  { label: "canada", value: "3" },
                 ]}
               />
             )}
@@ -166,9 +179,9 @@ const FormCandidateRegister = () => {
                 {...field}
                 error={errors.city?.message}
                 options={[
-                  { label: "cairo", value: "cairo" },
-                  { label: "alex", value: "alex" },
-                  { label: "reyad", value: "reyad" },
+                  { label: "cairo", value: "1" },
+                  { label: "alex", value: "2" },
+                  { label: "reyad", value: "3" },
                 ]}
               />
             )}
@@ -197,7 +210,7 @@ const FormCandidateRegister = () => {
             files={field.value}
             onChange={field.onChange}
             allowMultiple={false}
-            maxFiles={2}
+            maxFiles={1}
             error={errors.uploadCV?.message}
           />
         )}
@@ -236,10 +249,11 @@ const FormCandidateRegister = () => {
                   options={[
                     {
                       label: "United Arab Emirates (UAE)",
-                      value: "United Arab Emirates (UAE)",
+                      value: "1",
                     },
-                    { label: "Egypt", value: "Egypt" },
-                    { label: "Saudi Arabia", value: "Saudi Arabia" },
+                    { label: "Egypt", value: "2" },
+                    { label: "Saudi Arabia", value: "3" },
+                    { label: "Canada", value: "4" },
                   ]}
                 />
               )}
@@ -267,8 +281,6 @@ const FormCandidateRegister = () => {
             error={errors.licenseNumber?.message}
           />
 
-
-
           <Controller
             name="uploadLicense"
             control={control}
@@ -279,7 +291,7 @@ const FormCandidateRegister = () => {
                 files={field.value}
                 onChange={field.onChange}
                 allowMultiple={false}
-                maxFiles={2}
+                maxFiles={1}
                 error={errors.uploadLicense?.message}
               />
             )}
