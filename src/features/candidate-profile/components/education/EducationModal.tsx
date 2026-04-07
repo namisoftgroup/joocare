@@ -1,9 +1,12 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useCallback, useEffect, useState } from "react";
 import { useLocale } from "next-intl";
+import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import useGetCountries from "@/shared/hooks/useGetCountries";
 import { InputField } from "@/shared/components/InputField";
 import { SelectInputField } from "@/shared/components/SelectInputField";
 import { Button } from "@/shared/components/ui/button";
@@ -15,12 +18,12 @@ import {
   DialogTitle,
 } from "@/shared/components/ui/dialog";
 import { useRouter } from "@/i18n/navigation";
-import {
-  createEducation,
-  getCountryOptions,
-  updateEducation,
-} from "../../services/education-client-service";
+import { createEducation, updateEducation } from "../../services/education-client-service";
 import type { CandidateEducationViewModel } from "../../types/profile.types";
+import {
+  educationModalSchema,
+  type EducationModalFormData,
+} from "../../validation/education-modal-schema";
 
 interface EducationModalProps {
   open: boolean;
@@ -29,15 +32,7 @@ interface EducationModalProps {
   education?: CandidateEducationViewModel | null;
 }
 
-type FormState = {
-  degree: string;
-  university: string;
-  countryId: string;
-  startDate: string;
-  endDate: string;
-};
-
-const EMPTY_FORM: FormState = {
+const EMPTY_FORM: EducationModalFormData = {
   degree: "",
   university: "",
   countryId: "",
@@ -45,7 +40,9 @@ const EMPTY_FORM: FormState = {
   endDate: "",
 };
 
-function toFormState(education?: CandidateEducationViewModel | null): FormState {
+function toFormState(
+  education?: CandidateEducationViewModel | null,
+): EducationModalFormData {
   if (!education) {
     return EMPTY_FORM;
   }
@@ -68,73 +65,48 @@ export function EducationModal({
   const router = useRouter();
   const locale = useLocale();
   const { data: session } = useSession();
-  const [form, setForm] = useState<FormState>(toFormState(education));
-  const [countries, setCountries] = useState<Array<{ label: string; value: string }>>([]);
+  const [dialogContentElement, setDialogContentElement] = useState<HTMLDivElement | null>(null);
+  const [countrySearch, setCountrySearch] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const [isLoadingCountries, setIsLoadingCountries] = useState(false);
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<EducationModalFormData>({
+    resolver: zodResolver(educationModalSchema),
+    defaultValues: toFormState(education),
+  });
+  const {
+    countries,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    fetchNextPage,
+  } = useGetCountries(countrySearch);
+
+  const countryOptions = countries
+    .map((country) => ({
+      label: String(country.title ?? country.name ?? ""),
+      value: String(country.id),
+    }))
+    .filter((country) => country.label);
 
   useEffect(() => {
     if (open) {
-      setForm(toFormState(education));
+      reset(toFormState(education));
+      setCountrySearch("");
     }
-  }, [education, open]);
+  }, [education, open, reset]);
 
-  useEffect(() => {
-    let ignore = false;
+  const handleDialogContentRef = useCallback((node: HTMLDivElement | null) => {
+    setDialogContentElement(node);
+  }, []);
 
-    if (!open || countries.length > 0) {
-      return;
-    }
-
-    const loadCountries = async () => {
-      try {
-        setIsLoadingCountries(true);
-        const items = await getCountryOptions(locale);
-
-        if (!ignore) {
-          setCountries(items.map((item) => ({ label: item.label, value: item.id })));
-        }
-      } catch (error) {
-        if (!ignore) {
-          const message =
-            error instanceof Error ? error.message : "Failed to load countries.";
-          toast.error(message);
-        }
-      } finally {
-        if (!ignore) {
-          setIsLoadingCountries(false);
-        }
-      }
-    };
-
-    void loadCountries();
-
-    return () => {
-      ignore = true;
-    };
-  }, [countries.length, locale, open]);
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (
-      !form.degree.trim() ||
-      !form.university.trim() ||
-      !form.countryId ||
-      !form.startDate ||
-      !form.endDate
-    ) {
-      toast.error("Please complete all education fields.");
-      return;
-    }
-
+  const onSubmit: SubmitHandler<EducationModalFormData> = async (form) => {
     if (!session?.accessToken) {
       toast.error("Your session has expired. Please log in again.");
-      return;
-    }
-
-    if (form.endDate < form.startDate) {
-      toast.error("End date must be after start date.");
       return;
     }
 
@@ -161,6 +133,7 @@ export function EducationModal({
             ? "Education updated successfully."
             : "Education added successfully."),
       );
+      reset(EMPTY_FORM);
       onOpenChange(false);
       router.refresh();
     } catch (error) {
@@ -174,8 +147,8 @@ export function EducationModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-175">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <DialogContent ref={handleDialogContentRef} className="max-w-175">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
           <DialogHeader>
             <DialogTitle className="text-[28px] text-black">{label}</DialogTitle>
           </DialogHeader>
@@ -185,10 +158,8 @@ export function EducationModal({
             label="Degree"
             type="text"
             placeholder="ex: Bachelor's degree, Medicine and Surgery"
-            value={form.degree}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, degree: event.target.value }))
-            }
+            {...register("degree")}
+            error={errors.degree?.message}
           />
 
           <InputField
@@ -196,22 +167,32 @@ export function EducationModal({
             label="University"
             type="text"
             placeholder="ex: Ain Shams University - Faculty of Medicine"
-            value={form.university}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, university: event.target.value }))
-            }
+            {...register("university")}
+            error={errors.university?.message}
           />
 
-          <SelectInputField
-            id="country"
-            label="Country"
-            placeholder={isLoadingCountries ? "Loading countries..." : "ex: Egypt"}
-            options={countries}
-            value={form.countryId}
-            disabled={isLoadingCountries}
-            onChange={(value) =>
-              setForm((current) => ({ ...current, countryId: value }))
-            }
+          <Controller
+            name="countryId"
+            control={control}
+            render={({ field }) => (
+              <SelectInputField
+                id="country"
+                label="Country"
+                placeholder={isLoading ? "Loading countries..." : "ex: Egypt"}
+                options={countryOptions}
+                value={field.value}
+                disabled={isLoading}
+                portalContainer={dialogContentElement}
+                withSearchInput
+                searchPlaceholder="Search countries..."
+                onSearchChange={setCountrySearch}
+                onChange={field.onChange}
+                onReachEnd={() => void fetchNextPage()}
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                error={errors.countryId?.message}
+              />
+            )}
           />
 
           <div className="flex items-center justify-between gap-2 max-md:flex-col">
@@ -219,20 +200,16 @@ export function EducationModal({
               id="startDate"
               label="Start Date"
               type="date"
-              value={form.startDate}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, startDate: event.target.value }))
-              }
+              {...register("startDate")}
+              error={errors.startDate?.message}
             />
 
             <InputField
               id="endDate"
               label="End Date"
               type="date"
-              value={form.endDate}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, endDate: event.target.value }))
-              }
+              {...register("endDate")}
+              error={errors.endDate?.message}
             />
           </div>
 

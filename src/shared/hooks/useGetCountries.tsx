@@ -1,12 +1,22 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 
-export default function useGetCountries() {
+export default function useGetCountries(search = "") {
     const query = useInfiniteQuery({
-        queryKey: ["countries"],
+        queryKey: ["countries", search],
         initialPageParam: 1,
         queryFn: async ({ pageParam }) => {
+            const params = new URLSearchParams({
+                page: String(pageParam),
+                pagination: "on",
+                limit_per_page: "10",
+            });
+
+            if (search.trim()) {
+                params.set("search", search.trim());
+            }
+
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/countries?page=${pageParam}&pagination=on&limit_per_page=10`
+                `${process.env.NEXT_PUBLIC_BASE_URL}/countries?${params.toString()}`
             );
 
             if (!res.ok) {
@@ -25,7 +35,8 @@ export default function useGetCountries() {
             if (!lastPage?.next_page_url) return undefined;
 
             const url = new URL(lastPage.next_page_url);
-            return Number(url.searchParams.get("page"));
+            const page = Number(url.searchParams.get("page"));
+            return Number.isNaN(page) ? undefined : page;
         }
     });
 

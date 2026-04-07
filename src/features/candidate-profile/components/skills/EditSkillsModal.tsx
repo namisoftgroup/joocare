@@ -1,80 +1,181 @@
-"use client"
+"use client";
 
-import { Button } from "@/shared/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog"
-import { X } from "lucide-react"
-import { useEffect, useState } from "react"
-
-// ─── Constants ───────────────────────────────────────────────────────────────
-
-
-
-
+import { useEffect, useMemo, useState } from "react";
+import { useLocale } from "next-intl";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import {
+  getSkillOptions,
+  getUserSkills,
+  syncUserSkills,
+  type SkillOption,
+} from "../../services/skills-client-service";
+import { MultiSelectInputSkills } from "./MultiSelectInputSkills";
 
 interface EditSkillsModalProps {
-    open: boolean
-    onOpenChange: (open: boolean) => void
-    skills: string[]
-    onSave: (skills: string[]) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  skills: string[];
+  onSave: (skills: string[]) => void;
 }
 
+export function EditSkillsModal({
+  open,
+  onOpenChange,
+  skills,
+  onSave,
+}: EditSkillsModalProps) {
+  const locale = useLocale();
+  const { data: session } = useSession();
+  const [current, setCurrent] = useState<string[]>(skills);
+  const [options, setOptions] = useState<SkillOption[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
+  useEffect(() => {
+    let ignore = false;
 
-
-
-// ─── EditSkillsModal ──────────────────────────────────────────────────────────
-
-export function EditSkillsModal({ open, onOpenChange, skills, onSave }: EditSkillsModalProps) {
-    const [current, setCurrent] = useState<string[]>(skills)
-
-    // Sync when modal opens with new skills
-    useEffect(() => {
-        if (open) setCurrent(skills)
-    }, [open, skills])
-
-    const remove = (skill: string) => {
-        setCurrent((prev) => prev.filter((s) => s !== skill))
+    if (!open || !session?.accessToken) {
+      return;
     }
 
-    const handleSave = () => {
-        onSave(current)
-        onOpenChange(false)
+    const loadSkills = async () => {
+      try {
+        setIsLoading(true);
+        const [availableSkills, currentSkills] = await Promise.all([
+          getSkillOptions({ locale, token: session.accessToken }),
+          getUserSkills({ locale, token: session.accessToken }),
+        ]);
+
+        if (!ignore) {
+          setOptions(availableSkills);
+          setCurrent(currentSkills.map((skill) => skill.label));
+        }
+      } catch (error) {
+        if (!ignore) {
+          const message =
+            error instanceof Error ? error.message : "Failed to load skills.";
+          toast.error(message);
+          setCurrent(skills);
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadSkills();
+
+    return () => {
+      ignore = true;
+    };
+  }, [locale, open, session?.accessToken, skills]);
+
+  const availableLabels = useMemo(
+    () => options.map((skill) => skill.label),
+    [options],
+  );
+
+  const toggle = (skill: string) => {
+    setCurrent((prev) =>
+      prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill],
+    );
+  };
+
+  const remove = (skill: string) => {
+    setCurrent((prev) => prev.filter((s) => s !== skill));
+  };
+
+  const handleSave = async () => {
+    if (!session?.accessToken) {
+      toast.error("Your session has expired. Please log in again.");
+      return;
     }
 
-    return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-md rounded-2xl gap-4">
-                <DialogHeader>
-                    <DialogTitle className="text-lg font-bold">Edit Skills</DialogTitle>
-                </DialogHeader>
+    try {
+      setIsSaving(true);
+      const selectedIds = current
+        .map(
+          (label) => options.find((skill) => skill.label === label)?.id ?? null,
+        )
+        .filter((id): id is string => Boolean(id));
 
-                {current.length === 0 ? (
-                    <p className="text-sm text-gray-400 text-center py-6">No skills added yet.</p>
-                ) : (
-                    <div className="bg-[#09760A08] rounded-xl p-3 flex flex-wrap gap-2 min-h-[60px]">
-                        {current.map((skill) => (
-                            <span
-                                key={skill}
-                                className="flex items-center gap-1.5 bg-primary text-white text-sm px-3 py-1 rounded-full"
-                            >
-                                {skill}
-                                <X
-                                    size={13}
-                                    className="cursor-pointer hover:opacity-70"
-                                    onClick={() => remove(skill)}
-                                />
-                            </span>
-                        ))}
-                    </div>
-                )}
+      await syncUserSkills({
+        selectedSkillIds: selectedIds,
+        locale,
+        token: session.accessToken,
+      });
 
-                {/* CTA */}
-                <div className="flex justify-center pt-1">
-                    <Button onClick={handleSave} className="rounded-full px-10">
-                        Save
-                    </Button>
-                </div>
-            </DialogContent>
-        </Dialog>
-    )
+      toast.success("Skills updated successfully.");
+      onSave(current);
+      onOpenChange(false);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to update skills.";
+      toast.error(message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-150 gap-4 rounded-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-bold">Edit Skills</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-1.5">
+          <label className="font-semibold">Skill</label>
+          <MultiSelectInputSkills
+            selected={current}
+            onSelect={toggle}
+            onRemove={remove}
+            options={availableLabels}
+          />
+        </div>
+
+        {/* <div className="space-y-2">
+          <p className="text-sm">Suggested based on your profile</p>
+          <div className="bg-[#09760A08] flex min-h-[60px] flex-wrap gap-2 rounded-xl p-3">
+            {availableLabels.map((skill) => {
+              const isSelected = current.includes(skill);
+              return (
+                <button
+                  key={skill}
+                  type="button"
+                  onClick={() => toggle(skill)}
+                  className={`rounded-full border border-border px-4 py-2 text-sm transition-all ${
+                    isSelected
+                      ? "border-primary bg-primary text-white"
+                      : "border-muted bg-white text-black hover:border-primary hover:text-primary"
+                  }`}
+                >
+                  {skill}
+                </button>
+              );
+            })}
+          </div>
+        </div> */}
+
+        <div className="flex justify-center pt-1">
+          <Button
+            onClick={handleSave}
+            className="rounded-full px-10"
+            disabled={isLoading || isSaving}
+          >
+            {isSaving ? "Saving..." : "Save"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
