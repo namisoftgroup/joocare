@@ -90,7 +90,7 @@ const SideContentInfos = ({
       </section>
 
       {/* upload cv */}
-      <UploadCvSection />
+      <UploadCvSection cvUrl={profile?.cv ?? null} />
     </aside>
   );
 };

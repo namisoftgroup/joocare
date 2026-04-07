@@ -1,59 +1,146 @@
-"use client"
+"use client";
 
-import { useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image"
 import { Button } from "@/shared/components/ui/button"
 import { File, Eye } from "lucide-react"
+import { useLocale } from "next-intl";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 import CVModal from "./CVModal"
+import { deleteCvAction, updateCvAction } from "../actions/cv-actions";
+import { cvSchema } from "../validation/cv-schema";
 
-const UploadCvSection = () => {
-  const [cvFile, setCvFile] = useState<File | null>(null)
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
+const UploadCvSection = ({ cvUrl }: { cvUrl: string | null }) => {
+  const [currentCvUrl, setCurrentCvUrl] = useState<string | null>(cvUrl);
+  const [selectedCvFile, setSelectedCvFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [open, setOpen] = useState(false);
+  const locale = useLocale();
+  const { data: session } = useSession();
+  const objectUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    setCurrentCvUrl(cvUrl);
+  }, [cvUrl]);
+
+  useEffect(() => {
+    if (!selectedCvFile) {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+      return;
+    }
+
+    const nextObjectUrl = URL.createObjectURL(selectedCvFile);
+
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+    }
+
+    objectUrlRef.current = nextObjectUrl;
+
+    return () => {
+      if (objectUrlRef.current === nextObjectUrl) {
+        URL.revokeObjectURL(nextObjectUrl);
+        objectUrlRef.current = null;
+      }
+    };
+  }, [selectedCvFile]);
+
+  const displayUrl = objectUrlRef.current ?? currentCvUrl;
+  const hasCv = Boolean(selectedCvFile || currentCvUrl);
+  const displayFileName = useMemo(() => {
+    if (selectedCvFile) {
+      return selectedCvFile.name;
+    }
+
+    if (!currentCvUrl) {
+      return "";
+    }
+
+    const cleanUrl = currentCvUrl.split("?")[0];
+    return decodeURIComponent(cleanUrl.split("/").pop() || "CV");
+  }, [currentCvUrl, selectedCvFile]);
+  const displayFileSize = selectedCvFile
+    ? `${(selectedCvFile.size / (1024 * 1024)).toFixed(1)}MB`
+    : null;
 
   // open file picker
   const handleUploadClick = () => {
-    fileInputRef.current?.click()
+    fileInputRef.current?.click();
     setOpen(false);
-  }
+  };
 
   // handle file change
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    // allow only PDF
-    if (file.type !== "application/pdf") {
-      alert("Only PDF files are allowed")
-      return
+    const validation = cvSchema.safeParse({ cv: file });
+    if (!validation.success) {
+      toast.error(validation.error.issues[0]?.message || "Invalid CV file.");
+      e.target.value = "";
+      return;
     }
 
-    setCvFile(file)
-  }
+    try {
+      setIsUploading(true);
+      const payload = new FormData();
+      payload.append("cv", file);
+      payload.append("locale", locale);
+      const response = await updateCvAction(payload, session?.accessToken);
+
+      setSelectedCvFile(file);
+      setCurrentCvUrl(null);
+      toast.success(response.message);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to upload CV.";
+      toast.error(message);
+    } finally {
+      setIsUploading(false);
+      e.target.value = "";
+    }
+  };
 
   // view file
   const handleView = () => {
-    if (!cvFile) return
-    // const url = URL.createObjectURL(cvFile)
-    // window.open(url, "_blank")
+    if (!hasCv) return;
     setOpen(true);
-
-  }
+  };
 
   // download file
   const handleDownload = () => {
-    if (!cvFile) return
-    const url = URL.createObjectURL(cvFile)
+    if (!displayUrl) return;
+    const url = displayUrl;
 
-    const a = document.createElement("a")
-    a.href = url
-    a.download = cvFile.name
-    a.click()
-  }
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = displayFileName || "cv";
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.click();
+  };
 
-  const handleDelete = () => {
-    setCvFile(null)
-  }
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      const response = await deleteCvAction(locale, session?.accessToken);
+
+      setSelectedCvFile(null);
+      setCurrentCvUrl(null);
+      setOpen(false);
+      toast.success(response.message);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to delete CV.";
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
 
   return (
@@ -61,20 +148,21 @@ const UploadCvSection = () => {
       {/* hidden input */}
       <input
         type="file"
-        accept=".pdf"
+        accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ref={fileInputRef}
         onChange={handleFileChange}
         className="hidden"
       />
 
-      {!cvFile ? (
+      {!hasCv ? (
         // ================= NO CV =================
         <Button
           variant="outline"
           size="pill"
           onClick={handleUploadClick}
+          disabled={isUploading}
         >
-          Upload CV
+          {isUploading ? "Uploading..." : "Upload CV"}
         </Button>
       ) : (
         // ================= HAS CV =================
@@ -88,11 +176,13 @@ const UploadCvSection = () => {
               height={24}
             />
 
-            <span className="text-sm">{cvFile.name}</span>
+            <span className="text-sm">{displayFileName}</span>
 
-            <span className="text-primary text-sm font-semibold">
-              {(cvFile.size / (1024 * 1024)).toFixed(1)}MB
-            </span>
+            {displayFileSize && (
+              <span className="text-primary text-sm font-semibold">
+                {displayFileSize}
+              </span>
+            )}
           </div>
 
           {/* Actions */}
@@ -119,8 +209,19 @@ const UploadCvSection = () => {
         </section>
       )}
 
-      {cvFile && <CVModal open={open} onOpenChange={setOpen} title={"View Cv"} url={URL.createObjectURL(cvFile)} handleDownload={handleDownload} handleUploadClick={handleUploadClick}
-        handleDelete={handleDelete} />}
+      {hasCv && (
+        <CVModal
+          open={open}
+          onOpenChange={setOpen}
+          title={"View Cv"}
+          url={displayUrl ?? undefined}
+          fileName={displayFileName}
+          handleDownload={handleDownload}
+          handleUploadClick={handleUploadClick}
+          handleDelete={handleDelete}
+          isDeleting={isDeleting}
+        />
+      )}
 
     </>
   )
