@@ -16,3 +16,7 @@ export type UpdateBasicInfoPayload = {
     city_id: number;
     established_date: string;
 }
+
+export type UpdateEmailPayload = {
+    email: string;
+}
