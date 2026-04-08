@@ -1,7 +1,11 @@
+"use client"
+
 import ActiveJobsTable from "@/features/company-dashboard/components/ActiveJobsTable";
 import DashBoardStatsCard from "@/features/company-dashboard/components/DashBoardStatsCard";
 import PieChartCard from "@/features/company-dashboard/components/PieChartCard";
+import useGetCompanyDashboard from "@/features/company-dashboard/hooks/useGetCompanyDashboard";
 import { activeJobType } from "@/features/company-dashboard/index.type";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 
 const MOCK_ACTIVE_JOBS: activeJobType[] = Array.from({ length: 6 }, (_, i) => ({
@@ -14,6 +18,11 @@ const MOCK_ACTIVE_JOBS: activeJobType[] = Array.from({ length: 6 }, (_, i) => ({
 }));
 
 const DashboardPage = () => {
+  const { data: session } = useSession();
+  const token = session?.accessToken as string
+  const { data: companyDashboardData, isPending } = useGetCompanyDashboard({ token });
+  console.log("companydashboard data", companyDashboardData);
+
   return (
     <section className="space-y-6">
       <h1 className="text-foreground text-xl font-semibold">Active Jobs</h1>
