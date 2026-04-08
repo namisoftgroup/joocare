@@ -4,7 +4,7 @@ import { Progress } from "@/shared/components/ui/progress";
 import { CircleAlert, Sparkles } from "lucide-react";
 import Image from "next/image";
 import UploadCvSection from "./UploadCvSection";
-import { CandidateProfileViewModel } from "../services/profile.service";
+import type { CandidateProfileViewModel } from "../types/profile.types";
 
 const SideContentInfos = ({
   profile,
@@ -90,7 +90,7 @@ const SideContentInfos = ({
       </section>
 
       {/* upload cv */}
-      <UploadCvSection />
+      <UploadCvSection cvUrl={profile?.cv ?? null} />
     </aside>
   );
 };

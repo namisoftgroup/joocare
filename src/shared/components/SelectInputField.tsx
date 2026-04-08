@@ -40,6 +40,9 @@ type SelectInputFieldProps = {
   isFetchingNextPage?: boolean;
 
   withSearchInput?: boolean;
+  searchPlaceholder?: string;
+  onSearchChange?: (value: string) => void;
+  portalContainer?: HTMLElement | null;
 };
 
 export const SelectInputField = React.forwardRef<
@@ -63,6 +66,9 @@ export const SelectInputField = React.forwardRef<
       hasNextPage,
       isFetchingNextPage,
       withSearchInput = false,
+      searchPlaceholder = "Search...",
+      onSearchChange,
+      portalContainer,
       ...props
     },
     ref,
@@ -162,11 +168,12 @@ export const SelectInputField = React.forwardRef<
             )}
           </ComboboxTrigger>
 
-          <ComboboxContent>
+          <ComboboxContent portalContainer={portalContainer}>
             {withSearchInput && (
               <ComboboxInput
                 showTrigger={false}
-                placeholder="Search..."
+                placeholder={searchPlaceholder}
+                onChange={(event) => onSearchChange?.(event.currentTarget.value)}
               />
             )}
 

@@ -4,12 +4,8 @@ import { useRouter } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 import { signOut, useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { getAuthApiUrl } from "@/shared/lib/api-endpoints";
 import { apiFetch } from "@/shared/lib/fetch-manager";
-
-const baseUrlByRole = {
-  candidate: process.env.NEXT_PUBLIC_BASE_USER_URL,
-  employer: process.env.NEXT_PUBLIC_BASE_COMPANY_URL,
-} as const;
 
 export const useLogout = () => {
   const router = useRouter();
@@ -19,11 +15,10 @@ export const useLogout = () => {
   const logout = async () => {
     const authRole = session?.authRole;
     const accessToken = session?.accessToken;
-    const baseUrl = authRole ? baseUrlByRole[authRole] : undefined;
 
     try {
-      if (baseUrl && accessToken) {
-        const { ok, message } = await apiFetch(`${baseUrl}/auth/logout`, {
+      if (authRole && accessToken) {
+        const { ok, message } = await apiFetch(`${getAuthApiUrl(authRole)}/auth/logout`, {
           method: "POST",
           locale,
           token: accessToken,

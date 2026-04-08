@@ -8,7 +8,7 @@ import {
 } from "@/shared/components/ui/accordion";
 import { CalendarRange, Plus } from "lucide-react";
 import { useState } from "react";
-import { CandidateProfileViewModel } from "../../services/profile.service";
+import type { CandidateProfileViewModel } from "../../types/profile.types";
 import { ExperienceModal } from "./ExperienceModal";
 import ExperienceActions from "./ExperienceActions";
 
@@ -46,20 +46,20 @@ export function ExperienceSectionData({
                       {exp.title}
                     </span>
                     <div className="flex items-center gap-2">
-                      {exp.organization && (
+                    {exp.organization && (
                         <span className="text-sm font-semibold">
                           {exp.organization}
                         </span>
                       )}
                       <span className="text-secondary flex items-center gap-1 text-[12px]">
                         <CalendarRange size={16} />
-                        {exp.startDate ?? "Start date"} - {exp.endDate ?? "Present"}
+                        {exp.startDateLabel ?? "Start date"} - {exp.endDateLabel ?? "Present"}
                       </span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-1 lg:gap-4">
-                    <ExperienceActions />
+                    <ExperienceActions experience={exp} />
                     <AccordionTrigger
                       iconType="arrow"
                       className="[&>svg]:text-muted-foreground flex items-center justify-center rounded-md p-0"
@@ -98,6 +98,7 @@ export function ExperienceSectionData({
         label="Add Experience"
         open={open}
         onOpenChange={setOpen}
+        experience={null}
       />
     </>
   );

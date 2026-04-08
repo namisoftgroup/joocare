@@ -1,3 +1,4 @@
+import { getBaseApiUrl } from "../lib/api-endpoints";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 export default function useGetJobTitles() {
@@ -6,7 +7,7 @@ export default function useGetJobTitles() {
         initialPageParam: 1,
         queryFn: async ({ pageParam }) => {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/job-titles?page=${pageParam}&pagination=on&limit_per_page=10`
+                `${getBaseApiUrl()}/job-titles?page=${pageParam}&pagination=on&limit_per_page=10`
             );
 
             if (!res.ok) {

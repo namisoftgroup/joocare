@@ -1,20 +1,6 @@
+import { getAuthApiUrl } from "@/shared/lib/api-endpoints";
 import { apiFetch } from "@/shared/lib/fetch-manager";
 import { PasswordResetRole } from "./password-reset";
-
-const baseUrlByRole: Record<PasswordResetRole, string | undefined> = {
-  candidate: process.env.NEXT_PUBLIC_BASE_USER_URL,
-  employer: process.env.NEXT_PUBLIC_BASE_COMPANY_URL,
-};
-
-function getBaseUrl(role: PasswordResetRole) {
-  const baseUrl = baseUrlByRole[role];
-
-  if (!baseUrl) {
-    throw new Error("Authentication endpoint is not configured.");
-  }
-
-  return baseUrl;
-}
 
 function createFormData(values: Record<string, string>) {
   const formData = new FormData();
@@ -35,7 +21,7 @@ export async function requestEmailVerification({
   email: string;
   locale: string;
 }) {
-  const { ok, message } = await apiFetch(`${getBaseUrl(role)}/auth/email/verify`, {
+  const { ok, message } = await apiFetch(`${getAuthApiUrl(role)}/auth/email/verify`, {
     method: "POST",
     locale,
     body: createFormData({ email }),
@@ -59,7 +45,7 @@ export async function confirmEmailVerification({
   otp: string;
   locale: string;
 }) {
-  const { ok, message } = await apiFetch(`${getBaseUrl(role)}/auth/email/confirm`, {
+  const { ok, message } = await apiFetch(`${getAuthApiUrl(role)}/auth/email/confirm`, {
     method: "POST",
     locale,
     body: createFormData({ email, otp }),
