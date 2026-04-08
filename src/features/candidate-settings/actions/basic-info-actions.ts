@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
-import { updateCandidateBasicInfo } from "../services/basic-info-service";
+import {
+  storeUploadedFile,
+  updateCandidateBasicInfo,
+} from "../services/basic-info-service";
 
 async function resolveCandidateToken() {
   const session = await getServerSession(authOptions);
@@ -15,12 +18,54 @@ async function resolveCandidateToken() {
   return session.accessToken;
 }
 
-export async function updateCandidateBasicInfoAction(formData: FormData) {
-  const token = await resolveCandidateToken();
-  const locale = typeof formData.get("locale") === "string" ? String(formData.get("locale")) : "en";
+export async function storeUploadedFileAction(
+  formData: FormData,
+  locale = "en",
+) {
+  const file = formData.get("image");
 
-  await updateCandidateBasicInfo({
-    formData,
+  if (!(file instanceof File) || file.size === 0) {
+    throw new Error("No file selected.");
+  }
+
+  return storeUploadedFile({
+    file,
+    locale,
+  });
+}
+
+export async function updateCandidateBasicInfoAction(formData: FormData, locale = "en") {
+  const token = await resolveCandidateToken();
+  const nextFormData = new FormData();
+
+  for (const [key, value] of formData.entries()) {
+    nextFormData.append(key, value);
+  }
+
+  const profileImage = nextFormData.get("image");
+
+  if (profileImage instanceof File && profileImage.size > 0) {
+    const uploadedImage = await storeUploadedFile({
+      file: profileImage,
+      locale,
+    });
+
+    nextFormData.set("image", uploadedImage.path);
+  }
+
+  const cvFile = nextFormData.get("cv");
+
+  if (cvFile instanceof File && cvFile.size > 0) {
+    const uploadedCv = await storeUploadedFile({
+      file: cvFile,
+      locale,
+    });
+
+    nextFormData.set("cv", uploadedCv.path);
+  }
+
+  const response = await updateCandidateBasicInfo({
+    formData: nextFormData,
     locale,
     token,
   });
@@ -28,7 +73,5 @@ export async function updateCandidateBasicInfoAction(formData: FormData) {
   revalidatePath(`/${locale}/candidate/settings/basic-info`);
   revalidatePath(`/${locale}/candidate/profile`);
 
-  return {
-    message: "Profile updated successfully.",
-  };
+  return response;
 }

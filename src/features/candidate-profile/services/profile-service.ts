@@ -5,68 +5,14 @@ import { authOptions } from "@/auth";
 import { getUserApiUrl } from "@/shared/lib/api-endpoints";
 import { apiFetch } from "@/shared/lib/fetch-manager";
 import type {
+  CandidateProfileApiEducation,
+  CandidateProfileApiExperience,
+  CandidateProfileApiUser,
   CandidateEducationViewModel,
   CandidateExperienceViewModel,
   CandidateProfileViewModel,
   CandidateSkillViewModel,
 } from "../types/profile.types";
-
-type CandidateProfileNamedRecord = {
-  id: number;
-  name?: string;
-  title?: string;
-};
-
-type CandidateProfileApiSkill = {
-  id: number;
-  title: string;
-};
-
-type CandidateProfileApiResponsibility = {
-  id: number;
-  description: string;
-};
-
-type CandidateProfileApiExperience = {
-  id: number;
-  title: string;
-  company: string | null;
-  start_date: string | null;
-  end_date: string | null;
-  is_current: boolean;
-  responsibilities: CandidateProfileApiResponsibility[];
-};
-
-type CandidateProfileApiEducation = {
-  id: number;
-  degree: string | null;
-  university: string | null;
-  country_id: number | null;
-  start_date: string | null;
-  end_date: string | null;
-};
-
-type CandidateProfileApiUser = {
-  id: number;
-  name: string;
-  email: string;
-  phone: string | null;
-  phone_code: string | null;
-  job_title: CandidateProfileNamedRecord | null;
-  specialty: CandidateProfileNamedRecord | null;
-  experience: CandidateProfileNamedRecord | null;
-  country: CandidateProfileNamedRecord | null;
-  city: CandidateProfileNamedRecord | null;
-  image: string | null;
-  cv: string | null;
-  age: number | string | null;
-  birth_date: string | null;
-  date_of_birth: string | null;
-  bio: string | null;
-  experiences: CandidateProfileApiExperience[];
-  educations: CandidateProfileApiEducation[];
-  skills: CandidateProfileApiSkill[];
-};
 
 function normalizeDateLabel(value: string | null) {
   if (!value) {
@@ -184,11 +130,11 @@ export async function getCandidateProfile() {
     phone: user.phone,
     phoneCode: user.phone_code,
     fullPhone: fullPhone ?? null,
-    jobTitleId: user.job_title?.id ? String(user.job_title.id) : null,
-    specialtyId: user.specialty?.id ? String(user.specialty.id) : null,
-    experienceId: user.experience?.id ? String(user.experience.id) : null,
-    countryId: user.country?.id ? String(user.country.id) : null,
-    cityId: user.city?.id ? String(user.city.id) : null,
+    jobTitleId: user.job_title_id ? String(user.job_title_id) : null,
+    specialtyId: user.specialty_id ? String(user.specialty_id) : null,
+    experienceId: user.experience_id ? String(user.experience_id) : null,
+    countryId: user.country_id ? String(user.country_id) : null,
+    cityId: user.city_id ? String(user.city_id) : null,
     birthDate: user.birth_date ?? user.date_of_birth ?? null,
     image: user.image ?? null,
     cv: user.cv ?? null,

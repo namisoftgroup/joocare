@@ -1,63 +1,69 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, type SubmitHandler, useForm, useWatch } from "react-hook-form";
-import { useEffect, useMemo, useState } from "react";
-import { parsePhoneNumber } from "react-phone-number-input";
-import { useLocale } from "next-intl";
-import { toast } from "sonner";
-import { InputField } from "@/shared/components/InputField";
-import { SelectInputField } from "@/shared/components/SelectInputField";
-import { Button } from "@/shared/components/ui/button";
-import { PhoneInputCode } from "@/shared/components/PhoneInputCode";
 import { FilepondUpload } from "@/shared/components/FilepondUpload";
+import { InputField } from "@/shared/components/InputField";
+import { PhoneInputCode } from "@/shared/components/PhoneInputCode";
+import { SelectInputField } from "@/shared/components/SelectInputField";
 import useGetCitiesByCountryId from "@/shared/hooks/useGetCitiesByCountryId";
-import { updateCandidateBasicInfoAction } from "../../actions/basic-info-actions";
-import type {
-  CandidateSettingsOption,
-  CandidateSettingsProfile,
-} from "../../services/basic-info-service";
-import ProfileImage from "./ProfileImage";
+import useGetCountries from "@/shared/hooks/useGetCountries";
+import useGetExperiences from "@/shared/hooks/useGetExperiences";
+import useGetJobTitles from "@/shared/hooks/useGetJobTitles";
+import useGetSpecialties from "@/shared/hooks/useGetSpecialties";
+import { Button } from "@/shared/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useLocale } from "next-intl";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Controller,
+  type SubmitHandler,
+  useForm,
+  useWatch,
+} from "react-hook-form";
+import { parsePhoneNumber } from "react-phone-number-input";
+import { toast } from "sonner";
+import {
+  storeUploadedFileAction,
+  updateCandidateBasicInfoAction,
+} from "../../actions/basic-info-actions";
+import type { CandidateSettingsProfile } from "../../services/basic-info-service";
 import {
   SettingBasicInfoSchema,
   type TSettingBasicInfoSchema,
 } from "../../validation/basic-info-schema";
+import ProfileImage from "./ProfileImage";
 
 interface BasicInfoFormProps {
   profile: CandidateSettingsProfile;
-  jobTitles: CandidateSettingsOption[];
-  specialties: CandidateSettingsOption[];
-  experiences: CandidateSettingsOption[];
-  countries: CandidateSettingsOption[];
-  initialCities: CandidateSettingsOption[];
 }
 
-const BasicInfoForm = ({
-  profile,
-  jobTitles,
-  specialties,
-  experiences,
-  countries,
-  initialCities,
-}: BasicInfoFormProps) => {
+const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
   const locale = useLocale();
   const [isSaving, setIsSaving] = useState(false);
-  const defaultValues = useMemo<TSettingBasicInfoSchema>(() => ({
-    fullName: profile.name,
-    email: profile.email,
-    phoneNumber:
-      profile.phoneCode && profile.phone
-        ? `${profile.phoneCode}${profile.phone}`
-        : profile.phone,
-    jobTitle: profile.jobTitleId,
-    specialty: profile.specialtyId,
-    yearsOfExperience: profile.experienceId,
-    country: profile.countryId,
-    city: profile.cityId,
-    dateOfBirth: profile.birthDate,
-    profileImage: [],
-    uploadCV: [],
-  }), [profile]);
+  const [jobTitleSearch, setJobTitleSearch] = useState("");
+  const [specialtySearch, setSpecialtySearch] = useState("");
+  const [experienceSearch, setExperienceSearch] = useState("");
+  const [countrySearch, setCountrySearch] = useState("");
+  const [citySearch, setCitySearch] = useState("");
+  const [uploadedCvPath, setUploadedCvPath] = useState<string | null>(null);
+  const defaultValues = useMemo<TSettingBasicInfoSchema>(
+    () => ({
+      fullName: profile.name,
+      email: profile.email,
+      phoneNumber:
+        profile.phoneCode && profile.phone
+          ? `${profile.phoneCode}${profile.phone}`
+          : profile.phone,
+      jobTitle: profile.jobTitleId,
+      specialty: profile.specialtyId,
+      yearsOfExperience: profile.experienceId,
+      country: profile.countryId,
+      city: profile.cityId,
+      dateOfBirth: profile.birthDate,
+      profileImage: [],
+      uploadCV: [],
+    }),
+    [profile],
+  );
 
   const {
     register,
@@ -73,26 +79,47 @@ const BasicInfoForm = ({
   });
 
   const selectedCountryId = useWatch({ control, name: "country" });
+  const previousCountryId = useRef<string | undefined>(profile.countryId);
+  const {
+    jobTitles,
+    isLoading: isJobTitlesLoading,
+    error: jobTitlesError,
+    hasNextPage: hasMoreJobTitles,
+    fetchNextPage: fetchMoreJobTitles,
+    isFetchingNextPage: isFetchingMoreJobTitles,
+  } = useGetJobTitles(jobTitleSearch);
+  const {
+    specialties,
+    isLoading: isSpecialtiesLoading,
+    error: specialtiesError,
+    hasNextPage: hasMoreSpecialties,
+    fetchNextPage: fetchMoreSpecialties,
+    isFetchingNextPage: isFetchingMoreSpecialties,
+  } = useGetSpecialties(specialtySearch);
+  const {
+    experiences,
+    isLoading: isExperiencesLoading,
+    error: experiencesError,
+    hasNextPage: hasMoreExperiences,
+    fetchNextPage: fetchMoreExperiences,
+    isFetchingNextPage: isFetchingMoreExperiences,
+  } = useGetExperiences(experienceSearch);
+  const {
+    countries,
+    isLoading: isCountriesLoading,
+    error: countriesError,
+    hasNextPage: hasMoreCountries,
+    fetchNextPage: fetchMoreCountries,
+    isFetchingNextPage: isFetchingMoreCountries,
+  } = useGetCountries(countrySearch);
   const {
     cities,
     isLoading: isCitiesLoading,
-  } = useGetCitiesByCountryId(Number(selectedCountryId));
-
-  const cityOptions = useMemo(() => {
-    if (cities.length > 0) {
-      return cities
-        .map((city) => ({
-          label: String(city.name ?? ""),
-          value: String(city.id ?? ""),
-        }))
-        .filter((city) => city.label);
-    }
-
-    return initialCities.map((city) => ({
-      label: city.label,
-      value: city.id,
-    }));
-  }, [cities, initialCities]);
+    error: citiesError,
+    hasNextPage: hasMoreCities,
+    fetchNextPage: fetchMoreCities,
+    isFetchingNextPage: isFetchingMoreCities,
+  } = useGetCitiesByCountryId(Number(selectedCountryId), citySearch);
 
   useEffect(() => {
     reset(defaultValues);
@@ -102,6 +129,23 @@ const BasicInfoForm = ({
     if (!selectedCountryId) {
       setValue("city", "");
     }
+  }, [selectedCountryId, setValue]);
+
+  useEffect(() => {
+    setUploadedCvPath(null);
+  }, [profile.cv]);
+
+  useEffect(() => {
+    if (
+      previousCountryId.current &&
+      selectedCountryId &&
+      previousCountryId.current !== selectedCountryId
+    ) {
+      setValue("city", "");
+      setCitySearch("");
+    }
+
+    previousCountryId.current = selectedCountryId;
   }, [selectedCountryId, setValue]);
 
   const onSubmit: SubmitHandler<TSettingBasicInfoSchema> = async (data) => {
@@ -116,7 +160,6 @@ const BasicInfoForm = ({
       setIsSaving(true);
 
       const formData = new FormData();
-      formData.append("locale", locale);
       formData.append("name", data.fullName.trim());
       formData.append("phone", parsedPhone.nationalNumber ?? "");
       formData.append("phone_code", `+${parsedPhone.countryCallingCode ?? ""}`);
@@ -131,15 +174,19 @@ const BasicInfoForm = ({
         formData.append("image", data.profileImage[0]);
       }
 
-      if (data.uploadCV[0] instanceof File) {
+      if (uploadedCvPath) {
+        formData.append("cv", uploadedCvPath);
+      } else if (data.uploadCV[0] instanceof File) {
         formData.append("cv", data.uploadCV[0]);
       }
 
-      const response = await updateCandidateBasicInfoAction(formData);
+      const response = await updateCandidateBasicInfoAction(formData, locale);
       toast.success(response.message ?? "Profile updated successfully.");
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Failed to update profile information.";
+        error instanceof Error
+          ? error.message
+          : "Failed to update profile information.";
       toast.error(message);
     } finally {
       setIsSaving(false);
@@ -147,9 +194,12 @@ const BasicInfoForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="mt-6 flex flex-col gap-5">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="mt-6 flex flex-col gap-5"
+    >
       <div className="flex w-full flex-col">
-        <h3 className="mx-1 mb-1 font-semibold text-base">Profile Picture</h3>
+        <h3 className="mx-1 mb-1 text-base font-semibold">Profile Picture</h3>
         <Controller
           name="profileImage"
           control={control}
@@ -216,12 +266,24 @@ const BasicInfoForm = ({
             id="jobTitle"
             label="Job Title"
             placeholder="ex: Consultant Internist"
+            withSearchInput
+            searchPlaceholder="Search job titles..."
             {...field}
-            error={errors.jobTitle?.message}
+            error={
+              errors.jobTitle?.message ??
+              (jobTitlesError instanceof Error
+                ? jobTitlesError.message
+                : undefined)
+            }
             options={jobTitles.map((jobTitle) => ({
-              label: jobTitle.label,
-              value: jobTitle.id,
+              label: jobTitle.title,
+              value: String(jobTitle.id),
             }))}
+            disabled={isJobTitlesLoading}
+            onReachEnd={() => fetchMoreJobTitles()}
+            hasNextPage={Boolean(hasMoreJobTitles)}
+            isFetchingNextPage={isFetchingMoreJobTitles}
+            onSearchChange={setJobTitleSearch}
           />
         )}
       />
@@ -235,12 +297,24 @@ const BasicInfoForm = ({
               label="Specialty"
               id="specialty"
               placeholder="ex: Cardiology"
+              withSearchInput
+              searchPlaceholder="Search specialties..."
               {...field}
-              error={errors.specialty?.message}
+              error={
+                errors.specialty?.message ??
+                (specialtiesError instanceof Error
+                  ? specialtiesError.message
+                  : undefined)
+              }
               options={specialties.map((specialty) => ({
-                label: specialty.label,
-                value: specialty.id,
+                label: specialty.title,
+                value: String(specialty.id),
               }))}
+              disabled={isSpecialtiesLoading}
+              onReachEnd={() => fetchMoreSpecialties()}
+              hasNextPage={Boolean(hasMoreSpecialties)}
+              isFetchingNextPage={isFetchingMoreSpecialties}
+              onSearchChange={setSpecialtySearch}
             />
           )}
         />
@@ -252,12 +326,24 @@ const BasicInfoForm = ({
               label="Years of Experience"
               id="yearsOfExperience"
               placeholder="ex: 3-5 years"
+              withSearchInput
+              searchPlaceholder="Search experience..."
               {...field}
-              error={errors.yearsOfExperience?.message}
+              error={
+                errors.yearsOfExperience?.message ??
+                (experiencesError instanceof Error
+                  ? experiencesError.message
+                  : undefined)
+              }
               options={experiences.map((experience) => ({
-                label: experience.label,
-                value: experience.id,
+                label: experience.title,
+                value: String(experience.id),
               }))}
+              disabled={isExperiencesLoading}
+              onReachEnd={() => fetchMoreExperiences()}
+              hasNextPage={Boolean(hasMoreExperiences)}
+              isFetchingNextPage={isFetchingMoreExperiences}
+              onSearchChange={setExperienceSearch}
             />
           )}
         />
@@ -275,12 +361,24 @@ const BasicInfoForm = ({
               <SelectInputField
                 id="country"
                 placeholder="country"
+                withSearchInput
+                searchPlaceholder="Search countries..."
                 {...field}
-                error={errors.country?.message}
+                error={
+                  errors.country?.message ??
+                  (countriesError instanceof Error
+                    ? countriesError.message
+                    : undefined)
+                }
                 options={countries.map((country) => ({
-                  label: country.label,
-                  value: country.id,
+                  label: country.name,
+                  value: String(country.id),
                 }))}
+                disabled={isCountriesLoading}
+                onReachEnd={() => fetchMoreCountries()}
+                hasNextPage={Boolean(hasMoreCountries)}
+                isFetchingNextPage={isFetchingMoreCountries}
+                onSearchChange={setCountrySearch}
               />
             )}
           />
@@ -291,10 +389,24 @@ const BasicInfoForm = ({
               <SelectInputField
                 id="city"
                 placeholder="city"
+                withSearchInput
+                searchPlaceholder="Search cities..."
                 {...field}
-                error={errors.city?.message}
-                options={cityOptions}
+                error={
+                  errors.city?.message ??
+                  (citiesError instanceof Error
+                    ? citiesError.message
+                    : undefined)
+                }
+                options={cities.map((city) => ({
+                  label: city.name,
+                  value: String(city.id),
+                }))}
                 disabled={!selectedCountryId || isCitiesLoading}
+                onReachEnd={() => fetchMoreCities()}
+                hasNextPage={Boolean(hasMoreCities)}
+                isFetchingNextPage={isFetchingMoreCities}
+                onSearchChange={setCitySearch}
               />
             )}
           />
@@ -329,6 +441,12 @@ const BasicInfoForm = ({
             hint={`"Optional"`}
             files={field.value}
             onChange={field.onChange}
+            processFile={async (file) => {
+              const uploadFormData = new FormData();
+              uploadFormData.append("image", file);
+              return storeUploadedFileAction(uploadFormData, locale);
+            }}
+            onStoredPathChange={setUploadedCvPath}
             allowMultiple={false}
             maxFiles={1}
             error={errors.uploadCV?.message}
@@ -336,12 +454,12 @@ const BasicInfoForm = ({
         )}
       />
 
-      <div className="flex justify-center items-center">
+      <div className="flex items-center justify-center">
         <Button
           variant={"secondary"}
-          hoverStyle={'slidePrimary'}
-          size={'pill'}
-          className='w-1/3 md:w-56'
+          hoverStyle={"slidePrimary"}
+          size={"pill"}
+          className="w-1/3 md:w-56"
           type="submit"
           disabled={isSaving}
         >

@@ -1,11 +1,8 @@
 import "server-only";
 
-import { getLocale } from "next-intl/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/auth";
+import type { CandidateProfileViewModel } from "@/features/candidate-profile/types/profile.types";
 import { getBaseApiUrl, getUserApiUrl } from "@/shared/lib/api-endpoints";
 import { apiFetch } from "@/shared/lib/fetch-manager";
-import type { CandidateProfileViewModel } from "@/features/candidate-profile/types/profile.types";
 
 export type CandidateSettingsOption = {
   id: string;
@@ -35,90 +32,20 @@ export type CandidateBasicInfoOptions = {
   cities: CandidateSettingsOption[];
 };
 
-function asRecord(value: unknown) {
-  return value && typeof value === "object"
-    ? (value as Record<string, unknown>)
-    : null;
-}
+type StoredImageResponse = {
+  id: number;
+  image: string;
+  created_at: string;
+  updated_at: string;
+};
 
-function parseOption(entry: unknown): CandidateSettingsOption | null {
-  const record = asRecord(entry);
+const STORAGE_BASE_URL = "https://joocare.nami-tec.com/storage";
 
-  if (!record) {
-    return null;
-  }
 
-  const nestedItem = asRecord(record.item);
-  const id = nestedItem?.id ?? record.id ?? record.value;
-  const label =
-    nestedItem?.name ??
-    nestedItem?.title ??
-    record.name ??
-    record.title ??
-    record.label ??
-    record.value;
 
-  if ((typeof id === "number" || typeof id === "string") && typeof label === "string") {
-    return {
-      id: String(id),
-      label,
-    };
-  }
 
-  return null;
-}
 
-function findCollections(
-  data: unknown,
-  keyHints: string[],
-  parentKey = "",
-): unknown[][] {
-  const record = asRecord(data);
 
-  if (!record) {
-    return [];
-  }
-
-  const matches: unknown[][] = [];
-
-  for (const [key, value] of Object.entries(record)) {
-    const normalizedKey = key.toLowerCase();
-    const matchedKey = keyHints.some(
-      (hint) => normalizedKey.includes(hint) || parentKey.includes(hint),
-    );
-
-    if (Array.isArray(value)) {
-      if (matchedKey) {
-        matches.push(value);
-      }
-
-      for (const item of value) {
-        matches.push(...findCollections(item, keyHints, normalizedKey));
-      }
-
-      continue;
-    }
-
-    if (value && typeof value === "object") {
-      matches.push(...findCollections(value, keyHints, normalizedKey));
-    }
-  }
-
-  return matches;
-}
-
-function getBestCollection(data: unknown, keyHints: string[]) {
-  const collections = findCollections(data, keyHints)
-    .map((collection) => collection.map(parseOption).filter((item): item is CandidateSettingsOption => Boolean(item)))
-    .filter((collection) => collection.length > 0);
-
-  if (collections.length === 0) {
-    return [];
-  }
-
-  collections.sort((left, right) => right.length - left.length);
-  return collections[0];
-}
 
 function normalizeDate(value: unknown) {
   if (typeof value !== "string" || !value) {
@@ -134,28 +61,19 @@ function normalizeDate(value: unknown) {
   return parsed.toISOString().slice(0, 10);
 }
 
-async function getCountryCities(countryId: string) {
-  if (!countryId) {
-    return [];
+function resolveStoredFileUrl(path: string | null | undefined) {
+  if (!path) {
+    return null;
   }
 
-  const { ok, data } = await apiFetch(
-    `${getBaseApiUrl()}/cities?pagination=on&limit_per_page=100&page=1&country_id=${countryId}`,
-    {
-      method: "GET",
-    },
-  );
-
-  if (!ok) {
-    return [];
+  if (/^https?:\/\//i.test(path)) {
+    return path;
   }
 
-  const items = Array.isArray(data?.data) ? data.data : [];
-
-  return items
-    .map(parseOption)
-    .filter((item): item is CandidateSettingsOption => Boolean(item));
+  return `${STORAGE_BASE_URL}/${path.replace(/^\/+/, "")}`;
 }
+
+
 
 export function mapCandidateProfileToSettingsProfile(
   profile: CandidateProfileViewModel,
@@ -171,40 +89,43 @@ export function mapCandidateProfileToSettingsProfile(
     countryId: profile.countryId ?? "",
     cityId: profile.cityId ?? "",
     birthDate: normalizeDate(profile.birthDate),
-    image: profile.image,
-    cv: profile.cv,
+    image: resolveStoredFileUrl(profile.image),
+    cv: resolveStoredFileUrl(profile.cv),
   };
 }
 
-export async function getCandidateBasicInfoOptions(countryId: string) {
-  const session = await getServerSession(authOptions);
+export async function storeUploadedFile({
+  file,
+  locale = "en",
+}: {
+  file: File;
+  locale?: string;
+}) {
+  const uploadFormData = new FormData();
+  uploadFormData.append("image", file);
 
-  if (!session?.accessToken || session.authRole !== "candidate") {
-    return null;
+  const { ok, data, message } = await apiFetch<StoredImageResponse>(
+    `${getBaseApiUrl()}/images`,
+    {
+      method: "POST",
+      locale,
+      body: uploadFormData,
+    },
+  );
+
+  const storedFilePath = data?.data?.image;
+
+  if (!ok || !storedFilePath) {
+    throw new Error(message || "Failed to upload file.");
   }
-
-  const locale = await getLocale();
-  const token = String(session.accessToken);
-  const formDataResponse = await apiFetch(`${getUserApiUrl()}/auth/update-profile/form-data`, {
-    method: "GET",
-    locale,
-    token,
-  });
-
-  if (!formDataResponse.ok) {
-    return null;
-  }
-
-  const formData = formDataResponse.data;
 
   return {
-    jobTitles: getBestCollection(formData, ["job_title", "jobtitle"]),
-    specialties: getBestCollection(formData, ["specialty"]),
-    experiences: getBestCollection(formData, ["experience"]),
-    countries: getBestCollection(formData, ["country"]),
-    cities: await getCountryCities(countryId),
-  } satisfies CandidateBasicInfoOptions;
+    path: storedFilePath,
+    message: message || data?.message || "Success",
+  };
 }
+
+
 
 export async function updateCandidateBasicInfo({
   formData,
@@ -215,16 +136,22 @@ export async function updateCandidateBasicInfo({
   locale?: string;
   token: string;
 }) {
-  const { ok, data, message } = await apiFetch(`${getUserApiUrl()}/auth/update-profile`, {
-    method: "POST",
-    locale,
-    token,
-    body: formData,
-  });
+  const { ok, data, message } = await apiFetch(
+    `${getUserApiUrl()}/auth/update-profile`,
+    {
+      method: "POST",
+      locale,
+      token,
+      body: formData,
+    },
+  );
 
   if (!ok) {
     throw new Error(message || "Failed to update profile information.");
   }
 
-  return data;
+  return {
+    data,
+    message: message || data?.message || "Profile updated successfully.",
+  };
 }
