@@ -168,6 +168,7 @@ export async function getCandidateProfile() {
   const skills = user.skills.map((skill) => ({
     id: String(skill.id),
     label: skill.title,
+    deleteId: String(skill.id),
   })) satisfies CandidateSkillViewModel[];
   const educations = user.educations.map(mapEducation);
   const experiences = user.experiences.map(mapExperience);

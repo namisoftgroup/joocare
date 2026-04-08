@@ -24,16 +24,16 @@ export async function saveSkillsAction({
 }) {
   const token = await resolveCandidateToken();
 
-  await addUserSkills({
+  const result = await addUserSkills({
     skillIds,
     locale,
     token,
   });
-
+  console.log("[saveSkillsAction] addUserSkills response:", result);
   revalidatePath(`/${locale}/candidate/profile`);
 
   return {
-    message: "Skills saved successfully.",
+    message: result.message || "Skills saved successfully.",
   };
 }
 
@@ -46,15 +46,16 @@ export async function updateSkillsAction({
 }) {
   const token = await resolveCandidateToken();
 
-  await updateUserSkills({
+  const result = await updateUserSkills({
     skillIds: deletedSkillIds,
     locale,
     token,
   });
+  console.log("[updateSkillsAction] updateUserSkills response:", result);
 
   revalidatePath(`/${locale}/candidate/profile`);
 
   return {
-    message: "Skills updated successfully.",
+    message: result.message || "Skills updated successfully.",
   };
 }

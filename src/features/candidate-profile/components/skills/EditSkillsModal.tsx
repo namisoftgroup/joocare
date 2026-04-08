@@ -57,12 +57,12 @@ export function EditSkillsModal({
         .filter((skill) => !currentIdSet.has(skill.id))
         .map((skill) => skill.id);
 
-      await updateSkillsAction({
+      const result = await updateSkillsAction({
         deletedSkillIds,
         locale,
       });
 
-      toast.success("Skills updated successfully.");
+      toast.success(result.message);
       onSave(current);
       onOpenChange(false);
     } catch (error) {

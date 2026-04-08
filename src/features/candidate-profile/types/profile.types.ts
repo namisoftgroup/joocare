@@ -19,6 +19,7 @@ export type CandidateProfileViewModel = {
 export type CandidateSkillViewModel = {
   id: string;
   label: string;
+  deleteId?: string;
 };
 
 export type CandidateEducationViewModel = {

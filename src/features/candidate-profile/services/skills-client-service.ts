@@ -4,6 +4,7 @@ import { apiFetch } from "@/shared/lib/fetch-manager";
 export type SkillOption = {
   id: string;
   label: string;
+  deleteId?: string;
 };
 
 export type UserSkillsCatalog = {
@@ -21,7 +22,8 @@ function parseSkillOption(entry: unknown): SkillOption | null {
     record.skill && typeof record.skill === "object"
       ? (record.skill as Record<string, unknown>)
       : null;
-  const id = nestedSkill?.id ?? record.skill_id ?? record.id;
+  const rawId = record.id;
+  const id = nestedSkill?.id ?? record.skill_id ?? rawId;
   const label =
     nestedSkill?.name ??
     nestedSkill?.title ??
@@ -34,6 +36,11 @@ function parseSkillOption(entry: unknown): SkillOption | null {
     return {
       id: String(id),
       label,
+      deleteId:
+        (nestedSkill || record.skill_id) &&
+          (typeof rawId === "number" || typeof rawId === "string")
+          ? String(rawId)
+          : String(id),
     };
   }
 
@@ -120,26 +127,48 @@ export async function addUserSkills({
   token: string;
 }) {
   if (skillIds.length === 0) {
-    return null;
+    return {
+      data: null,
+      message: "No new skills to add.",
+    };
   }
 
   const formData = new FormData();
   skillIds.forEach((id) => {
     formData.append("skills[]", id);
   });
+  console.log("[addUserSkills] request payload:", {
+    locale,
+    skillIds,
+    entries: Array.from(formData.entries()),
+  });
+  console.log("[addUserSkills] request formData:",
+    formData
+  );
 
-  const { ok, data, message } = await apiFetch(`${getUserApiUrl()}/user-skills`, {
+
+  const result = await apiFetch(`${getUserApiUrl()}/user-skills`, {
     method: "POST",
     locale,
     token,
     body: formData,
   });
+  console.log("[addUserSkills] api response:", {
+    ok: result.ok,
+    statusCode: result.statusCode,
+    message: result.message,
+    data: result.data,
+  });
+  const { ok, data, message } = result;
 
   if (!ok) {
     throw new Error(message || "Failed to save skills.");
   }
 
-  return data;
+  return {
+    data,
+    message,
+  };
 }
 
 export async function updateUserSkills({
@@ -151,22 +180,49 @@ export async function updateUserSkills({
   locale?: string;
   token: string;
 }) {
+  if (skillIds.length === 0) {
+    return {
+      data: null,
+      message: "No skills to delete.",
+    };
+  }
+
   const formData = new FormData();
   skillIds.forEach((id) => {
     formData.append("skills[]", id);
   });
   formData.append("_method", "put");
 
-  const { ok, data, message } = await apiFetch(`${getUserApiUrl()}/user-skills/`, {
+  console.log("[updateUserSkills] request payload:", {
+    locale,
+    skillIds,
+    entries: Array.from(formData.entries()),
+  });
+  console.log("[updateUserSkills] request formData:",
+    formData
+  );
+
+  const result = await apiFetch(`${getUserApiUrl()}/user-skills`, {
     method: "POST",
     locale,
     token,
     body: formData,
+
   });
+  console.log("[updateUserSkills] api response:", {
+    ok: result.ok,
+    statusCode: result.statusCode,
+    message: result.message,
+    data: result.data,
+  });
+  const { ok, data, message } = result;
 
   if (!ok) {
     throw new Error(message || "Failed to update skills.");
   }
 
-  return data;
+  return {
+    data,
+    message,
+  };
 }

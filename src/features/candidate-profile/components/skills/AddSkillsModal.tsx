@@ -84,50 +84,53 @@ export function AddSkillsModal({
     };
   }, [locale, open, session?.accessToken, skills]);
 
-  const availableLabels = useMemo(
-    () => options.map((skill) => skill.label),
-    [options],
+  const allSkillOptions = useMemo(() => {
+    const merged = new Map<string, SkillOption>();
+
+    [...options, ...suggestedSkills].forEach((skill) => {
+      merged.set(skill.id, skill);
+    });
+
+    return Array.from(merged.values());
+  }, [options, suggestedSkills]);
+
+  const optionsById = useMemo(
+    () => new Map(allSkillOptions.map((skill) => [skill.id, skill])),
+    [allSkillOptions],
   );
 
-  const toggle = (skill: string) => {
+  const toggle = (skillId: string) => {
     setSelected((prev) =>
-      prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill],
+      prev.includes(skillId) ? prev.filter((id) => id !== skillId) : [...prev, skillId],
     );
   };
 
-  const remove = (skill: string) => {
-    setSelected((prev) => prev.filter((s) => s !== skill));
+  const remove = (skillId: string) => {
+    setSelected((prev) => prev.filter((id) => id !== skillId));
   };
 
   const handleAdd = async () => {
     try {
       setIsSaving(true);
-      const selectedIds = selected
-        .map(
-          (label) => options.find((skill) => skill.label === label)?.id ?? null,
-        )
-        .filter((id): id is string => Boolean(id));
-
-      const existingLabelSet = new Set(
-        currentSkills.map((skill) => skill.label),
-      );
-      const newLabels = selected.filter(
-        (label) => !existingLabelSet.has(label),
-      );
-      const newSkills = newLabels
-        .map((label) => options.find((skill) => skill.label === label))
+      const existingSkillIdSet = new Set(currentSkills.map((skill) => skill.id));
+      const newlySelectedOptions = selected
+        .map((skillId) => optionsById.get(skillId))
         .filter((skill): skill is SkillOption => Boolean(skill))
+        .filter((skill) => !existingSkillIdSet.has(skill.id));
+      const newSkillIds = newlySelectedOptions.map((skill) => skill.id);
+      const newSkills = newlySelectedOptions
         .map((skill) => ({
           id: skill.id,
           label: skill.label,
+          deleteId: skill.deleteId ?? skill.id,
         }));
 
-      await saveSkillsAction({
-        skillIds: selectedIds,
+      const result = await saveSkillsAction({
+        skillIds: newSkillIds,
         locale,
       });
 
-      toast.success("Skills added successfully.");
+      toast.success(result.message);
       onSave([...currentSkills, ...newSkills]);
       handleClose(false);
     } catch (error) {
@@ -161,7 +164,7 @@ export function AddSkillsModal({
             selected={selected}
             onSelect={toggle}
             onRemove={remove}
-            options={availableLabels}
+            options={allSkillOptions}
           />
         </div>
 
@@ -169,12 +172,12 @@ export function AddSkillsModal({
           <p className="text-sm">Suggested based on your profile</p>
           <div className="flex flex-wrap gap-2 rounded-xl bg-[#09760A05] p-3">
             {suggestedSkills.map((skill) => {
-              const isSelected = selected.includes(skill.label);
+              const isSelected = selected.includes(skill.id);
               return (
                 <button
                   key={skill.id}
                   type="button"
-                  onClick={() => toggle(skill.label)}
+                  onClick={() => toggle(skill.id)}
                   className={`border-border rounded-full border px-4 py-2 text-sm transition-all ${
                     isSelected
                       ? "border-primary bg-primary text-white"
