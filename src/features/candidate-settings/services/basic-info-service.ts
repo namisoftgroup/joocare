@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { getBaseApiUrl, getUserApiUrl } from "@/shared/lib/api-endpoints";
 import { apiFetch } from "@/shared/lib/fetch-manager";
+import type { CandidateProfileViewModel } from "@/features/candidate-profile/types/profile.types";
 
 export type CandidateSettingsOption = {
   id: string;
@@ -26,8 +27,7 @@ export type CandidateSettingsProfile = {
   cv: string | null;
 };
 
-export type CandidateSettingsPageData = {
-  profile: CandidateSettingsProfile;
+export type CandidateBasicInfoOptions = {
   jobTitles: CandidateSettingsOption[];
   specialties: CandidateSettingsOption[];
   experiences: CandidateSettingsOption[];
@@ -120,40 +120,6 @@ function getBestCollection(data: unknown, keyHints: string[]) {
   return collections[0];
 }
 
-function resolveUserRecord(data: unknown) {
-  const root = asRecord(data);
-  const nestedData = asRecord(root?.data);
-
-  return (
-    asRecord(nestedData?.user) ??
-    asRecord(nestedData?.profile) ??
-    nestedData ??
-    asRecord(root?.user) ??
-    asRecord(root?.profile)
-  );
-}
-
-function resolveNestedId(record: Record<string, unknown>, key: string) {
-  const nested = asRecord(record[key]);
-  const snakeKey = `${key}_id`;
-  const value = nested?.id ?? record[snakeKey];
-
-  return typeof value === "number" || typeof value === "string"
-    ? String(value)
-    : "";
-}
-
-function resolveAsset(value: unknown) {
-  if (typeof value === "string" && value) {
-    return value;
-  }
-
-  const record = asRecord(value);
-  const url = record?.url ?? record?.path ?? record?.file;
-
-  return typeof url === "string" && url ? url : null;
-}
-
 function normalizeDate(value: unknown) {
   if (typeof value !== "string" || !value) {
     return "";
@@ -191,7 +157,26 @@ async function getCountryCities(countryId: string) {
     .filter((item): item is CandidateSettingsOption => Boolean(item));
 }
 
-export async function getCandidateBasicInfoPageData() {
+export function mapCandidateProfileToSettingsProfile(
+  profile: CandidateProfileViewModel,
+): CandidateSettingsProfile {
+  return {
+    name: profile.name,
+    email: profile.email,
+    phone: profile.phone ?? "",
+    phoneCode: profile.phoneCode ?? "",
+    jobTitleId: profile.jobTitleId ?? "",
+    specialtyId: profile.specialtyId ?? "",
+    experienceId: profile.experienceId ?? "",
+    countryId: profile.countryId ?? "",
+    cityId: profile.cityId ?? "",
+    birthDate: normalizeDate(profile.birthDate),
+    image: profile.image,
+    cv: profile.cv,
+  };
+}
+
+export async function getCandidateBasicInfoOptions(countryId: string) {
   const session = await getServerSession(authOptions);
 
   if (!session?.accessToken || session.authRole !== "candidate") {
@@ -200,51 +185,25 @@ export async function getCandidateBasicInfoPageData() {
 
   const locale = await getLocale();
   const token = String(session.accessToken);
+  const formDataResponse = await apiFetch(`${getUserApiUrl()}/auth/update-profile/form-data`, {
+    method: "GET",
+    locale,
+    token,
+  });
 
-  const [profileResponse, formDataResponse] = await Promise.all([
-    apiFetch(`${getUserApiUrl()}/auth/profile`, {
-      method: "GET",
-      locale,
-      token,
-    }),
-    apiFetch(`${getUserApiUrl()}/auth/update-profile/form-data`, {
-      method: "GET",
-      locale,
-      token,
-    }),
-  ]);
-
-  const user = resolveUserRecord(profileResponse.data);
-
-  if (!profileResponse.ok || !user) {
+  if (!formDataResponse.ok) {
     return null;
   }
-
-  const profile: CandidateSettingsProfile = {
-    name: typeof user.name === "string" ? user.name : "",
-    email: typeof user.email === "string" ? user.email : "",
-    phone: typeof user.phone === "string" ? user.phone : "",
-    phoneCode: typeof user.phone_code === "string" ? user.phone_code : "",
-    jobTitleId: resolveNestedId(user, "job_title"),
-    specialtyId: resolveNestedId(user, "specialty"),
-    experienceId: resolveNestedId(user, "experience"),
-    countryId: resolveNestedId(user, "country"),
-    cityId: resolveNestedId(user, "city"),
-    birthDate: normalizeDate(user.birth_date ?? user.date_of_birth),
-    image: resolveAsset(user.image),
-    cv: resolveAsset(user.cv),
-  };
 
   const formData = formDataResponse.data;
 
   return {
-    profile,
     jobTitles: getBestCollection(formData, ["job_title", "jobtitle"]),
     specialties: getBestCollection(formData, ["specialty"]),
     experiences: getBestCollection(formData, ["experience"]),
     countries: getBestCollection(formData, ["country"]),
-    cities: await getCountryCities(profile.countryId),
-  } satisfies CandidateSettingsPageData;
+    cities: await getCountryCities(countryId),
+  } satisfies CandidateBasicInfoOptions;
 }
 
 export async function updateCandidateBasicInfo({

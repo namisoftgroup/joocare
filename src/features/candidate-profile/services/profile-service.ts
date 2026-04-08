@@ -53,11 +53,15 @@ type CandidateProfileApiUser = {
   phone: string | null;
   phone_code: string | null;
   job_title: CandidateProfileNamedRecord | null;
+  specialty: CandidateProfileNamedRecord | null;
+  experience: CandidateProfileNamedRecord | null;
   country: CandidateProfileNamedRecord | null;
   city: CandidateProfileNamedRecord | null;
   image: string | null;
   cv: string | null;
   age: number | string | null;
+  birth_date: string | null;
+  date_of_birth: string | null;
   bio: string | null;
   experiences: CandidateProfileApiExperience[];
   educations: CandidateProfileApiEducation[];
@@ -180,6 +184,12 @@ export async function getCandidateProfile() {
     phone: user.phone,
     phoneCode: user.phone_code,
     fullPhone: fullPhone ?? null,
+    jobTitleId: user.job_title?.id ? String(user.job_title.id) : null,
+    specialtyId: user.specialty?.id ? String(user.specialty.id) : null,
+    experienceId: user.experience?.id ? String(user.experience.id) : null,
+    countryId: user.country?.id ? String(user.country.id) : null,
+    cityId: user.city?.id ? String(user.city.id) : null,
+    birthDate: user.birth_date ?? user.date_of_birth ?? null,
     image: user.image ?? null,
     cv: user.cv ?? null,
     bio: user.bio ?? null,

@@ -5,6 +5,12 @@ export type CandidateProfileViewModel = {
   phone: string | null;
   phoneCode: string | null;
   fullPhone: string | null;
+  jobTitleId?: string | null;
+  specialtyId?: string | null;
+  experienceId?: string | null;
+  countryId?: string | null;
+  cityId?: string | null;
+  birthDate?: string | null;
   image: string | null;
   cv: string | null;
   bio: string | null;

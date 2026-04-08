@@ -1,10 +1,24 @@
 import BasicInfoForm from "@/features/candidate-settings/components/basic-info/BasicInfoForm";
-import { getCandidateBasicInfoPageData } from "@/features/candidate-settings/services/basic-info-service";
+import { getCandidateProfile } from "@/features/candidate-profile/services/profile-service";
+import {
+  getCandidateBasicInfoOptions,
+  mapCandidateProfileToSettingsProfile,
+} from "@/features/candidate-settings/services/basic-info-service";
 
 const BasicInfoPage = async () => {
-    const data = await getCandidateBasicInfoPageData();
+    const profile = await getCandidateProfile();
 
-    if (!data) {
+    if (!profile) {
+        return (
+            <main className="rounded-2xl bg-white p-6">
+                <p className="text-sm text-muted-foreground">Unable to load profile information.</p>
+            </main>
+        );
+    }
+
+    const options = await getCandidateBasicInfoOptions(profile.countryId ?? "");
+
+    if (!options) {
         return (
             <main className="rounded-2xl bg-white p-6">
                 <p className="text-sm text-muted-foreground">Unable to load profile information.</p>
@@ -15,12 +29,12 @@ const BasicInfoPage = async () => {
     return (
         <main className="rounded-2xl bg-white p-6">
             <BasicInfoForm
-                profile={data.profile}
-                jobTitles={data.jobTitles}
-                specialties={data.specialties}
-                experiences={data.experiences}
-                countries={data.countries}
-                initialCities={data.cities}
+                profile={mapCandidateProfileToSettingsProfile(profile)}
+                jobTitles={options.jobTitles}
+                specialties={options.specialties}
+                experiences={options.experiences}
+                countries={options.countries}
+                initialCities={options.cities}
             />
         </main>
     );
