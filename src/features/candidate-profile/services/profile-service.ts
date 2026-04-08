@@ -8,6 +8,7 @@ import type {
   CandidateEducationViewModel,
   CandidateExperienceViewModel,
   CandidateProfileViewModel,
+  CandidateSkillViewModel,
 } from "../types/profile.types";
 
 type CandidateProfileNamedRecord = {
@@ -164,7 +165,10 @@ export async function getCandidateProfile() {
   const jobTitle = user.job_title?.title ?? null;
   const fullPhone =
     user.phone && user.phone_code ? `${user.phone_code}${user.phone}` : user.phone;
-  const skills = user.skills.map((skill) => skill.title);
+  const skills = user.skills.map((skill) => ({
+    id: String(skill.id),
+    label: skill.title,
+  })) satisfies CandidateSkillViewModel[];
   const educations = user.educations.map(mapEducation);
   const experiences = user.experiences.map(mapExperience);
 

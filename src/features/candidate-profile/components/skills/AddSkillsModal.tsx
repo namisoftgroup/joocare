@@ -5,27 +5,41 @@ import { useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
 import { saveSkillsAction } from "../../actions/skills-actions";
 import {
-  getSkillOptions,
   getUserSkills,
   type SkillOption,
 } from "../../services/skills-client-service";
+import type { CandidateSkillViewModel } from "../../types/profile.types";
 import { MultiSelectInputSkills } from "./MultiSelectInputSkills";
 
 interface AddSkillsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (skills: string[]) => void;
+  skills: CandidateSkillViewModel[];
+  onSave: (skills: CandidateSkillViewModel[]) => void;
 }
 
-export function AddSkillsModal({ open, onOpenChange, onSave }: AddSkillsModalProps) {
+export function AddSkillsModal({
+  open,
+  onOpenChange,
+  skills,
+  onSave,
+}: AddSkillsModalProps) {
   const locale = useLocale();
   const { data: session } = useSession();
   const [selected, setSelected] = useState<string[]>([]);
   const [options, setOptions] = useState<SkillOption[]>([]);
-  const [currentSkillLabels, setCurrentSkillLabels] = useState<string[]>([]);
+  const [suggestedSkills, setSuggestedSkills] = useState<SkillOption[]>([]);
+  const [currentSkills, setCurrentSkills] = useState<CandidateSkillViewModel[]>(
+    [],
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -39,14 +53,15 @@ export function AddSkillsModal({ open, onOpenChange, onSave }: AddSkillsModalPro
     const loadSkills = async () => {
       try {
         setIsLoading(true);
-        const [availableSkills, currentSkills] = await Promise.all([
-          getSkillOptions({ locale, token: session.accessToken }),
-          getUserSkills({ locale, token: session.accessToken }),
-        ]);
+        const skillsResponse = await getUserSkills({
+          locale,
+          token: session.accessToken,
+        });
 
         if (!ignore) {
-          setOptions(availableSkills);
-          setCurrentSkillLabels(currentSkills.map((skill) => skill.label));
+          setOptions(skillsResponse.skills);
+          setSuggestedSkills(skillsResponse.suggested);
+          setCurrentSkills(skills);
           setSelected([]);
         }
       } catch (error) {
@@ -67,7 +82,7 @@ export function AddSkillsModal({ open, onOpenChange, onSave }: AddSkillsModalPro
     return () => {
       ignore = true;
     };
-  }, [locale, open, session?.accessToken]);
+  }, [locale, open, session?.accessToken, skills]);
 
   const availableLabels = useMemo(
     () => options.map((skill) => skill.label),
@@ -88,11 +103,24 @@ export function AddSkillsModal({ open, onOpenChange, onSave }: AddSkillsModalPro
     try {
       setIsSaving(true);
       const selectedIds = selected
-        .map((label) => options.find((skill) => skill.label === label)?.id ?? null)
+        .map(
+          (label) => options.find((skill) => skill.label === label)?.id ?? null,
+        )
         .filter((id): id is string => Boolean(id));
 
-      const existingLabelSet = new Set(currentSkillLabels);
-      const newLabels = selected.filter((label) => !existingLabelSet.has(label));
+      const existingLabelSet = new Set(
+        currentSkills.map((skill) => skill.label),
+      );
+      const newLabels = selected.filter(
+        (label) => !existingLabelSet.has(label),
+      );
+      const newSkills = newLabels
+        .map((label) => options.find((skill) => skill.label === label))
+        .filter((skill): skill is SkillOption => Boolean(skill))
+        .map((skill) => ({
+          id: skill.id,
+          label: skill.label,
+        }));
 
       await saveSkillsAction({
         skillIds: selectedIds,
@@ -100,7 +128,7 @@ export function AddSkillsModal({ open, onOpenChange, onSave }: AddSkillsModalPro
       });
 
       toast.success("Skills added successfully.");
-      onSave([...currentSkillLabels, ...newLabels]);
+      onSave([...currentSkills, ...newSkills]);
       handleClose(false);
     } catch (error) {
       const message =
@@ -122,7 +150,9 @@ export function AddSkillsModal({ open, onOpenChange, onSave }: AddSkillsModalPro
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-150 gap-4 rounded-2xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold text-black">Add Skills</DialogTitle>
+          <DialogTitle className="text-2xl font-semibold text-black">
+            Add Skills
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-1.5">
@@ -137,24 +167,29 @@ export function AddSkillsModal({ open, onOpenChange, onSave }: AddSkillsModalPro
 
         <div className="space-y-2">
           <p className="text-sm">Suggested based on your profile</p>
-          <div className="bg-[#09760A05] flex flex-wrap gap-2 rounded-xl p-3">
-            {availableLabels.map((skill) => {
-              const isSelected = selected.includes(skill);
+          <div className="flex flex-wrap gap-2 rounded-xl bg-[#09760A05] p-3">
+            {suggestedSkills.map((skill) => {
+              const isSelected = selected.includes(skill.label);
               return (
                 <button
-                  key={skill}
+                  key={skill.id}
                   type="button"
-                  onClick={() => toggle(skill)}
-                  className={`rounded-full border border-border px-4 py-2 text-sm transition-all ${
+                  onClick={() => toggle(skill.label)}
+                  className={`border-border rounded-full border px-4 py-2 text-sm transition-all ${
                     isSelected
                       ? "border-primary bg-primary text-white"
-                      : "border-muted bg-white text-black hover:border-primary hover:text-primary"
+                      : "border-muted hover:border-primary hover:text-primary bg-white text-black"
                   }`}
                 >
-                  {skill}
+                  {skill.label}
                 </button>
               );
             })}
+            {suggestedSkills.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                No suggested skills available.
+              </p>
+            ) : null}
           </div>
         </div>
 

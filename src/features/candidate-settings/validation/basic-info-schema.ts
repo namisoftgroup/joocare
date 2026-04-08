@@ -42,6 +42,7 @@ export const SettingBasicInfoSchema = z.object({
     })
     .min(1, { message: "City is required" }),
   dateOfBirth: z.string().min(1, { message: "Date of birth is required" }),
+  profileImage: z.array(z.instanceof(File)).optional().default([]),
   uploadCV: z.array(z.instanceof(File)).optional().default([]),
 });
 

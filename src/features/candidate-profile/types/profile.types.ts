@@ -11,9 +11,14 @@ export type CandidateProfileViewModel = {
   age: number | null;
   location: string | null;
   jobTitle: string | null;
-  skills: string[];
+  skills: CandidateSkillViewModel[];
   educations: CandidateEducationViewModel[];
   experiences: CandidateExperienceViewModel[];
+};
+
+export type CandidateSkillViewModel = {
+  id: string;
+  label: string;
 };
 
 export type CandidateEducationViewModel = {
