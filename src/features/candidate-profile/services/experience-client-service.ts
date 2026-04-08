@@ -2,7 +2,8 @@ import { getUserApiUrl } from "@/shared/lib/api-endpoints";
 import { apiFetch } from "@/shared/lib/fetch-manager";
 
 type ExperiencePayload = {
-  title: string;
+  title?: string;
+  jobTitleId?: string;
   company: string;
   startDate: string;
   endDate?: string;
@@ -17,7 +18,14 @@ function buildExperienceFormData(
   includeMethodOverride = false,
 ) {
   const formData = new FormData();
-  formData.append("title", payload.title);
+  if (payload.jobTitleId) {
+    formData.append("job_title_id", payload.jobTitleId);
+  }
+
+  if (payload.title) {
+    formData.append("title", payload.title);
+  }
+
   formData.append("company", payload.company);
   formData.append("start_date", payload.startDate);
   formData.append("is_current", payload.isCurrent ? "1" : "0");

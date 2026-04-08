@@ -44,14 +44,22 @@ const EMPTY_FORM: FormData = {
   responsibilities: [{ value: "" }],
 };
 
-function toFormState(experience?: CandidateExperienceViewModel | null): FormData {
+function toFormState(
+  experience?: CandidateExperienceViewModel | null,
+  jobTitles?: Array<{ id: string | number; title?: string | null }>,
+): FormData {
   if (!experience) {
     return EMPTY_FORM;
   }
 
+  const normalizedExperienceTitle = experience.title.trim().toLowerCase();
+  const matchedJobTitle = jobTitles?.find(
+    (jobTitle) => jobTitle.title?.trim().toLowerCase() === normalizedExperienceTitle,
+  );
+
   return {
-    jobTitle: experience.title,
-    otherJobTitle: "",
+    jobTitle: matchedJobTitle ? String(matchedJobTitle.id) : "__other__",
+    otherJobTitle: matchedJobTitle ? "" : experience.title,
     organizationOrHospitalName: experience.organization ?? "",
     startDate: experience.startDate ?? "",
     endDate: experience.endDate ?? "",
@@ -104,32 +112,30 @@ export function ExperienceModal({
   const workHere = watch("workHere");
   const selectedJobTitle = watch("jobTitle");
   const isOtherJobTitle = selectedJobTitle === "__other__";
+  const jobTitlesKey = useMemo(
+    () => jobTitles.map((jobTitle) => `${jobTitle.id}:${jobTitle.title ?? ""}`).join("|"),
+    [jobTitles],
+  );
 
   const jobTitleOptions = useMemo(() => {
     const mappedOptions = jobTitles
       .map((jobTitle) => ({
         label: String(jobTitle.title ?? ""),
-        value: String(jobTitle.title ?? ""),
+        value: String(jobTitle.id ?? ""),
       }))
       .filter((jobTitle) => jobTitle.label);
-    const currentTitle = experience?.title?.trim();
-    const hasCurrentTitle =
-      currentTitle && mappedOptions.some((option) => option.value === currentTitle);
 
     return [
       ...mappedOptions,
-      ...(currentTitle && !hasCurrentTitle
-        ? [{ label: currentTitle, value: currentTitle }]
-        : []),
       { label: "Other", value: "__other__" },
     ];
-  }, [experience?.title, jobTitles]);
+  }, [jobTitles]);
 
   useEffect(() => {
     if (open) {
-      reset(toFormState(experience));
+      reset(toFormState(experience, jobTitles));
     }
-  }, [experience, open, reset]);
+  }, [experience, jobTitlesKey, open, reset]);
 
   useEffect(() => {
     if (workHere) {
@@ -160,7 +166,11 @@ export function ExperienceModal({
         title:
           form.jobTitle === "__other__"
             ? form.otherJobTitle?.trim() ?? ""
-            : form.jobTitle.trim(),
+            : undefined,
+        jobTitleId:
+          form.jobTitle !== "__other__"
+            ? form.jobTitle
+            : undefined,
         company: form.organizationOrHospitalName.trim(),
         startDate: form.startDate,
         endDate: form.workHere ? undefined : form.endDate?.trim(),
