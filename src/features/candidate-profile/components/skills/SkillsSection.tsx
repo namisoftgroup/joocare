@@ -1,6 +1,6 @@
 "use client";
 import { Edit2, Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import OneSkillSection from "./OneSkillSection";
 import { AddSkillsModal } from "./AddSkillsModal";
 import { EditSkillsModal } from "./EditSkillsModal";
@@ -15,6 +15,12 @@ const SkillsSection = ({
   const [editOpen, setEditOpen] = useState(false);
 
   const [skills, setSkills] = useState<string[]>(profile?.skills ?? []);
+
+  useEffect(() => {
+    setSkills(profile?.skills ?? []);
+  }, [profile?.skills]);
+  console.log( "" , profile?.skills);
+
   return (
     <>
       <section className="flex flex-col gap-5 rounded-2xl border bg-white p-4">

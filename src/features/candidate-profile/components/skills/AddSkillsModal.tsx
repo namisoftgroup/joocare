@@ -6,8 +6,8 @@ import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { Button } from "@/shared/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog";
+import { saveSkillsAction } from "../../actions/skills-actions";
 import {
-  addUserSkills,
   getSkillOptions,
   getUserSkills,
   type SkillOption,
@@ -85,11 +85,6 @@ export function AddSkillsModal({ open, onOpenChange, onSave }: AddSkillsModalPro
   };
 
   const handleAdd = async () => {
-    if (!session?.accessToken) {
-      toast.error("Your session has expired. Please log in again.");
-      return;
-    }
-
     try {
       setIsSaving(true);
       const selectedIds = selected
@@ -99,15 +94,14 @@ export function AddSkillsModal({ open, onOpenChange, onSave }: AddSkillsModalPro
       const existingLabelSet = new Set(currentSkillLabels);
       const newLabels = selected.filter((label) => !existingLabelSet.has(label));
 
-      await addUserSkills({
+      await saveSkillsAction({
         skillIds: selectedIds,
         locale,
-        token: session.accessToken,
       });
 
       toast.success("Skills added successfully.");
       onSave([...currentSkillLabels, ...newLabels]);
-      onOpenChange(false);
+      handleClose(false);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to add skills.";
