@@ -12,6 +12,7 @@ import useGetSpecialties from "@/shared/hooks/useGetSpecialties";
 import { Button } from "@/shared/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Controller,
@@ -38,13 +39,16 @@ interface BasicInfoFormProps {
 
 const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
   const locale = useLocale();
+  const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
   const [jobTitleSearch, setJobTitleSearch] = useState("");
   const [specialtySearch, setSpecialtySearch] = useState("");
   const [experienceSearch, setExperienceSearch] = useState("");
   const [countrySearch, setCountrySearch] = useState("");
   const [citySearch, setCitySearch] = useState("");
+  const [uploadedImagePath, setUploadedImagePath] = useState<string | null>(null);
   const [uploadedCvPath, setUploadedCvPath] = useState<string | null>(null);
+  const [showExistingCv, setShowExistingCv] = useState(Boolean(profile.cv));
   const defaultValues = useMemo<TSettingBasicInfoSchema>(
     () => ({
       fullName: profile.name,
@@ -71,6 +75,8 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
     handleSubmit,
     reset,
     setValue,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<TSettingBasicInfoSchema>({
     resolver: zodResolver(SettingBasicInfoSchema),
@@ -132,7 +138,22 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
   }, [selectedCountryId, setValue]);
 
   useEffect(() => {
+    setUploadedImagePath(null);
     setUploadedCvPath(null);
+    setShowExistingCv(Boolean(profile.cv));
+  }, [profile.image, profile.cv]);
+
+  const currentCvLabel = useMemo(() => {
+    if (!profile.cv) {
+      return null;
+    }
+
+    try {
+      const pathname = new URL(profile.cv).pathname;
+      return decodeURIComponent(pathname.split("/").filter(Boolean).pop() ?? "Current CV");
+    } catch {
+      return decodeURIComponent(profile.cv.split("/").filter(Boolean).pop() ?? "Current CV");
+    }
   }, [profile.cv]);
 
   useEffect(() => {
@@ -158,7 +179,6 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
 
     try {
       setIsSaving(true);
-
       const formData = new FormData();
       formData.append("name", data.fullName.trim());
       formData.append("phone", parsedPhone.nationalNumber ?? "");
@@ -170,18 +190,17 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
       formData.append("experience_id", data.yearsOfExperience);
       formData.append("birth_date", data.dateOfBirth);
 
-      if (data.profileImage[0] instanceof File) {
-        formData.append("image", data.profileImage[0]);
+      if (uploadedImagePath) {
+        formData.append("image", uploadedImagePath);
       }
 
       if (uploadedCvPath) {
         formData.append("cv", uploadedCvPath);
-      } else if (data.uploadCV[0] instanceof File) {
-        formData.append("cv", data.uploadCV[0]);
       }
 
       const response = await updateCandidateBasicInfoAction(formData, locale);
       toast.success(response.message ?? "Profile updated successfully.");
+      router.refresh();
     } catch (error) {
       const message =
         error instanceof Error
@@ -206,8 +225,33 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
           render={({ field }) => (
             <ProfileImage
               value={field.value?.length ? field.value : profile.image}
-              onChange={field.onChange}
-              error={Boolean(errors.profileImage?.message)}
+              onChange={async (files) => {
+                field.onChange(files);
+
+                const imageFile = files[0];
+                if (!(imageFile instanceof File)) {
+                  setUploadedImagePath(null);
+                  return;
+                }
+
+                clearErrors("profileImage");
+
+                try {
+                  const uploadFormData = new FormData();
+                  uploadFormData.append("image", imageFile);
+                  const result = await storeUploadedFileAction(uploadFormData, locale);
+                  setUploadedImagePath(result.path);
+                } catch (error) {
+                  const message =
+                    error instanceof Error ? error.message : "Failed to upload profile image.";
+                  setUploadedImagePath(null);
+                  setError("profileImage", {
+                    type: "server",
+                    message,
+                  });
+                }
+              }}
+              error={errors.profileImage?.message}
             />
           )}
         />
@@ -421,17 +465,6 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
         error={errors.dateOfBirth?.message}
       />
 
-      {profile.cv ? (
-        <a
-          href={profile.cv}
-          target="_blank"
-          rel="noreferrer"
-          className="text-primary text-sm underline"
-        >
-          View current CV
-        </a>
-      ) : null}
-
       <Controller
         name="uploadCV"
         control={control}
@@ -441,12 +474,41 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
             hint={`"Optional"`}
             files={field.value}
             onChange={field.onChange}
+            allowImagePreview={false}
+            acceptedFileTypes={[
+              "application/pdf",
+              "application/msword",
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ]}
             processFile={async (file) => {
               const uploadFormData = new FormData();
               uploadFormData.append("image", file);
               return storeUploadedFileAction(uploadFormData, locale);
             }}
-            onStoredPathChange={setUploadedCvPath}
+            onStoredPathChange={(path) => {
+              setUploadedCvPath(path);
+              if (path) {
+                clearErrors("uploadCV");
+              }
+            }}
+            onUploadError={(message) => {
+              if (!message) {
+                clearErrors("uploadCV");
+                return;
+              }
+
+              setError("uploadCV", {
+                type: "server",
+                message,
+              });
+            }}
+            existingFileUrl={showExistingCv ? profile.cv : null}
+            existingFileLabel={currentCvLabel}
+            onExistingFileRemove={() => {
+              setShowExistingCv(false);
+              setUploadedCvPath(null);
+              field.onChange([]);
+            }}
             allowMultiple={false}
             maxFiles={1}
             error={errors.uploadCV?.message}

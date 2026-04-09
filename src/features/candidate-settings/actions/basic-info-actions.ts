@@ -3,10 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
-import {
-  storeUploadedFile,
-  updateCandidateBasicInfo,
-} from "../services/basic-info-service";
+import { storeUploadedFile, updateCandidateBasicInfo } from "../services/basic-info-service";
 
 async function resolveCandidateToken() {
   const session = await getServerSession(authOptions);
@@ -40,28 +37,6 @@ export async function updateCandidateBasicInfoAction(formData: FormData, locale 
 
   for (const [key, value] of formData.entries()) {
     nextFormData.append(key, value);
-  }
-
-  const profileImage = nextFormData.get("image");
-
-  if (profileImage instanceof File && profileImage.size > 0) {
-    const uploadedImage = await storeUploadedFile({
-      file: profileImage,
-      locale,
-    });
-
-    nextFormData.set("image", uploadedImage.path);
-  }
-
-  const cvFile = nextFormData.get("cv");
-
-  if (cvFile instanceof File && cvFile.size > 0) {
-    const uploadedCv = await storeUploadedFile({
-      file: cvFile,
-      locale,
-    });
-
-    nextFormData.set("cv", uploadedCv.path);
   }
 
   const response = await updateCandidateBasicInfo({

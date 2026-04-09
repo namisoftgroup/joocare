@@ -8,7 +8,7 @@ import { cn } from "@/shared/lib/utils";
 interface ProfileImageProps {
   value?: File[] | string | null;
   onChange: (files: File[]) => void;
-  error?: boolean;
+  error?: string | boolean;
 }
 
 const ProfileImage = ({ value, onChange, error }: ProfileImageProps) => {
@@ -64,6 +64,11 @@ const ProfileImage = ({ value, onChange, error }: ProfileImageProps) => {
           </div>
         </div>
       </div>
+      {typeof error === "string" && error ? (
+        <span className="mt-2 block text-center text-[12px] text-red-500">
+          {error}
+        </span>
+      ) : null}
     </div>
   );
 };
