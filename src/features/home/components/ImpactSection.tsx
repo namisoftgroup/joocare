@@ -3,20 +3,21 @@ import Image from "next/image";
 import SectionTitle from "./SectionTitle";
 import StatCard from "./StatCard";
 
-export const ImpactSection = () => {
+export const ImpactSection = ({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) => {
   return (
     <section className="bg-background py-10 md:py-20">
       <div className="container mx-auto px-3 lg:px-25">
         <div className="grid gap-12 lg:grid-cols-2">
           <div className="flex flex-col justify-center">
             <SectionTitle sectionTitle="Proven Hiring Impact" />
-            <h2 className="text-foreground mt-4 mb-8">
-              Measurable Impact Across <br /> Healthcare Hiring
-            </h2>
-            <p className="text-muted-foreground mb-8 max-w-132 text-xl">
-              Joocare delivers measurable hiring outcomes by combining AI-driven
-              intelligence with a verified network of healthcare professionals.
-            </p>
+            <h2 className="text-foreground mt-4 mb-8">{title}</h2>
+            <p className="text-muted-foreground mb-8 max-w-132 text-xl">{description}</p>
             <Button
               variant="default"
               size="pill"
