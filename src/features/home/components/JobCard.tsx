@@ -5,10 +5,10 @@ interface JobProps {
   company: string;
   location: string;
   type: string;
-  time: string;
+  timeLabel: string;
 }
 
-const JobCard = ({ title, company, location, type, time }: JobProps) => (
+const JobCard = ({ title, company, location, type, timeLabel }: JobProps) => (
   <article className="group bg-card border-border group hover:border-primary/50 relative rounded-xl border p-5 transition-all hover:shadow-sm">
     <section className="flex items-start gap-4">
       <Image
@@ -31,9 +31,9 @@ const JobCard = ({ title, company, location, type, time }: JobProps) => (
           </span>
           <time
             className="bg-muted text-muted-foreground rounded-xl px-2.5 py-1 text-xs font-medium tracking-wider"
-            dateTime={time}
+            dateTime={timeLabel}
           >
-            {time} ago
+            {timeLabel}
           </time>
         </footer>
       </div>
