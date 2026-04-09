@@ -4,34 +4,34 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
 import { getUserApiUrl } from "@/shared/lib/api-endpoints";
-import { extractQualificationItems, mapQualification } from "../services/qualification-utils";
-import type { QualificationViewModel } from "../types/qualification.types";
+import { extractCertificateItems, mapCertificate } from "../services/certificate-utils";
+import type { CertificateViewModel } from "../types/certificate.types";
 
-type QualificationsPageResponse = {
+type CertificatesPageResponse = {
   code?: number;
   message?: string;
   next_page_url?: string | null;
   data?: unknown;
 };
 
-export const qualificationsQueryKey = (locale: string) => [
-  "candidate-qualifications",
+export const certificatesQueryKey = (locale: string,) => [
+  "candidate-certificates",
   locale,
 
 ];
 
-export const qualificationsQueryKeyPrefix = (locale: string) => [
-  "candidate-qualifications",
+export const certificatesQueryKeyPrefix = (locale: string) => [
+  "candidate-certificates",
   locale,
 ];
 
-export default function useGetQualifications() {
+export default function useGetCertificates() {
   const locale = useLocale();
   const { data: session, status } = useSession();
   const token = session?.accessToken;
 
   const query = useInfiniteQuery({
-    queryKey: qualificationsQueryKey(locale),
+    queryKey: certificatesQueryKey(locale),
     initialPageParam: 1,
     enabled: status === "authenticated" && Boolean(token),
     queryFn: async ({ pageParam }) => {
@@ -41,7 +41,7 @@ export default function useGetQualifications() {
         limit_per_page: "10",
       });
 
-      const res = await fetch(`${getUserApiUrl()}/qualifications?${params.toString()}`, {
+      const res = await fetch(`${getUserApiUrl()}/certifications?${params.toString()}`, {
         headers: {
           Accept: "application/json",
           "Accept-Language": locale,
@@ -51,13 +51,13 @@ export default function useGetQualifications() {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to load qualifications.");
+        throw new Error("Failed to load certificates.");
       }
 
-      const data = (await res.json()) as QualificationsPageResponse;
+      const data = (await res.json()) as CertificatesPageResponse;
 
       if (data.code && data.code >= 400) {
-        throw new Error(data.message || "Failed to load qualifications.");
+        throw new Error(data.message || "Failed to load certificates.");
       }
 
       return data;
@@ -78,9 +78,9 @@ export default function useGetQualifications() {
     isInitialLoading:
       status === "loading" ||
       (status === "authenticated" && query.isFetching && !query.data),
-    qualifications:
-      query.data?.pages.flatMap((page) =>
-        extractQualificationItems(page).map(mapQualification).filter(Boolean),
-      )?.filter((item): item is QualificationViewModel => Boolean(item)) ?? [],
+    certificates:
+      query.data?.pages
+        .flatMap((page) => extractCertificateItems(page).map(mapCertificate).filter(Boolean))
+        .filter((item): item is CertificateViewModel => Boolean(item)) ?? [],
   };
 }
