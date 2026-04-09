@@ -4,9 +4,15 @@ import { useState } from "react";
 import SectionTitle from "@/features/home/components/SectionTitle";
 import { Button } from "@/shared/components/ui/button";
 import CorePillarsAccordionItem from "./CorePillarsAccordionItem";
-import { corePillars } from "./core-pillars-data";
+import type { AboutPillar } from "../types/about.types";
 
-export default function CorePillarsContent() {
+export default function CorePillarsContent({
+  title,
+  items,
+}: {
+  title: string;
+  items: AboutPillar[];
+}) {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
@@ -16,15 +22,13 @@ export default function CorePillarsContent() {
       </div>
 
       <h2 className="text-secondary mb-6 text-3xl leading-tight font-bold sm:mb-8 sm:text-4xl lg:text-5xl">
-        Core Pillars of the
-        <br />
-        <span className="text-primary">Joocare</span> Framework
+        {title}
       </h2>
 
       <div className="space-y-6">
-        {corePillars.map((pillar, index) => (
+        {items.map((pillar, index) => (
           <CorePillarsAccordionItem
-            key={pillar.title}
+            key={pillar.id}
             pillar={pillar}
             isOpen={openIndex === index}
             onToggle={() => setOpenIndex(openIndex === index ? -1 : index)}
