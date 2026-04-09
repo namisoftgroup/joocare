@@ -1,15 +1,15 @@
 "use client";
 
 import { Button } from "@/shared/components/ui/button";
-import useGetQualifications from "../../hooks/useGetQualifications";
+import useGetCertificates from "../../hooks/useGetCertificates";
 import { CredentialCardSkeletonList } from "../shared/CredentialCardSkeleton";
 import CredentialsEmptyState from "../shared/CredentialsEmptyState";
 import InfiniteScrollTrigger from "../shared/InfiniteScrollTrigger";
-import QualificationCard from "./QualificationCard";
+import CertificateCard from "./CertificateCard";
 
-export default function QualificationsContent() {
+export default function CertificatesContent() {
   const {
-    qualifications,
+    certificates,
     isInitialLoading,
     isError,
     error,
@@ -17,7 +17,7 @@ export default function QualificationsContent() {
     fetchNextPage,
     isFetchingNextPage,
     refetch,
-  } = useGetQualifications();
+  } = useGetCertificates();
 
   if (isInitialLoading) {
     return <CredentialCardSkeletonList />;
@@ -26,7 +26,7 @@ export default function QualificationsContent() {
   if (isError) {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 px-6 py-5 text-sm text-red-700">
-        <p>{error instanceof Error ? error.message : "Unable to load qualifications."}</p>
+        <p>{error instanceof Error ? error.message : "Unable to load certificates."}</p>
         <Button
           type="button"
           variant="outline"
@@ -40,19 +40,19 @@ export default function QualificationsContent() {
     );
   }
 
-  if (qualifications.length === 0) {
+  if (certificates.length === 0) {
     return (
       <CredentialsEmptyState
-        title="No qualifications added yet"
-        description="Use the add button above to create your first qualification entry."
+        title="No certificates added yet"
+        description="Use the add button above to create your first certificate entry."
       />
     );
   }
 
   return (
     <div className="flex flex-col gap-3">
-      {qualifications.map((qualification) => (
-        <QualificationCard key={qualification.id} qualification={qualification} />
+      {certificates.map((certificate) => (
+        <CertificateCard key={certificate.id} certificate={certificate} />
       ))}
 
       <InfiniteScrollTrigger

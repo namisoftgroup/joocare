@@ -1,15 +1,15 @@
 "use client";
 
 import { Button } from "@/shared/components/ui/button";
-import useGetQualifications from "../../hooks/useGetQualifications";
-import { CredentialCardSkeletonList } from "../shared/CredentialCardSkeleton";
+import useGetLicenses from "../../hooks/useGetLicenses";
 import CredentialsEmptyState from "../shared/CredentialsEmptyState";
 import InfiniteScrollTrigger from "../shared/InfiniteScrollTrigger";
-import QualificationCard from "./QualificationCard";
+import LicenseCard from "./LicenseCard";
+import { LicenseCardSkeletonList } from "./LicenseCardSkeleton";
 
-export default function QualificationsContent() {
+export default function LicensesContent() {
   const {
-    qualifications,
+    licenses,
     isInitialLoading,
     isError,
     error,
@@ -17,16 +17,16 @@ export default function QualificationsContent() {
     fetchNextPage,
     isFetchingNextPage,
     refetch,
-  } = useGetQualifications();
+  } = useGetLicenses();
 
   if (isInitialLoading) {
-    return <CredentialCardSkeletonList />;
+    return <LicenseCardSkeletonList />;
   }
 
   if (isError) {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 px-6 py-5 text-sm text-red-700">
-        <p>{error instanceof Error ? error.message : "Unable to load qualifications."}</p>
+        <p>{error instanceof Error ? error.message : "Unable to load licenses."}</p>
         <Button
           type="button"
           variant="outline"
@@ -40,26 +40,28 @@ export default function QualificationsContent() {
     );
   }
 
-  if (qualifications.length === 0) {
+  if (licenses.length === 0) {
     return (
       <CredentialsEmptyState
-        title="No qualifications added yet"
-        description="Use the add button above to create your first qualification entry."
+        title="No licenses added yet"
+        description="Use the add button above to create your first license entry."
       />
     );
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {qualifications.map((qualification) => (
-        <QualificationCard key={qualification.id} qualification={qualification} />
-      ))}
+    <>
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+        {licenses.map((license) => (
+          <LicenseCard key={license.id} license={license} />
+        ))}
+      </div>
 
       <InfiniteScrollTrigger
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
         onLoadMore={() => void fetchNextPage()}
       />
-    </div>
+    </>
   );
 }

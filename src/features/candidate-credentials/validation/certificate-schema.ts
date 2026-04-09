@@ -3,19 +3,18 @@ import { z } from "zod";
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
 
-export const qualificationSchema = z
+export const certificateSchema = z
   .object({
-    degree: z
+    name: z
       .string()
       .trim()
-      .min(3, "Degree must be at least 3 characters.")
-      .max(100, "Degree must be at most 100 characters."),
-    university: z
+      .min(3, "Certificate name must be at least 3 characters.")
+      .max(100, "Certificate name must be at most 100 characters."),
+    company: z
       .string()
       .trim()
-      .min(3, "University must be at least 3 characters.")
-      .max(150, "University must be at most 150 characters."),
-    countryId: z.string().trim().min(1, "Country is required."),
+      .min(3, "Issuing organization must be at least 3 characters.")
+      .max(150, "Issuing organization must be at most 150 characters."),
     startDate: z.string().min(1, "Start date is required."),
     endDate: z.string().optional(),
     image: z
@@ -24,11 +23,11 @@ export const qualificationSchema = z
       .default([])
       .refine(
         (files) => files.every((file) => ALLOWED_IMAGE_TYPES.includes(file.type)),
-        "Qualification image must be JPG or PNG.",
+        "Certificate image must be JPG or PNG.",
       )
       .refine(
         (files) => files.every((file) => file.size <= MAX_IMAGE_SIZE),
-        "Qualification image size must not exceed 2MB.",
+        "Certificate image size must not exceed 2MB.",
       ),
   })
   .refine((data) => data.startDate <= new Date().toISOString().split("T")[0], {
@@ -40,5 +39,5 @@ export const qualificationSchema = z
     path: ["endDate"],
   });
 
-export type QualificationSchemaValues = z.input<typeof qualificationSchema>;
-export type QualificationSchemaOutput = z.output<typeof qualificationSchema>;
+export type CertificateSchemaValues = z.input<typeof certificateSchema>;
+export type CertificateSchemaOutput = z.output<typeof certificateSchema>;

@@ -24,12 +24,17 @@ import {
   updateQualificationAction,
 } from "../../actions/qualification-actions";
 import { qualificationsQueryKeyPrefix } from "../../hooks/useGetQualifications";
+import {
+  prependInfiniteItem,
+  replaceInfiniteItem,
+} from "../../services/infinite-query-cache";
 import type {
   QualificationFormValues,
   QualificationViewModel,
 } from "../../types/qualification.types";
 import {
   qualificationSchema,
+  type QualificationSchemaOutput,
   type QualificationSchemaValues,
 } from "../../validation/qualification-schema";
 
@@ -66,6 +71,47 @@ function toFormState(
   };
 }
 
+function buildOptimisticQualification({
+  qualification,
+  degree,
+  university,
+  countryId,
+  startDate,
+  endDate,
+  image,
+}: {
+  qualification?: QualificationViewModel | null;
+  degree: string;
+  university: string;
+  countryId: string;
+  startDate: string;
+  endDate?: string;
+  image?: string | null;
+}): QualificationViewModel {
+  const startLabel = new Date(startDate).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+  });
+  const endLabel = endDate
+    ? new Date(endDate).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+      })
+    : "Present";
+
+  return {
+    id: qualification?.id ?? `temp-${Date.now()}`,
+    degree,
+    university,
+    countryId,
+    countryName: qualification?.countryName ?? null,
+    startDate,
+    endDate: endDate ?? null,
+    period: `${startLabel} - ${endLabel}`,
+    image: image ?? qualification?.image ?? null,
+  };
+}
+
 export function QualificationModal({
   open,
   onOpenChange,
@@ -86,7 +132,7 @@ export function QualificationModal({
     setError,
     clearErrors,
     formState: { errors },
-  } = useForm<QualificationSchemaValues>({
+  } = useForm<QualificationSchemaValues, undefined, QualificationSchemaOutput>({
     resolver: zodResolver(qualificationSchema),
     defaultValues: toFormState(qualification),
   });
@@ -109,21 +155,44 @@ export function QualificationModal({
     setDialogContentElement(node);
   }, []);
 
-  const onSubmit: SubmitHandler<QualificationSchemaValues> = (form) => {
+  const onSubmit: SubmitHandler<QualificationSchemaOutput> = (form) => {
+    const payload = {
+      degree: form.degree.trim(),
+      university: form.university.trim(),
+      countryId: form.countryId,
+      startDate: form.startDate,
+      endDate: form.endDate?.trim() || undefined,
+      image:
+        storedImagePath ??
+        (showExistingImage ? qualification?.image ?? null : null),
+      locale,
+    };
+    const optimisticQualification = buildOptimisticQualification({
+      qualification,
+      ...payload,
+    });
+    const previousQueries = queryClient.getQueriesData({
+      queryKey: qualificationsQueryKeyPrefix(locale),
+    });
+
+    queryClient.setQueriesData(
+      { queryKey: qualificationsQueryKeyPrefix(locale) },
+      (current) =>
+        qualification?.id
+          ? replaceInfiniteItem<QualificationViewModel>(
+              current,
+              ["qualifications", "qualification"],
+              optimisticQualification,
+            )
+          : prependInfiniteItem<QualificationViewModel>(
+              current,
+              ["qualifications", "qualification"],
+              optimisticQualification,
+            ),
+    );
+
     startTransition(async () => {
       try {
-        const payload = {
-          degree: form.degree.trim(),
-          university: form.university.trim(),
-          countryId: form.countryId,
-          startDate: form.startDate,
-          endDate: form.endDate?.trim() || undefined,
-          image:
-            storedImagePath ??
-            (showExistingImage ? qualification?.image ?? null : null),
-          locale,
-        };
-
         const response = qualification?.id
           ? await updateQualificationAction({
               id: qualification.id,
@@ -142,6 +211,10 @@ export function QualificationModal({
         });
         onOpenChange(false);
       } catch (error) {
+        previousQueries.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+
         const message =
           error instanceof Error ? error.message : "Failed to save qualification.";
         toast.error(message);

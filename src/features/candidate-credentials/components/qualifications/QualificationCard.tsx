@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import DeleteModal from "@/shared/components/modals/DeleteModal";
 import { deleteQualificationAction } from "../../actions/qualification-actions";
 import { qualificationsQueryKeyPrefix } from "../../hooks/useGetQualifications";
+import { removeInfiniteItem } from "../../services/infinite-query-cache";
 import type { QualificationViewModel } from "../../types/qualification.types";
 import { QualificationModal } from "./QualificationModal";
 
@@ -24,6 +25,20 @@ export default function QualificationCard({
   const queryClient = useQueryClient();
 
   const handleDeleteQualification = () => {
+    const previousQueries = queryClient.getQueriesData({
+      queryKey: qualificationsQueryKeyPrefix(locale),
+    });
+
+    queryClient.setQueriesData(
+      { queryKey: qualificationsQueryKeyPrefix(locale) },
+      (current) =>
+        removeInfiniteItem<QualificationViewModel>(
+          current,
+          ["qualifications", "qualification"],
+          qualification.id,
+        ),
+    );
+
     startTransition(async () => {
       try {
         const response = await deleteQualificationAction({
@@ -37,6 +52,10 @@ export default function QualificationCard({
         });
         setDeleteQualification(false);
       } catch (error) {
+        previousQueries.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+
         const message =
           error instanceof Error ? error.message : "Failed to delete qualification.";
         toast.error(message);
