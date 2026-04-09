@@ -55,7 +55,7 @@ export function FilepondUpload({
         allowMultiple={allowMultiple}
         maxFiles={maxFiles}
         name={name}
-        // ✅ FilePond handles upload internally via server.process
+        //  FilePond handles upload internally via server.process
         server={{
           process: (fieldName, file, _metadata, load, error, progress) => {
             const formData = new FormData();
@@ -72,8 +72,8 @@ export function FilepondUpload({
             xhr.onload = () => {
               if (xhr.status >= 200 && xhr.status < 300) {
                 const response = JSON.parse(xhr.responseText);
-                const imagePath = response.data.image; // ✅ extract data.image
-                onUploadSuccess(imagePath);            // ✅ send to form
+                const imagePath = response.data.image; //  extract data.image
+                onUploadSuccess(imagePath);            //  send to form
                 load(response.data.id);                // FilePond needs a server ID
               } else {
                 error("Upload failed");
@@ -91,7 +91,7 @@ export function FilepondUpload({
             };
           },
           revert: () => {
-            onRemove?.(); // ✅ clear the value from form on file remove
+            onRemove?.(); //  clear the value from form on file remove
           },
         }}
         onremovefile={() => onRemove?.()}
