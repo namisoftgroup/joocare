@@ -9,24 +9,31 @@ export type Applicant = {
 };
 
 // Candidate jobs
-// -- Candidate Filter Section
+
+export type JobsFilterOption = {
+  value: string;
+  label: string;
+};
 
 export interface FilterState {
-  professionalLicense: string[];
-  roleCategory: string[];
-  seniorityLevel: string[];
-  byDomain: string[];
-  speciality: string[];
-  experienceLevel: string[];
-  availability: string[];
-  employerType: string[];
+  professionalLicense: string;
+  roleCategories: string[];
+  seniorityLevels: string[];
+  domains: string[];
+  specialties: string[];
+  experiences: string[];
+  availabilities: string[];
+  categories: string[];
+  employmentTypes: string[];
+  salaryTypes: string[];
   salaryMin: string;
   salaryMax: string;
-  salaryType: string;
 }
 
 export interface AccordionSection {
-  key: keyof Omit<FilterState, "salaryMin" | "salaryMax" | "salaryType">;
+  key: keyof Omit<FilterState, "salaryMin" | "salaryMax">;
   label: string;
-  options: string[];
+  name: string;
+  options: JobsFilterOption[];
+  type?: "checkbox" | "radio";
 }

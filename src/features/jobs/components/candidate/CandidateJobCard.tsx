@@ -13,66 +13,92 @@ import {
   Briefcase,
   DollarSign,
   Dot,
-  LocationEdit,
+  MapPin,
   Share,
 } from "lucide-react";
 import Image from "next/image";
 
-export default function CandidateJobCard({ appliedBadge }: { appliedBadge?: boolean }) {
+type CandidateJobCardProps = {
+  title?: string;
+  company?: string;
+  companyLogo?: string | null;
+  postedAtLabel?: string;
+  location?: string;
+  employmentType?: string;
+  salary?: string;
+  experience?: string;
+  domain?: string;
+  excerpt?: string;
+  href?: string;
+  appliedBadge?: boolean;
+};
+
+export default function CandidateJobCard({
+  title = "Healthcare Opportunity",
+  company = "Joocare Employer",
+  companyLogo,
+  postedAtLabel = "Recently posted",
+  location = "Location not specified",
+  employmentType = "Not specified",
+  salary = "Salary not specified",
+  experience = "Experience not specified",
+  domain = "Healthcare",
+  excerpt = "Explore the job details to learn more about the role and employer.",
+  href = "/jobs",
+  appliedBadge,
+}: CandidateJobCardProps) {
   return (
     <Card>
       <CardHeader className="flex gap-2 max-lg:px-2">
         <Image
           width={52}
           height={46}
-          src="/assets/comp-logo.svg"
-          alt="company logo"
+          src={companyLogo || "/assets/comp-logo.svg"}
+          alt={`${company} logo`}
         />
         <div className="flex grow flex-col gap-1">
           <h6 className="text-secondary text-lg font-semibold">
-            Medical Approval
+            {title}
           </h6>
-          <p className="text-foreground text-md font-normal">Health care</p>
-          <time className="text-muted-foreground font normal text-xs">
-            21 December 2026 , 4:00AM
+          <p className="text-foreground text-md font-normal">{company}</p>
+          <time className="text-muted-foreground text-xs font-normal">
+            {postedAtLabel}
           </time>
         </div>
-        <p className="text-[12px]">Resume Match</p>
+        {/* <p className="text-[12px]">{domain}</p> */}
       </CardHeader>
-      <CardContent className="max-lg:px-2">
-        <div className="border-b-border flex flex-col gap-4 border-b pb-4">
+      <CardContent className="max-lg:px-2 grow">
+        <div className=" flex flex-col gap-4  ">
           <ul className="items-cente flex gap-2">
             <li className="text-secondary flex items-center gap-1 text-sm font-normal">
-              <LocationEdit size={14} color="var(--muted-foreground)" />
-              cairo,Egypt
+              <MapPin size={14} color="var(--muted-foreground)" />
+              {location}
             </li>
             <li className="text-secondary flex items-center gap-1 text-sm font-normal">
               <Briefcase size={14} color="var(--muted-foreground)" />
-              Pharmce{" "}
+              {employmentType}
             </li>
             <li className="text-secondary flex items-center gap-1 text-sm font-normal">
               <DollarSign size={14} color="var(--muted-foreground)" />
-              4000$ : 10000${" "}
+              {salary}
             </li>
           </ul>
           <ul className="items-cente flex gap-2">
             <li className="text-muted-foreground bg-muted flex items-center gap-1 rounded-full px-2 py-1 text-xs font-normal">
-              +3 Exp
+              {experience}
             </li>
             <li className="text-muted-foreground bg-muted flex items-center gap-1 rounded-full px-2 py-1 text-xs font-normal">
-              Full time
+              {employmentType}
             </li>
             <li className="text-muted-foreground bg-muted flex items-center gap-1 rounded-full px-2 py-1 text-xs font-normal">
-              Pharmaceutical
+              {domain}
             </li>
           </ul>
-          <div className="text-muted-foreground text-sm">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit...
-          </div>{" "}
+          <p className="text-muted-foreground grow h-auto text-sm">{excerpt}</p>
         </div>
       </CardContent>
-      <CardFooter className="flex flex-col gap-4 max-lg:px-2">
-        <div className="flex w-full items-center justify-between gap-2">
+      <CardFooter className="flex flex-col gap-4  max-lg:px-2">
+        <div className="flex w-full items-center justify-between gap-2 border-b-border border-t pt-4">
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -91,7 +117,7 @@ export default function CandidateJobCard({ appliedBadge }: { appliedBadge?: bool
           </div>
           <Link
             className={`border-border bg-primary flex h-9 items-center gap-2 rounded-full px-3 py-2 text-sm text-white`}
-            href="/jobs/mediacl-job"
+            href={href}
           >
             View Job
             <ArrowRight size={18} strokeWidth={1.5} className="size-5" />
@@ -104,7 +130,7 @@ export default function CandidateJobCard({ appliedBadge }: { appliedBadge?: bool
             className="flex w-full justify-start gap-1"
           >
             <Dot className="h-4 w-4" strokeWidth={12} /> <span>Applied</span>
-            <span className="grow text-end text-xs text-muted-foreground">21 December 2026 , 4:00AM</span>
+            <span className="grow text-end text-xs text-muted-foreground">{postedAtLabel}</span>
           </Badge>
         )}
       </CardFooter>
