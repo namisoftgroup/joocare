@@ -101,7 +101,7 @@ function HeaderActionsButtons({
         )}
         {!isAuthed && (
           <Link
-            href="/employer"
+            href="/for-employers"
             className={`text-secondary flex items-center justify-center text-lg ${buttonVariants(
               {
                 variant: "outline",

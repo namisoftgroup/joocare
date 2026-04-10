@@ -11,12 +11,14 @@ export default function ForEmployers() {
       <PlainBreadcrumb
         items={[{ label: "Home", href: "/" }, { label: "For Employers" }]}
       />
-      <section>
-        <EmployersHero />
-        <Banner />
-        <Why />
-        <Hire />
-        <FAQ />
+      <section className="px-3 lg:px-25">
+        <section className="container mx-auto">
+          <EmployersHero />
+          <Banner />
+          <Why />
+          <Hire />
+          <FAQ />
+        </section>
       </section>
     </>
   );
