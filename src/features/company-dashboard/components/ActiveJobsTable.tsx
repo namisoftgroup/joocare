@@ -25,49 +25,63 @@ const tabelHeaderTitles = [
   "Posted Since",
   " ",
 ];
-export default function ActiveJobsTable({
-  activeJobs,
-  onView,
-}: activeJobsProps) {
+export default function ActiveJobsTable() {
   const [page, setPage] = useState(1);
+
   const { data: session } = useSession();
-  const token = session?.accessToken as string
-  const { jobs, total, isLoading: jobsLoading } = useGetCompanyJobs({ token, page });
+  const token = session?.accessToken as string;
+
+  const {
+    jobs,
+    total,
+    perPage,
+    lastPage,
+    isLoading,
+  } = useGetCompanyJobs({ token, page });
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > lastPage) return;
+    setPage(newPage);
+  };
 
   return (
     <section>
       <div className="border-border w-full overflow-x-auto rounded-2xl border bg-white">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted border-b border-[#E4E5E8] hover:bg-white">
+            <TableRow>
               {tabelHeaderTitles.map((col) => (
-                <TableHead
-                  key={col}
-                  className="text-foreground text-md px-4 py-5 text-center font-semibold"
-                >
-                  {col}
-                </TableHead>
+                <TableHead key={col}>{col}</TableHead>
               ))}
             </TableRow>
           </TableHeader>
 
+
           <TableBody>
-            {jobs.map((activeJob) => (
-              <ActiveJobRow
-                key={activeJob.id}
-                activeJob={activeJob}
-              // onView={onView}
-              />
-            ))}
+            {isLoading
+              ? Array.from({ length: 5 }).map((_, index) => (
+                <ActiveJobRow
+                  key={index} isLoading={true} />
+              ))
+              : jobs.map((job) => (
+                <ActiveJobRow
+                  key={job.id}
+                  activeJob={job}
+                  isLoading={false}
+                />
+              ))}
           </TableBody>
+
         </Table>
       </div>
-      <div className="mt-4 flex w-full items-center justify-center">
+
+      <div className="mt-4 flex justify-center">
         <CustomPagination
-          currentPage={page}
           totalItems={total}
-          pageSize={10}
-          onPageChange={setPage}
+          pageSize={perPage}
+          currentPage={page}
+          totalPages={lastPage}
+          onPageChange={handlePageChange}
         />
       </div>
     </section>
