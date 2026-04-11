@@ -2,7 +2,6 @@
 
 import { useRouter } from "@/i18n/navigation";
 import AlertModal from "./AlertModal";
-import { fa } from "zod/v4/locales";
 
 type LoginAlertModalProps = {
   open: boolean;
