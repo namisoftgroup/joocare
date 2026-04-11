@@ -10,8 +10,9 @@ import { useSession } from "next-auth/react"
 
 const MyProfilePage = () => {
     const { data: session } = useSession();
+    const token = session?.accessToken || "";
 
-    const { data: companyProfileData, isPending } = useGetCompanyProfile(session?.accessToken);
+    const { data: companyProfileData, isPending } = useGetCompanyProfile({ token });
 
 
     return (
