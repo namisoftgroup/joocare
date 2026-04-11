@@ -34,11 +34,14 @@ export default function useGetCompanyJobs({ token, page }: { token: string, page
             return res?.data;
         },
         enabled: !!token,
+
     });
 
     return {
         ...query,
         jobs: query.data?.data ?? [],
         total: query.data?.total ?? 0,
+        perPage: query.data?.per_page ?? 10,
+        lastPage: query.data?.last_page ?? 1,
     };
 }

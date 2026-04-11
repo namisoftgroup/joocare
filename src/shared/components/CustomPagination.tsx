@@ -12,6 +12,7 @@ type CustomPaginationProps = {
   currentPage: number;
   totalItems: number;
   pageSize?: number;
+  totalPages: number;
   onPageChange: (page: number) => void;
 };
 
@@ -19,9 +20,9 @@ export function CustomPagination({
   currentPage,
   totalItems,
   pageSize = 10,
+  totalPages,
   onPageChange,
 }: CustomPaginationProps) {
-  const totalPages = Math.ceil(totalItems / pageSize);
 
   const start = (currentPage - 1) * pageSize + 1;
   const end = Math.min(currentPage * pageSize, totalItems);
