@@ -16,20 +16,72 @@ import { useEffect, useState } from "react";
 import { useUpdateBusinessVerification } from "../../hooks/useUpdateBusinessVerification";
 import { UpdateBusinessVerificationPayload } from "../../types";
 import { BusinessVerificationSchema, TBusinessVerificationSchema } from "../../validation/business-verification-schema";
+import useGetCountries from "@/shared/hooks/useGetCountries";
+import useGetSpecialties from "@/shared/hooks/useGetSpecialties";
+import useGetOrganizationSizes from "@/shared/hooks/useGetOrganizationSizes";
+import useGetEmployerTypes from "@/shared/hooks/useGetEmployerTypes";
 
 export default function BusinessVerificationForm() {
+    // hooks land and token
     const locale = useLocale();
     const { data: session } = useSession();
     const token = session?.accessToken as string
+
+    // company profile data
     const { data: companyProfileData, isPending: isCompanyProfilePending } = useGetCompanyProfile({ token });
 
-    const { data: bussinessVerificationData, isPending: isBusinessVerificationPending } = useGetBusinessVerification({ token });
+    // search states
+    const [specialtySearch, setSpecialtySearch] = useState("");
+    const [countrySearch, setCountrySearch] = useState("");
+    const [organizationSizesSearch, setOrganizationSizesSearch] = useState("");
+    const [employerTypesSearch, setEmployerTypesSearch] = useState("");
+    // countries data
+    const {
+        countries,
+        isLoading: isCountriesLoading,
+        error: countriesError,
+        hasNextPage: hasMoreCountries,
+        fetchNextPage: fetchMoreCountries,
+        isFetchingNextPage: isFetchingMoreCountries,
+    } = useGetCountries(countrySearch);
+    //organization sizes
+    const {
+        organizationSizes,
+        isLoading: isOrganizationSizesLoading,
+        error: organizationSizesError,
+        hasNextPage: hasMoreOrganizationSizes,
+        fetchNextPage: fetchMoreOrganizationSizes,
+        isFetchingNextPage: isFetchingMoreOrganizationSizes,
+    } = useGetOrganizationSizes(organizationSizesSearch);
+
+    ///employer-types
+    const {
+        employerTypes,
+        isLoading: isEmployerTypesLoading,
+        error: employerTypesError,
+        hasNextPage: hasMoreEmployerTypes,
+        fetchNextPage: fetchMoreEmployerTypes,
+        isFetchingNextPage: isFetchingMoreEmployerTypes,
+    } = useGetEmployerTypes(employerTypesSearch);
+
+    //specialties
+    const {
+        specialties,
+        isLoading: isSpecialtiesLoading,
+        error: specialtiesError,
+        hasNextPage: hasMoreSpecialties,
+        fetchNextPage: fetchMoreSpecialties,
+        isFetchingNextPage: isFetchingMoreSpecialties,
+    } = useGetSpecialties(specialtySearch);
+
+
+    // file states
     const [commercialRegistrationImage, setCommercialRegistrationImage] = useState<string | null>(null);
     const [showExistingCommercialRegistrationImage, setShowExistingCommercialRegistrationImage] = useState(false);
     const [medicalLicenseImage, setMedicalLicenseImage] = useState<string | null>(null);
     const [showExistingMedicalLicenseImage, setShowExistingMedicalLicenseImage] = useState(false);
 
-
+    // form states
     const {
         register,
         handleSubmit,
@@ -41,8 +93,11 @@ export default function BusinessVerificationForm() {
     } = useForm<TBusinessVerificationSchema>({
         resolver: zodResolver(BusinessVerificationSchema),
     });
+
+    // update business verification
     const { mutate: updateBusinessVerification, isPending: isUpdating } = useUpdateBusinessVerification({ token });
 
+    // set form data from company profile
     useEffect(() => {
         if (companyProfileData) {
             reset({
@@ -68,6 +123,7 @@ export default function BusinessVerificationForm() {
         }
     }, [companyProfileData, reset]);
 
+    // submit handler
     const onSubmit: SubmitHandler<TBusinessVerificationSchema> = (data) => {
         const payload: UpdateBusinessVerificationPayload = {
             commercial_registration_number: data.commercial_registration_number,
@@ -109,23 +165,31 @@ export default function BusinessVerificationForm() {
                         control={control}
                         render={({ field }) => (
                             <SelectInputField
+                                withSearchInput={true}
                                 id="license_issue_country_id"
                                 label="Issuing country of the license"
                                 placeholder="Select"
                                 className="bg-white hover:bg-transparent"
                                 {...field}
-                                error={errors.license_issue_country_id?.message?.toString()}
-                                options={bussinessVerificationData?.countries?.map((country: {
-                                    name: { en: string, ar: string }
-                                    id: string
-                                }) => ({
-                                    label: country.name.en,
+                                error={
+                                    errors.license_issue_country_id?.message ??
+                                    (countriesError instanceof Error
+                                        ? countriesError.message
+                                        : undefined)
+                                }
+                                options={countries.map((country) => ({
+                                    label: country.name,
                                     value: String(country.id),
-                                })) || []}
-                                disabled={isBusinessVerificationPending}
+                                }))}
+                                disabled={isCountriesLoading}
+                                onReachEnd={() => fetchMoreCountries()}
+                                hasNextPage={Boolean(hasMoreCountries)}
+                                isFetchingNextPage={isFetchingMoreCountries}
+                                onSearchChange={setCountrySearch}
                             />
                         )}
                     />
+
                     <Controller
                         name="organization_size_id"
                         control={control}
@@ -136,18 +200,25 @@ export default function BusinessVerificationForm() {
                                 placeholder="Select"
                                 className="bg-white"
                                 {...field}
-                                error={errors.organization_size_id?.message?.toString()}
-                                options={bussinessVerificationData?.organization_sizes?.map((size: {
-                                    title: { en: string, ar: string }
-                                    id: string
-                                }) => ({
-                                    label: size.title.en,
-                                    value: String(size.id),
-                                })) || []}
-                                disabled={isBusinessVerificationPending}
+                                error={
+                                    errors.organization_size_id?.message ??
+                                    (organizationSizesError instanceof Error
+                                        ? organizationSizesError.message
+                                        : undefined)
+                                }
+                                options={organizationSizes.map((country) => ({
+                                    label: country.title,
+                                    value: String(country.id),
+                                }))}
+                                disabled={isOrganizationSizesLoading}
+                                onReachEnd={() => fetchMoreOrganizationSizes()}
+                                hasNextPage={Boolean(hasMoreOrganizationSizes)}
+                                isFetchingNextPage={isFetchingMoreOrganizationSizes}
+                                onSearchChange={setOrganizationSizesSearch}
                             />
                         )}
                     />
+
                 </div>
 
                 <div className="flex flex-col lg:flex-row justify-center items-center gap-2">
@@ -182,11 +253,9 @@ export default function BusinessVerificationForm() {
                             label="Commercial Registration Image"
                             files={field.value}
                             onChange={field.onChange}
-                            allowImagePreview={false}
+                            allowImagePreview={true}
                             acceptedFileTypes={[
-                                "application/pdf",
-                                "application/msword",
-                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                "image/*",
                             ]}
                             processFile={async (file) => {
                                 const uploadFormData = new FormData();
@@ -240,15 +309,21 @@ export default function BusinessVerificationForm() {
                             placeholder="ex: Full-time"
                             className="bg-white"
                             {...field}
-                            error={errors.employer_type_id?.message?.toString()}
-                            options={bussinessVerificationData?.employer_type?.map((type: {
-                                title: { en: string, ar: string }
-                                id: string
-                            }) => ({
-                                label: type.title.en,
+                            error={
+                                errors.employer_type_id?.message ??
+                                (employerTypesError instanceof Error
+                                    ? employerTypesError.message
+                                    : undefined)
+                            }
+                            options={employerTypes.map((type) => ({
+                                label: type.title,
                                 value: String(type.id),
-                            })) || []}
-                            disabled={isBusinessVerificationPending}
+                            }))}
+                            disabled={isEmployerTypesLoading}
+                            onReachEnd={() => fetchMoreEmployerTypes()}
+                            hasNextPage={Boolean(hasMoreEmployerTypes)}
+                            isFetchingNextPage={isFetchingMoreEmployerTypes}
+                            onSearchChange={setEmployerTypesSearch}
                         />
                     )}
                 />
@@ -270,29 +345,36 @@ export default function BusinessVerificationForm() {
                     {...register("license_issuing_authority")}
                     error={errors.license_issuing_authority?.message?.toString()}
                 />
+
                 <Controller
                     name="specialty_id"
                     control={control}
                     render={({ field }) => (
                         <SelectInputField
-                            id="specialty_id"
                             label="Specialty / Scope of Practice"
-                            placeholder="ex: hospital"
-                            className="bg-white hover:bg-transparent"
+                            id="specialty"
+                            placeholder="ex: Cardiology"
+                            withSearchInput
+                            searchPlaceholder="Search specialties..."
                             {...field}
-                            error={errors.specialty_id?.message?.toString()}
-                            options={bussinessVerificationData?.specialties?.map((practice: {
-                                title: { en: string, ar: string }
-                                id: string
-                            }) => ({
-                                label: practice.title.en,
-                                value: String(practice.id),
-                            })) || []}
-                            disabled={isBusinessVerificationPending}
+                            error={
+                                errors.specialty_id?.message ??
+                                (specialtiesError instanceof Error
+                                    ? specialtiesError.message
+                                    : undefined)
+                            }
+                            options={specialties.map((specialty) => ({
+                                label: specialty.title,
+                                value: String(specialty.id),
+                            }))}
+                            disabled={isSpecialtiesLoading}
+                            onReachEnd={() => fetchMoreSpecialties()}
+                            hasNextPage={Boolean(hasMoreSpecialties)}
+                            isFetchingNextPage={isFetchingMoreSpecialties}
+                            onSearchChange={setSpecialtySearch}
                         />
                     )}
                 />
-
                 <div className="flex flex-col lg:flex-row justify-center items-center gap-2">
                     <InputField
                         id="medical_license_issue_date"
@@ -327,6 +409,9 @@ export default function BusinessVerificationForm() {
                             allowMultiple={false}
                             maxFiles={2}
                             allowImagePreview={true}
+                            acceptedFileTypes={[
+                                "image/*",
+                            ]}
                             processFile={async (file) => {
                                 const uploadFormData = new FormData();
                                 uploadFormData.append("image", file);
@@ -364,7 +449,7 @@ export default function BusinessVerificationForm() {
             </div>
             <div className="flex justify-center items-center">
 
-                <Button variant={"secondary"} hoverStyle={'slidePrimary'} size={'pill'} className='w-1/3 md:w-56' type="submit" disabled={isUpdating || isCompanyProfilePending || isBusinessVerificationPending}>
+                <Button variant={"secondary"} hoverStyle={'slidePrimary'} size={'pill'} className='w-1/3 md:w-56' type="submit" disabled={isUpdating || isCompanyProfilePending}>
                     {isUpdating ? "Saving..." : "Save"}
                 </Button>
             </div>
