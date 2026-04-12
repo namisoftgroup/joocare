@@ -1,3 +1,4 @@
+"use client"
 import { Link } from "@/i18n/navigation";
 import { JobListItem } from "@/features/jobs/types/jobs.types";
 import {
@@ -21,6 +22,7 @@ import {
   Share,
 } from "lucide-react";
 import Image from "next/image";
+import { useJobShare } from "../../hooks/useJobShare";
 import ToggleSavedJobButton from "./ToggleSavedJobButton";
 
 type CandidateJobCardProps = {
@@ -52,6 +54,7 @@ export default function CandidateJobCard({
     job.description || "Explore the job details to learn more about the role and employer.";
   const shouldShowAppliedBadge = appliedBadge || job.is_applied;
   const appliedLabel = appliedAtLabel || postedAtLabel;
+  const { shareJob } = useJobShare({ title, path: href });
 
   return (
     <Card>
@@ -115,6 +118,7 @@ export default function CandidateJobCard({
               variant="outline"
               size="pill"
               className="border-border text-muted-foreground h-9 px-4 py-2 text-sm"
+              onClick={() => void shareJob()}
             >
               <Share /> Share
             </Button>

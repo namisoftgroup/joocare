@@ -43,7 +43,9 @@ export default async function page({
               <JobLocationAndSalaryCard job={jobDetails.job} />
               <JobOverviewCard job={jobDetails.job} />
               <JobEducationAndCertificationsCard job={jobDetails.job} />
-              <JobShareCard />
+              <JobShareCard
+                title={jobDetails.job.title ?? jobDetails.job.job_title.title}
+              />
             </div>
           </div>
           <SimilarJobsSection jobs={jobDetails.similar_jobs} />

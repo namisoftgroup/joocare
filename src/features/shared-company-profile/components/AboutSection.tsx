@@ -1,7 +1,16 @@
+"use client";
+
+import { useJobShare } from "@/features/jobs/hooks/useJobShare";
+import { Button } from "@/shared/components/ui/button";
 import Image from "next/image";
 import { CompanyProfile } from "../company-profile.type";
 
 export default function AboutSection({ company }: { company: CompanyProfile }) {
+    const companyName = company.name ?? "this company";
+    const { shareJob } = useJobShare({
+        title: `Check out ${companyName} on JooCare`,
+    });
+
     return (
         <div className="rounded-2xl bg-white flex flex-col gap-4 p-4 border">
             <div className="flex items-center justify-between">
@@ -67,7 +76,12 @@ export default function AboutSection({ company }: { company: CompanyProfile }) {
                         </a>
                     )}
                 </div>
-                <div className="text-primary bg-accent flex items-center gap-2 rounded-full px-4 py-2">
+                <Button
+                    type="button"
+                    variant="ghost"
+                    className="text-primary bg-accent hover:bg-accent flex items-center gap-2 rounded-full px-4 py-2"
+                    onClick={() => void shareJob()}
+                >
                     <Image
                         src="/assets/icons/pin-link-icon.svg"
                         alt="link icon"
@@ -75,7 +89,7 @@ export default function AboutSection({ company }: { company: CompanyProfile }) {
                         height={24}
                     />
                     <span className="text-lg">Share</span>
-                </div>
+                </Button>
             </div>
         </div>
     )
