@@ -1,9 +1,9 @@
 import { getBaseApiUrl } from "../lib/api-endpoints";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
-export default function useGetSpecialties(search = "", categoryId?: number) {
+export default function useGetEducationLevels(search = "") {
     const query = useInfiniteQuery({
-        queryKey: ["specialties", search, categoryId],
+        queryKey: ["education-levels", search],
         initialPageParam: 1,
         queryFn: async ({ pageParam }) => {
             const params = new URLSearchParams({
@@ -16,11 +16,7 @@ export default function useGetSpecialties(search = "", categoryId?: number) {
                 params.set("search", search.trim());
             }
 
-            if (categoryId) {
-                params.set("category_id", String(categoryId));
-            }
-
-            const res = await fetch(`${getBaseApiUrl()}/specialties?${params.toString()}`);
+            const res = await fetch(`${getBaseApiUrl()}/education-levels?${params.toString()}`);
 
             if (!res.ok) {
                 throw new Error("Network error");
@@ -30,7 +26,6 @@ export default function useGetSpecialties(search = "", categoryId?: number) {
 
             return data;
         },
-        enabled: !categoryId || categoryId > 0,
         getNextPageParam: (lastPage) => {
             if (!lastPage?.next_page_url) return undefined;
 
@@ -42,6 +37,6 @@ export default function useGetSpecialties(search = "", categoryId?: number) {
 
     return {
         ...query,
-        specialties: query.data?.pages.flatMap((page) => page.data) ?? [],
+        educationLevels: query.data?.pages.flatMap((page) => page.data) ?? [],
     };
 }
