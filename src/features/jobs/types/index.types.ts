@@ -1,4 +1,4 @@
-export type JobStatus = "open" | "closed" | "paused";
+export type JobStatus = "open" | "closed" | "paused" | "draft";
 export type Applicant = {
   id: number;
   name: string;

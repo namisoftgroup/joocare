@@ -12,7 +12,7 @@ export default function JobOverviewCard({ job }: { job: JobDetails }) {
         <div className="col-span-2">
           <JobOverviewItem
             label="Experience"
-            value={job?.eduction_level?.title}
+            value={job?.experience?.title ?? "Not specified"}
             icon="/assets/icons/exp.svg"
           />
         </div>

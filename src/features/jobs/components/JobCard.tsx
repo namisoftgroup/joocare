@@ -1,6 +1,8 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
+import { useDeleteCompanyJob } from "@/features/jobs/hooks/useDeleteCompanyJob";
+import { useUpdateCompanyJobStatus } from "@/features/jobs/hooks/useUpdateCompanyJobStatus";
 import AlertModal from "@/shared/components/modals/AlertModal";
 import DeleteModal from "@/shared/components/modals/DeleteModal";
 import { Badge } from "@/shared/components/ui/badge";
@@ -27,19 +29,20 @@ import {
   Edit,
   EyeOff,
   MapPin,
+  Play,
   Trash2
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { JobListItem } from "../types/jobs.types";
-import { getJobLocation, getJobSalary } from "../utils";
+import { getJobLocation, getJobSalary, normalizeJobStatus } from "../utils";
 
 type JobCardProps = {
   job: JobListItem & {
-    status: {
+    status?: {
       status: string;
       created_at: string;
-    };
+    } | null;
   };
   href?: string;
   appliedBadge?: boolean;
@@ -60,14 +63,26 @@ export default function JobCard({ resumeMatch,
   const [closeJob, setCloseJob] = useState(false);
   const [pauseJob, setPauseJob] = useState(false);
   const [deleteJob, setDeleteJob] = useState(false);
+  const { updateStatus, isPending } = useUpdateCompanyJobStatus(job.id, {
+    onSuccess: () => {
+      setCloseJob(false);
+      setPauseJob(false);
+    },
+  });
+  const { deleteJob: deleteCompanyJob, isPending: isDeleting } = useDeleteCompanyJob(job.id, {
+    onSuccess: () => {
+      setDeleteJob(false);
+    },
+  });
+
   const handleCloseJob = () => {
-    setCloseJob(false);
+    updateStatus("closed");
   };
   const handlePauseJob = () => {
-    setPauseJob(false);
+    updateStatus("paused");
   };
   const handleDeleteJob = () => {
-    setDeleteJob(false);
+    deleteCompanyJob();
   };
 
 
@@ -82,6 +97,12 @@ export default function JobCard({ resumeMatch,
   const experience = job?.experience?.title || "Experience not specified";
   const specialty = job?.specialty?.title || "Healthcare";
   const excerpt = job?.description || "Explore the job details to learn more about the role and employer.";
+  const statusLabel = job.status?.status ?? "Draft";
+  const statusDate = job.status?.created_at ?? job.updated_at ?? "";
+  const normalizedStatus = normalizeJobStatus(job.status?.status);
+  const handleOpenJob = () => {
+    updateStatus("open");
+  };
 
   return (
     <>
@@ -113,20 +134,34 @@ export default function JobCard({ resumeMatch,
                 <DropdownMenuItem className="flex gap-2">
                   <Edit /> <span>Edit</span>
                 </DropdownMenuItem>
+                {normalizedStatus !== "open" ? (
+                  <DropdownMenuItem
+                  className="flex gap-2"
+                  disabled={isPending}
+                  onClick={handleOpenJob}
+                >
+                  <Play /> <span>Open</span>
+                </DropdownMenuItem>
+                ) : null}
                 <DropdownMenuItem
                   className="flex gap-2"
+                  disabled={isPending}
+                  hidden={normalizedStatus === "closed"}
                   onClick={() => setCloseJob(true)}
                 >
                   <CheckCheck /> <span>closed</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="flex gap-2"
+                  disabled={isPending}
+                  hidden={normalizedStatus === "paused"}
                   onClick={() => setPauseJob(true)}
                 >
                   <EyeOff /> <span>Pause</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="text-destructive flex gap-2"
+                  disabled={isDeleting}
                   onClick={() => setDeleteJob(true)}
                 >
                   <Trash2 color="var(--destructive)" /> <span>Delete</span>
@@ -176,7 +211,7 @@ export default function JobCard({ resumeMatch,
               })} `}
               href={`/company/job/candidates/${job.id}`}
             >
-              View Candidates 280
+              View Candidates {job.applications_count}
             </Link>
             <Link
               className={`lg-max:py-2 lg-max:px-4 flex items-center gap-2 ${buttonVariants(
@@ -185,23 +220,22 @@ export default function JobCard({ resumeMatch,
                   size: "pill",
                 },
               )}`}
-              href={`/company/job/medical/${job.id}`}
+              href={`/company/job/${job.id}`}
             >
               View Details
               <ArrowRight size={18} strokeWidth={1.5} className="size-5" />
             </Link>
           </div>
           <Badge
-            variant="open"
+            variant={normalizedStatus}
             size="pill"
             className="flex w-full justify-start gap-1"
           >
             <Dot className="h-4 w-4" strokeWidth={12} /> <span>
-              {job.status.status}
+              {statusLabel}
             </span>
             <span className="grow text-end">
-              {
-                job.status.created_at}
+              {statusDate}
             </span>
           </Badge>
         </CardFooter>
@@ -232,6 +266,7 @@ export default function JobCard({ resumeMatch,
         description="The advertisement will be permanently deleted from your account and you will not be able to recover it later. Please ensure before proceeding, as this action cannot be undone."
         cancelLabel="Back"
         onConfirm={handleDeleteJob}
+        isLoading={isDeleting}
       />
     </>
   );

@@ -146,62 +146,63 @@ export type JobListItem = {
 export type JobDetails = {
   id: number;
   company_id: number;
-  company: CompanyDetails;
+  company: CompanyDetails | null;
 
   title: string | null;
 
-  job_title_id: number;
-  job_title: NamedEntity;
+  job_title_id: number | null;
+  job_title: NamedEntity | null;
 
-  license_id: number;
-  license: NamedEntity;
+  license_id: number | null;
+  license: NamedEntity | null;
 
-  specialty_id: number;
-  specialty: WithCategory;
+  specialty_id: number | null;
+  specialty: WithCategory | null;
 
-  employment_type_id: number;
-  employment_type: NamedEntity;
+  employment_type_id: number | null;
+  employment_type: NamedEntity | null;
 
-  role_category_id: number;
-  role_category: NamedEntity;
+  role_category_id: number | null;
+  role_category: NamedEntity | null;
 
-  category_id: number;
-  category: NamedEntity;
+  category_id: number | null;
+  category: NamedEntity | null;
 
-  seniority_level_id: number;
-  seniority_level: NamedEntity;
+  seniority_level_id: number | null;
+  seniority_level: NamedEntity | null;
 
-  country_id: number;
-  country: Country;
+  country_id: number | null;
+  country: Country | null;
 
   city_id: number | null;
   city: City | null;
 
-  experience_id: number;
-  experience: NamedEntity;
+  experience_id: number | null;
+  experience: NamedEntity | null;
 
-  eduction_level_id: number;
-  eduction_level: NamedEntity;
+  eduction_level_id: number | null;
+  eduction_level: NamedEntity | null;
+  education_level?: NamedEntity | null;
 
-  availability_id: number;
-  availability: NamedEntity;
+  availability_id: number | null;
+  availability: NamedEntity | null;
 
-  description: string;
+  description: string | null;
 
-  professional_license: string;
+  professional_license: string | null;
 
   has_salary: number;
-  min_salary: string;
-  max_salary: string;
+  min_salary: string | null;
+  max_salary: string | null;
 
   status: string;
   applications_count: number;
 
-  currency_id: number;
-  currency: Currency;
+  currency_id: number | null;
+  currency: Currency | null;
 
-  salary_type_id: number;
-  salary_type: NamedEntity;
+  salary_type_id: number | null;
+  salary_type: NamedEntity | null;
 
   skills: NamedEntity[];
   mandatory_certifications: NamedEntity[];
@@ -212,9 +213,16 @@ export type JobDetails = {
     status: string;
     created_at: string;
     updated_at: string;
-  };
+  } | null;
 
-  applications: unknown[];
+  applications: Array<{
+    id: number;
+    user_id: number;
+    job_id: number;
+    cv: string | null;
+    created_at: string;
+    updated_at: string;
+  }>;
 
   is_applied: boolean;
   is_saved: boolean;
@@ -279,6 +287,6 @@ export type JobDetailsResponse = {
   message: string;
   data: {
     job: JobDetails;
-    similar_jobs: SimilarJob[];
+    similar_jobs?: SimilarJob[];
   };
 };
