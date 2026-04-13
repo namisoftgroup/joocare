@@ -1,8 +1,8 @@
 import { formatDistanceToNowStrict } from "date-fns";
 
 import { getBaseApiUrl } from "@/shared/lib/api-endpoints";
-import { JobListItem } from "./types/jobs.types";
-import { JobsSearchFilters } from "./types/index.types";
+import { JobDetails, JobListItem } from "./types/jobs.types";
+import { JobsSearchFilters, JobStatus } from "./types/index.types";
 
 function getSingleParam(
   searchParams: Record<string, string | string[] | undefined>,
@@ -178,11 +178,13 @@ export function getJobPostedAtLabel(date: string | null) {
   return formatDistanceToNowStrict(parsedDate, { addSuffix: true });
 }
 
-export function getJobLocation(job: JobListItem) {
+export function getJobLocation(job: Pick<JobListItem | JobDetails, "city" | "country">) {
   return [job.city?.name, job.country?.name].filter(Boolean).join(", ") || "Location not specified";
 }
 
-export function getJobSalary(job: JobListItem) {
+export function getJobSalary(
+  job: Pick<JobListItem | JobDetails, "min_salary" | "max_salary" | "currency">,
+) {
   if (job.min_salary && job.max_salary) {
     return `${job.min_salary} - ${job.max_salary}${job.currency?.code ? ` ${job.currency.code}` : ""}`;
   }
@@ -192,4 +194,18 @@ export function getJobSalary(job: JobListItem) {
   }
 
   return "Salary not specified";
+}
+
+export function normalizeJobStatus(status: string | null | undefined): JobStatus {
+  switch (status?.toLowerCase()) {
+    case "closed":
+      return "closed";
+    case "paused":
+    case "pause":
+      return "paused";
+    case "draft":
+      return "draft";
+    default:
+      return "open";
+  }
 }
