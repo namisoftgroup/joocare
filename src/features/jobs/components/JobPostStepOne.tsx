@@ -1,272 +1,3 @@
-// import { InputField } from "@/shared/components/InputField";
-// import { SelectInputField } from "@/shared/components/SelectInputField";
-// import { Label } from "@/shared/components/ui/label";
-// import { Switch } from "@/shared/components/ui/switch";
-// import React from "react";
-
-// export default function JobPostStepOne() {
-//   return (
-//     <div className="space-y-4">
-//       <div className="grid grid-cols-2 gap-4">
-//         <div>
-//           <SelectInputField
-//             id="title"
-//             label="Job Title"
-//             placeholder="ex: Cardiac surgeon"
-//             options={[
-//               { label: "Engineering", value: "engineering" },
-//               { label: "Design", value: "design" },
-//               { label: "Marketing", value: "marketing" },
-//             ]}
-//           />
-//         </div>
-//         <div>
-//           <SelectInputField
-//             id="license"
-//             label=" Professional License"
-//             placeholder="ex: Without Medical license"
-//             options={[
-//               { label: "Engineering", value: "engineering" },
-//               { label: "Design", value: "design" },
-//               { label: "Marketing", value: "marketing" },
-//             ]}
-//           />
-//         </div>
-//       </div>
-//       <div className="bg-muted rounded-[12px] p-3">
-//         <div className="mb-5 flex items-center justify-between">
-//           <p className="font-semibold">Do you want to add salary?</p>{" "}
-//           <Switch id="airplane-mode" />
-//         </div>
-//         <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-3">
-//           {/* Salary Range */}
-//           <div className="space-y-2">
-//             <label className="mb-1 block font-semibold">
-//               Salary Range (USD / year)
-//             </label>
-
-//             <div className="flex items-end gap-3">
-//               <InputField
-//                 id="salary-min"
-//                 name="salary.min"
-//                 type="number"
-//                 placeholder="Min"
-//                 className="bg-white"
-//               />
-
-//               <InputField
-//                 id="salary-max"
-//                 name="salary.max"
-//                 type="number"
-//                 placeholder="Max"
-//                 className="bg-white"
-//               />
-//             </div>
-//           </div>
-
-//           {/* Salary Type */}
-//           <div className="space-y-2">
-//             <SelectInputField
-//               id="salary-type"
-//               label="Salary Type"
-//               className="bg-white"
-//               placeholder="Hourly"
-//               options={[
-//                 { label: "Engineering", value: "engineering" },
-//                 { label: "Design", value: "design" },
-//                 { label: "Marketing", value: "marketing" },
-//               ]}
-//             />
-//           </div>
-
-//           {/* Currency */}
-//           <div className="space-y-2">
-//             <SelectInputField
-//               id="currency"
-//               label="Currency"
-//               className="bg-white"
-//               placeholder="Choose"
-//               options={[
-//                 { label: "Full-time", value: "full-time" },
-//                 { label: "Part-time", value: "part-time" },
-//                 { label: "Contract", value: "contract" },
-//               ]}
-//             />
-//           </div>
-//         </div>
-//       </div>
-//       <div className="grid grid-cols-2 gap-4">
-//         <div>
-//           <SelectInputField
-//             id="category"
-//             label="Category"
-//             options={[
-//               { label: "Engineering", value: "engineering" },
-//               { label: "Design", value: "design" },
-//               { label: "Marketing", value: "marketing" },
-//             ]}
-//           />
-//         </div>
-//         <div>
-//           <SelectInputField
-//             id="job-type"
-//             label="Specialty"
-//             options={[
-//               { label: "Full-time", value: "full-time" },
-//               { label: "Part-time", value: "part-time" },
-//               { label: "Contract", value: "contract" },
-//             ]}
-//           />
-//         </div>
-//       </div>
-//       <div className="bg-muted rounded-[12px] p-3">
-//         <h6 className="text-gray-45 mb-5 font-semibold">
-//           Employment Type Section
-//         </h6>{" "}
-//         <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-3">
-//           {/* Employment Type */}
-//           <div className="space-y-2">
-//             <SelectInputField
-//               id="employment-type"
-//               label="Employment Type"
-//               className="bg-white"
-//               placeholder="ex:Full-time"
-//               options={[
-//                 { label: "Engineering", value: "engineering" },
-//                 { label: "Design", value: "design" },
-//                 { label: "Marketing", value: "marketing" },
-//               ]}
-//             />
-//           </div>
-//           {/* Role Category */}
-//           <div className="space-y-2">
-//             <SelectInputField
-//               id="role-category"
-//               label="Role Category"
-//               className="bg-white"
-//               placeholder="ex:Clinical"
-//               options={[
-//                 { label: "Engineering", value: "engineering" },
-//                 { label: "Design", value: "design" },
-//                 { label: "Marketing", value: "marketing" },
-//               ]}
-//             />
-//           </div>
-
-//           {/* Seniority Level */}
-//           <div className="space-y-2">
-//             <SelectInputField
-//               id="seniority-level"
-//               hint="optional"
-//               label="Seniority Level"
-//               placeholder="select"
-//               className="bg-white"
-//               options={[
-//                 { label: "Full-time", value: "full-time" },
-//                 { label: "Part-time", value: "part-time" },
-//                 { label: "Contract", value: "contract" },
-//               ]}
-//             />
-//           </div>
-//         </div>
-//       </div>
-//       <div className="bg-muted rounded-[12px] p-3">
-//         <h6 className="text-gray-45 mb-5 font-semibold">Job Location</h6>{" "}
-//         <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
-//           {/* Country */}
-//           <div className="space-y-2">
-//             <SelectInputField
-//               id="country"
-//               label="Country"
-//               className="bg-white"
-//               placeholder="ex: United Arab Emirates (UAE)"
-//               options={[
-//                 { label: "Engineering", value: "engineering" },
-//                 { label: "Design", value: "design" },
-//                 { label: "Marketing", value: "marketing" },
-//               ]}
-//             />
-//           </div>
-//           {/* City */}
-//           <div className="space-y-2">
-//             <SelectInputField
-//               id="city"
-//               label="City"
-//               className="bg-white"
-//               placeholder="ex:Dubai"
-//               options={[
-//                 { label: "Engineering", value: "engineering" },
-//                 { label: "Design", value: "design" },
-//                 { label: "Marketing", value: "marketing" },
-//               ]}
-//             />
-//           </div>
-//         </div>
-//       </div>
-//       <div>
-//         <SelectInputField
-//           id="experience-years"
-//           label="Years of Experience"
-//           placeholder="select"
-//           options={[
-//             { label: "Engineering", value: "engineering" },
-//             { label: "Design", value: "design" },
-//             { label: "Marketing", value: "marketing" },
-//           ]}
-//         />
-//       </div>
-//       <div className="bg-muted rounded-[12px] p-3">
-//         <h6 className="text-gray-45 mb-5 font-semibold">
-//           Education & Certifications section
-//         </h6>{" "}
-//         <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-3">
-//           {/* Education Level */}
-//           <div className="space-y-2">
-//             <SelectInputField
-//               id="education-level"
-//               label="Education Level"
-//               placeholder="select"
-//               className="bg-white"
-//               options={[
-//                 { label: "Engineering", value: "engineering" },
-//                 { label: "Design", value: "design" },
-//                 { label: "Marketing", value: "marketing" },
-//               ]}
-//             />
-//           </div>
-//           {/* Education Level */}
-//           <div className="space-y-2">
-//             <SelectInputField
-//               id="mandatory-certifications"
-//               label="Mandatory Certifications"
-//               placeholder="select"
-//               className="bg-white"
-//               options={[
-//                 { label: "Engineering", value: "engineering" },
-//                 { label: "Design", value: "design" },
-//                 { label: "Marketing", value: "marketing" },
-//               ]}
-//             />
-//           </div>
-//           {/* Availability */}
-//           <div className="space-y-2">
-//             <SelectInputField
-//               id="availability"
-//               label="Availability"
-//               className="bg-white"
-//               placeholder="select"
-//               options={[
-//                 { label: "Engineering", value: "engineering" },
-//                 { label: "Design", value: "design" },
-//                 { label: "Marketing", value: "marketing" },
-//               ]}
-//             />
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
 "use client";
 
 import { InputField } from "@/shared/components/InputField";
@@ -274,6 +5,27 @@ import { SelectInputField } from "@/shared/components/SelectInputField";
 import { Switch } from "@/shared/components/ui/switch";
 import { Controller, useFormContext } from "react-hook-form";
 import { JobFormData } from "../validation/job-post-schema";
+
+// import hooks for fetching select options
+import useGetCountries from "@/shared/hooks/useGetCountries";
+import useGetOrganizationSizes from "@/shared/hooks/useGetOrganizationSizes";
+import useGetEmployerTypes from "@/shared/hooks/useGetEmployerTypes";
+import useGetCompanyProfile from "@/features/company-profile/hooks/useGetCompanyProfile";
+import { useSession } from "next-auth/react";
+import { useLocale } from "next-intl";
+import useGetSpecialties from "@/shared/hooks/useGetSpecialties";
+import useGetLicenses from "@/shared/hooks/useGetLicenses";
+import useGetCitiesByCountryId from "@/shared/hooks/useGetCitiesByCountryId";
+import useGetCategories from "@/shared/hooks/useGetCategories";
+import useGetExperiences from "@/shared/hooks/useGetExperiences";
+import useGetRoleCategories from "@/shared/hooks/useGetRoleCategories";
+import useGetSeniorityLevels from "@/shared/hooks/useGetSeniorityLevels";
+import useGetMandatoryCertifications from "@/shared/hooks/useGetMandatoryCertifications";
+import useGetEducationLevels from "@/shared/hooks/useGetEducationLevels";
+import useGetAvailabilities from "@/shared/hooks/useGetAvailabilities";
+import useGetSalaryTypes from "@/shared/hooks/useGetSalaryTypes";
+import useGetCurrencies from "@/shared/hooks/useGetCurrencies";
+import { useState } from "react";
 
 // ─── tiny helper: surface zod error message under a field ───────────────────
 function FieldError({ name }: { name: string }) {
@@ -294,6 +46,160 @@ function FieldError({ name }: { name: string }) {
 }
 
 export default function JobPostStepOne() {
+  // hooks land and token
+  const locale = useLocale();
+  const { data: session } = useSession();
+  const token = session?.accessToken as string
+
+  // company profile data
+  const { data: companyProfileData, isPending: isCompanyProfilePending } = useGetCompanyProfile({ token });
+
+  // search states
+  const [specialtySearch, setSpecialtySearch] = useState("");
+  const [countrySearch, setCountrySearch] = useState("");
+  const [organizationSizesSearch, setOrganizationSizesSearch] = useState("");
+  const [employerTypesSearch, setEmployerTypesSearch] = useState("");
+  const [licensesSearch, setLicensesSearch] = useState("");
+  const [categorySearch, setCategorySearch] = useState("");
+  const [roleCategorySearch, setRoleCategorySearch] = useState("");
+  const [experienceSearch, setExperienceSearch] = useState("");
+  const [mandatoryCertificationsSearch, setMandatoryCertificationsSearch] = useState("");
+  const [educationLevelsSearch, setEducationLevelsSearch] = useState("");
+  const [availabilitiesSearch, setAvailabilitiesSearch] = useState("");
+  const [salaryTypesSearch, setSalaryTypesSearch] = useState("");
+  const [currenciesSearch, setCurrenciesSearch] = useState("");
+  // countries data
+  const {
+    countries,
+    isLoading: isCountriesLoading,
+    error: countriesError,
+    hasNextPage: hasMoreCountries,
+    fetchNextPage: fetchMoreCountries,
+    isFetchingNextPage: isFetchingMoreCountries,
+  } = useGetCountries(countrySearch);
+
+  const [selectedCountryId, setSelectedCountryId] = useState<number | null>(null);
+
+  const {
+    cities,
+    isLoading: citiesLoading,
+    hasNextPage: citiesHasNextPage,
+    fetchNextPage: citiesFetchNextPage,
+    isFetchingNextPage: citiesIsFetchingNextPage,
+  } = useGetCitiesByCountryId(selectedCountryId ?? 0);
+
+  //organization sizes
+  const {
+    organizationSizes,
+    isLoading: isOrganizationSizesLoading,
+    error: organizationSizesError,
+    hasNextPage: hasMoreOrganizationSizes,
+    fetchNextPage: fetchMoreOrganizationSizes,
+    isFetchingNextPage: isFetchingMoreOrganizationSizes,
+  } = useGetOrganizationSizes(organizationSizesSearch);
+
+  ///employer-types
+  const {
+    employerTypes,
+    isLoading: isEmployerTypesLoading,
+    error: employerTypesError,
+    hasNextPage: hasMoreEmployerTypes,
+    fetchNextPage: fetchMoreEmployerTypes,
+    isFetchingNextPage: isFetchingMoreEmployerTypes,
+  } = useGetEmployerTypes(employerTypesSearch);
+
+  //specialties
+  const {
+    specialties,
+    isLoading: isSpecialtiesLoading,
+    error: specialtiesError,
+    hasNextPage: hasMoreSpecialties,
+    fetchNextPage: fetchMoreSpecialties,
+    isFetchingNextPage: isFetchingMoreSpecialties,
+  } = useGetSpecialties(specialtySearch);
+
+  //licenses
+  const {
+    licenses,
+    isLoading: isLicensesLoading,
+    error: licensesError,
+    hasNextPage: hasMoreLicenses,
+    fetchNextPage: fetchMoreLicenses,
+    isFetchingNextPage: isFetchingMoreLicenses,
+  } = useGetLicenses(licensesSearch);
+
+  const {
+    categories,
+    isLoading: categoriesLoading,
+    hasNextPage: categoriesHasNextPage,
+    fetchNextPage: fetchCategoriesNextPage,
+    isFetchingNextPage: categoriesFetchingNextPage,
+  } = useGetCategories(categorySearch);
+  const {
+    roleCategories,
+    isLoading: roleCategoriesLoading,
+    hasNextPage: roleCategoriesHasNextPage,
+    fetchNextPage: fetchRoleCategoriesNextPage,
+    isFetchingNextPage: roleCategoriesFetchingNextPage,
+  } = useGetRoleCategories(roleCategorySearch);
+  const {
+    seniorityLevels,
+    isLoading: seniorityLevelsLoading,
+    hasNextPage: seniorityLevelsHasNextPage,
+    fetchNextPage: fetchseniorityLevelsNextPage,
+    isFetchingNextPage: seniorityLevelsFetchingNextPage,
+  } = useGetSeniorityLevels(roleCategorySearch);
+  const {
+    experiences,
+    isLoading: isExperiencesLoading,
+    error: experiencesError,
+    hasNextPage: hasMoreExperiences,
+    fetchNextPage: fetchMoreExperiences,
+    isFetchingNextPage: isFetchingMoreExperiences,
+  } = useGetExperiences(experienceSearch);
+  const {
+    mandatoryCertifications,
+    isLoading: isMandatoryCertificationsLoading,
+    error: mandatoryCertificationsError,
+    hasNextPage: hasMoreMandatoryCertifications,
+    fetchNextPage: fetchMoreMandatoryCertifications,
+    isFetchingNextPage: isFetchingMoreMandatoryCertifications,
+  } = useGetMandatoryCertifications(mandatoryCertificationsSearch);
+  const {
+    educationLevels,
+    isLoading: isEducationLevelsLoading,
+    error: educationLevelsError,
+    hasNextPage: hasMoreEducationLevels,
+    fetchNextPage: fetchMoreEducationLevels,
+    isFetchingNextPage: isFetchingMoreEducationLevels,
+  } = useGetEducationLevels(educationLevelsSearch);
+  const {
+    availabilities,
+    isLoading: isAvailabilitiesLoading,
+    error: availabilitiesError,
+    hasNextPage: hasMoreAvailabilities,
+    fetchNextPage: fetchMoreAvailabilities,
+    isFetchingNextPage: isFetchingMoreAvailabilities,
+  } = useGetAvailabilities(availabilitiesSearch);
+  const {
+    salaryTypes,
+    isLoading: isSalaryTypesLoading,
+    error: salaryTypesError,
+    hasNextPage: hasMoreSalaryTypes,
+    fetchNextPage: fetchMoreSalaryTypes,
+    isFetchingNextPage: isFetchingMoreSalaryTypes,
+
+  } = useGetSalaryTypes(salaryTypesSearch);
+  const {
+    currencies,
+    isLoading: isCurrenciesLoading,
+    error: currenciesError,
+    hasNextPage: hasMoreCurrencies,
+    fetchNextPage: fetchMoreCurrencies,
+    isFetchingNextPage: isFetchingMoreCurrencies,
+
+  } = useGetCurrencies(currenciesSearch);
+
   const {
     control,
     register,
@@ -546,7 +452,6 @@ export default function JobPostStepOne() {
                 <SelectInputField
                   {...field}
                   id="seniority-level"
-                  hint="optional"
                   label="Seniority Level"
                   placeholder="select"
                   className="bg-white"
