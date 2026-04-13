@@ -116,14 +116,7 @@ export default function JobPostStepOne() {
     fetchNextPage: fetchMoreSpecialties,
     isFetchingNextPage: isFetchingMoreSpecialties,
   } = useGetSpecialties(specialtySearch, selectedCategoryId ?? undefined);
-  // const {
-  //   licenses,
-  //   isLoading: isLicensesLoading,
-  //   error: licensesError,
-  //   hasNextPage: hasMoreLicenses,
-  //   fetchNextPage: fetchMoreLicenses,
-  //   isFetchingNextPage: isFetchingMoreLicenses,
-  // } = useGetLicenses(licensesSearch);
+
   const {
     categories,
     isLoading: categoriesLoading,

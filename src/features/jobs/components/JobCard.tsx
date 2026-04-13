@@ -197,11 +197,11 @@ export default function JobCard({ resumeMatch,
             className="flex w-full justify-start gap-1"
           >
             <Dot className="h-4 w-4" strokeWidth={12} /> <span>
-              {job.status.status}
+              {job?.status?.status}
             </span>
             <span className="grow text-end">
               {
-                job.status.created_at}
+                job?.status?.created_at}
             </span>
           </Badge>
         </CardFooter>

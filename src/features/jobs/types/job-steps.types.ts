@@ -24,3 +24,7 @@ export type JobStepTwoPayload = {
     description: string;
     skills: number[];
 };
+
+export type JobStepThreePayload = {
+    status: "draft" | "open";
+};

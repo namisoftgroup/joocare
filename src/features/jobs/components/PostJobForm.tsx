@@ -17,9 +17,13 @@ import {
 } from "../validation/job-post-schema";
 import { usePostStepOne } from "../hooks/usePostStepOne";
 import { usePostStepTwo } from "../hooks/usePostStepTwo";
+import { usePostStepThree } from "../hooks/usePostStepThree";
+import { JobDetails } from "../types/jobs.types";
 import JobPostStepOne from "./JobPostStepOne";
 import JobPostStepTwo from "./JobPostStepTwo";
 import JobReviewPanel from "./JobReviewPanel";
+import { useRouter } from "@/i18n/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 const STEPS = ["Job Details", "Job Description & Requirements", "Job Preview"];
 const LAST_STEP = STEPS.length - 1;
 
@@ -28,6 +32,7 @@ export default function PostJobForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [createdJobId, setCreatedJobId] = useState<number | null>(null);
+  const [reviewJob, setReviewJob] = useState<JobDetails | null>(null);
   const { data: session } = useSession();
   const token = session?.accessToken || "";
   const { mutateAsync: postStepOne, isPending: isPostingStepOne } = usePostStepOne({
@@ -36,17 +41,45 @@ export default function PostJobForm() {
   const { mutateAsync: postStepTwo, isPending: isPostingStepTwo } = usePostStepTwo({
     token,
   });
+  const { mutateAsync: postStepThree, isPending: isPostingStepThree } = usePostStepThree({
+    token,
+  });
   // inside PostJobForm
   const [saveDraftOpen, setSaveDraftOpen] = useState(false);
   const [saveSuccessOpen, setSaveSuccessOpen] = useState(false);
   const [postSuccess, setPostSuccess] = useState(false);
+  const router = useRouter()
+  const resolveJobId = () => createdJobId ?? reviewJob?.id ?? null;
+  const queryClient = useQueryClient()
+  const submitStepThreeStatus = async (status: "draft" | "open") => {
+    const jobId = resolveJobId();
+    if (!jobId) {
+      throw new Error("Job id is missing. Please complete previous steps first.");
+    }
+
+    const stepThreeResponse = await postStepThree({
+      jobId,
+      payload: { status },
+    });
+
+    const nextReviewJob =
+      stepThreeResponse.data?.data?.job ??
+      stepThreeResponse.data?.job ??
+      null;
+
+    if (nextReviewJob) {
+      setReviewJob(nextReviewJob as JobDetails);
+    }
+  };
 
   const handleSaveDraft = async () => {
-    // your save draft logic
-    // await saveDraft(getValues());  
-
-    setSaveDraftOpen(false);
-    setSaveSuccessOpen(true);
+    try {
+      await submitStepThreeStatus("draft");
+      setSaveDraftOpen(false);
+      setSaveSuccessOpen(true);
+    } catch {
+      // errors are already handled in mutation onError toast
+    }
   };
   const methods = useForm<JobFormData>({
     resolver: zodResolver(jobFormSchema),
@@ -89,14 +122,7 @@ export default function PostJobForm() {
         availability_id: Number(data.availability),
       });
 
-      console.log(stepOneResponse);
-
-      const nextCreatedJobId = Number(
-        stepOneResponse.data?.data?.job?.id ??
-        stepOneResponse.data?.job?.id ??
-        stepOneResponse.data?.data?.id ??
-        stepOneResponse.data?.id,
-      );
+      const nextCreatedJobId = Number(stepOneResponse.data?.data?.job?.id);
 
       if (!nextCreatedJobId) {
         throw new Error("Unable to resolve created job id from step one response.");
@@ -114,13 +140,18 @@ export default function PostJobForm() {
         throw new Error("Job id is missing. Please complete step one first.");
       }
 
-      await postStepTwo({
+      const stepTwoResponse = await postStepTwo({
         jobId: effectiveJobId,
         payload: {
           description: data.description,
           skills: (data.skills ?? []).map((skillId) => Number(skillId)),
         },
       });
+      const nextReviewJob =
+        stepTwoResponse.data?.data?.job ??
+        stepTwoResponse.data?.job ??
+        null;
+      setReviewJob(nextReviewJob as JobDetails | null);
       setCurrentStep((s) => s + 1);
       return;
     }
@@ -130,12 +161,16 @@ export default function PostJobForm() {
 
   const handleBack = () => setCurrentStep((s) => s - 1);
 
-  const onSubmit: SubmitHandler<JobFormData> = async (data) => {
+  const onSubmit: SubmitHandler<JobFormData> = async () => {
     setIsSubmitting(true);
     try {
-      await new Promise((res) => setTimeout(res, 1500));
+      await submitStepThreeStatus("open");
       setSubmitted(true);
       setPostSuccess(true);
+      router.push("/company/job-management");
+      queryClient.invalidateQueries({ queryKey: ['company-jobs'] })
+    } catch {
+      // errors are already handled in mutation onError toast
     } finally {
       setIsSubmitting(false);
     }
@@ -146,7 +181,7 @@ export default function PostJobForm() {
       <div className="h-full rounded-2xl bg-white p-6">
         <div className="flex gap-6">
           <WizardProgress step={currentStep} steps={STEPS} />
-          {currentStep > 0 && (
+          {currentStep !== 0 && (
             <Button
               variant="outline"
               size="pill"
@@ -163,7 +198,7 @@ export default function PostJobForm() {
             <div className="min-h-80">
               {currentStep === 0 && <JobPostStepOne />}
               {currentStep === 1 && <JobPostStepTwo />}
-              {currentStep === 2 && <JobReviewPanel data={getValues()} />}
+              {currentStep === 2 && <JobReviewPanel data={getValues()} job={reviewJob} />}
             </div>
 
             <div className="mt-5 flex w-full items-center justify-center gap-6">
@@ -184,18 +219,20 @@ export default function PostJobForm() {
                 <Button
                   type="button"
                   onClick={handleNext}
-                  disabled={isPostingStepOne || isPostingStepTwo}
+                  disabled={isPostingStepOne || isPostingStepTwo || isPostingStepThree}
                   variant="secondary"
                   hoverStyle="slidePrimary"
                   size="pill"
                   className="w-1/6"
                 >
-                  {isPostingStepOne || isPostingStepTwo ? "Saving..." : "Next"}
+                  {isPostingStepOne || isPostingStepTwo || isPostingStepThree
+                    ? "Saving..."
+                    : "Next"}
                 </Button>
               ) : (
                 <Button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isPostingStepThree}
                   variant="secondary"
                   size="pill"
                   hoverStyle="slidePrimary"
@@ -242,6 +279,7 @@ export default function PostJobForm() {
         confirmLabel="Save as draft"
         cancelLabel="Back"
         onConfirm={handleSaveDraft}
+        isLoading={isPostingStepThree}
       />
       <SuccessModal
         open={saveSuccessOpen}
