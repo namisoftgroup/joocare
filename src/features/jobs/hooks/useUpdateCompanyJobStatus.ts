@@ -44,7 +44,6 @@ export function useUpdateCompanyJobStatus(
     onSuccess: (response, status) => {
       toast.success(response.message || `Job status updated to ${status}.`);
       void queryClient.invalidateQueries({ queryKey: ["company-jobs"] });
-      router.refresh();
       onSuccess?.();
     },
     onError: (error) => {

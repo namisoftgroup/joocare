@@ -49,7 +49,7 @@ export default function JobReviewPanel({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 p-7 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 p-7 lg:grid-cols-3">
         <div className="font-noto-sans col-span-2 text-[#212529]">
           <h3 className="text-primary mb-4 text-xl font-bold">
             Job description
