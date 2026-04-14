@@ -184,7 +184,7 @@ export const SelectInputField = React.forwardRef<
               className="max-h-60 overflow-y-auto"
             >
               {(item: Option) => (
-                <>
+                <React.Fragment key={item.value}>
                   <ComboboxItem key={item.value} value={item}>
                     {item.image && (
                       <Image
@@ -197,11 +197,10 @@ export const SelectInputField = React.forwardRef<
                     {item.label}
                   </ComboboxItem>
 
-                  {/* ❗ مهم: sentinel يكون مرتبط بآخر item */}
                   {item === options[options.length - 1] && (
                     <div ref={handleObserver} className="h-1" />
                   )}
-                </>
+                </React.Fragment>
               )}
             </ComboboxList>
             {isFetchingNextPage && (

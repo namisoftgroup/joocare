@@ -1,6 +1,7 @@
 "use client";
 
 import { InputField } from "@/shared/components/InputField";
+import { MultiSelectInputField } from "@/shared/components/MultiSelectInputField";
 import { SelectInputField } from "@/shared/components/SelectInputField";
 import { Switch } from "@/shared/components/ui/switch";
 import { Controller, useFormContext } from "react-hook-form";
@@ -199,7 +200,6 @@ export default function JobPostStepOne() {
     watch,
     formState: { errors },
   } = useFormContext<JobFormData>();
-  console.log(errors);
 
   const addSalary = watch("addSalary");
   const selectedJobTitle = watch("title");
@@ -224,6 +224,7 @@ export default function JobPostStepOne() {
                 id="title"
                 label="Job Title"
                 placeholder="ex: Cardiac surgeon"
+                withSearchInput
                 error={
                   errors.title?.message ??
                   (employerTypesError instanceof Error
@@ -578,6 +579,7 @@ export default function JobPostStepOne() {
                   label="Country"
                   className="bg-white"
                   placeholder="ex: United Arab Emirates (UAE)"
+                  withSearchInput
                   error={
                     errors.country?.message ??
                     (countriesError instanceof Error
@@ -613,6 +615,7 @@ export default function JobPostStepOne() {
                   label="City"
                   className="bg-white"
                   placeholder="ex: Dubai"
+                  withSearchInput
                   error={
                     errors.city?.message ??
                     (citiesError instanceof Error ? citiesError.message : undefined)
@@ -671,30 +674,28 @@ export default function JobPostStepOne() {
             <Controller
               control={control}
               name="educationLevel"
-              render={({ field }) => {
-                console.log(field);
-                return (
-                  <SelectInputField
-                    {...field}
-                    id="education-level"
-                    label="Education Level"
-                    placeholder="select"
-                    className="bg-white"
-                    error={
-                      errors.educationLevel?.message ??
-                      (educationLevelsError instanceof Error
-                        ? educationLevelsError.message
-                        : undefined)
-                    }
-                    options={toSelectOptions(educationLevels)}
-                    disabled={isEducationLevelsLoading}
-                    onReachEnd={() => fetchMoreEducationLevels()}
-                    hasNextPage={Boolean(hasMoreEducationLevels)}
-                    isFetchingNextPage={isFetchingMoreEducationLevels}
-                    onSearchChange={setEducationLevelsSearch}
-                  />
-                );
-              }}
+              render={({ field }) => (
+                <MultiSelectInputField
+                  {...field}
+                  id="education-level"
+                  label="Education Level"
+                  placeholder="select"
+                  className="bg-white"
+                  error={
+                    errors.educationLevel?.message ??
+                    (educationLevelsError instanceof Error
+                      ? educationLevelsError.message
+                      : undefined)
+                  }
+                  options={toSelectOptions(educationLevels)}
+                  disabled={isEducationLevelsLoading}
+                  onReachEnd={() => fetchMoreEducationLevels()}
+                  hasNextPage={Boolean(hasMoreEducationLevels)}
+                  isFetchingNextPage={isFetchingMoreEducationLevels}
+                  withSearchInput
+                  onSearchChange={setEducationLevelsSearch}
+                />
+              )}
             />
           </div>
           <div className="space-y-2">
@@ -702,7 +703,7 @@ export default function JobPostStepOne() {
               control={control}
               name="mandatoryCertifications"
               render={({ field }) => (
-                <SelectInputField
+                <MultiSelectInputField
                   {...field}
                   id="mandatory-certifications"
                   label="Mandatory Certifications"
@@ -719,6 +720,7 @@ export default function JobPostStepOne() {
                   onReachEnd={() => fetchMoreMandatoryCertifications()}
                   hasNextPage={Boolean(hasMoreMandatoryCertifications)}
                   isFetchingNextPage={isFetchingMoreMandatoryCertifications}
+                  withSearchInput
                   onSearchChange={setMandatoryCertificationsSearch}
                 />
               )}
