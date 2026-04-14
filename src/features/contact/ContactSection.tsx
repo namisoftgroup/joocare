@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import ContactForm from "./ContactForm";
 import SideCard from "./SideCard";
 import type { ContactInitialValues, ContactRole } from "./types";
@@ -14,9 +15,13 @@ export default function ContactSection({
   initialValues?: ContactInitialValues;
   containerClassName?: string;
 }) {
+  const { data: session, status } = useSession();
   const [guestRole, setGuestRole] = useState<ContactRole>("candidate");
-  const activeRole = authRole ?? guestRole;
-  const canSwitchRole = !authRole;
+  const resolvedAuthRole =
+    authRole ?? (session?.authRole as ContactRole | undefined);
+  const isResolvingAuthRole = !authRole && status === "loading";
+  const activeRole = resolvedAuthRole ?? guestRole;
+  const canSwitchRole = !resolvedAuthRole && !isResolvingAuthRole;
 
   return (
     <div className={containerClassName}>
