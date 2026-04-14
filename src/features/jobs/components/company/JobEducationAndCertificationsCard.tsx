@@ -1,11 +1,8 @@
 import Image from "next/image";
-import { JobDetails, NamedEntity } from "../types/jobs.types";
-import JobOverviewItem from "./JobOverviewItem";
+import JobOverviewItem from "../JobOverviewItem";
+import { JobDetails } from "../../types/jobs.types";
 
 export default function JobEducationAndCertificationsCard({ job }: { job: JobDetails }) {
-  const educationLevel = job.education_level?.title ?? job.eduction_level?.title ?? "Not specified";
-  const availability = job.availability?.title ?? "Not specified";
-
   return (
     <div className="card border-border shadow-card min-h-36 rounded-2xl border-2 bg-white p-8">
       <h2 className="text-foreground mb-4 text-lg font-semibold">
@@ -14,7 +11,7 @@ export default function JobEducationAndCertificationsCard({ job }: { job: JobDet
       <div className="flex flex-col gap-6">
         <JobOverviewItem
           label="Education Level"
-          value={educationLevel}
+          value={job?.eduction_level?.title ?? "-"}
           icon="/assets/icons/exp.svg"
         />
         <div>
@@ -32,18 +29,21 @@ export default function JobEducationAndCertificationsCard({ job }: { job: JobDet
             </div>
             <div>
               <ul className="mt-2 flex flex-col gap-2">
-                {
-                  job.mandatory_certifications.map((item: NamedEntity) =>
-                    <li className="edu-certificate" key={item?.id}>{item?.title}</li>
-                  )
-                }
+                {job.mandatory_certifications?.map((item) => (
+                  <li className="edu-certificate" key={item?.id}>
+                    {item?.title}
+                  </li>
+                ))}
+                {job.mandatory_certifications?.length === 0 && (
+                  <li className="edu-certificate">-</li>
+                )}
               </ul>
             </div>
           </div>
         </div>
         <JobOverviewItem
           label="Availability"
-          value={availability}
+          value={job.availability?.title ?? "-"}
           icon="/assets/icons/case.svg"
         />
       </div>{" "}

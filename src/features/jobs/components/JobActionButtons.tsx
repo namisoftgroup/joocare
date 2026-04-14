@@ -1,59 +1,131 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
+import { useDeleteCompanyJob } from "@/features/jobs/hooks/useDeleteCompanyJob";
+import { useUpdateCompanyJobStatus } from "@/features/jobs/hooks/useUpdateCompanyJobStatus";
 import AlertModal from "@/shared/components/modals/AlertModal";
 import DeleteModal from "@/shared/components/modals/DeleteModal";
 import { Button, buttonVariants } from "@/shared/components/ui/button";
-import { CheckCheck, Edit, EyeOff, Trash2 } from "lucide-react";
+import { CheckCheck, Edit, EyeOff, Play, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { JobStatus } from "../types/index.types";
 
-export function JobActionButtons() {
+type JobActionButtonsProps = {
+  jobId?: number | string;
+  candidatesHref?: string;
+  applicationsCount?: number;
+  currentStatus?: JobStatus;
+  deleteRedirectTo?: string;
+};
+
+export function JobActionButtons({
+  jobId,
+  candidatesHref,
+  applicationsCount,
+  currentStatus = "open",
+  deleteRedirectTo,
+}: JobActionButtonsProps) {
   const [closeJob, setCloseJob] = useState(false);
   const [pauseJob, setPauseJob] = useState(false);
   const [deleteJob, setDeleteJob] = useState(false);
+  const { updateStatus, isPending } = useUpdateCompanyJobStatus(jobId, {
+    onSuccess: () => {
+      setCloseJob(false);
+      setPauseJob(false);
+    },
+  });
+  const { deleteJob: deleteCompanyJob, isPending: isDeleting } = useDeleteCompanyJob(jobId, {
+    redirectTo: deleteRedirectTo,
+    onSuccess: () => {
+      setDeleteJob(false);
+    },
+  });
+
   const handleCloseJob = () => {
-    setCloseJob(false);
+    updateStatus("closed");
   };
   const handlePauseJob = () => {
-    setPauseJob(false);
+    updateStatus("paused");
+  };
+  const handleOpenJob = () => {
+    updateStatus("open");
   };
   const handleDeleteJob = () => {
-    setDeleteJob(false);
+    deleteCompanyJob();
   };
+
+  const resolvedCompleteHref = jobId ? `/company/post-job?jobId=${jobId}` : "/company/post-job";
+  const resolvedEditHref = jobId ? `/company/post-job?editId=${jobId}` : "/company/post-job";
+  const isDraft = currentStatus === "draft";
+  const isClosed = currentStatus === "closed";
+  const isOpen = currentStatus === "open";
+  const isPaused = currentStatus === "paused";
+
   return (
     <>
-      <div className="flex gap-3">
-        <Link
-          href="/company/post-job"
-          className={`${buttonVariants({
-            variant: "secondary",
-            size: "pill",
-          })} flex items-center gap-2`}
-        >
-          <Edit className="h-4 w-4" /> Edit
-        </Link>
-        <Button
-          variant="default"
-          size="pill"
-          className="flex items-center gap-2"
-          onClick={() => setCloseJob(true)}
-        >
-          <CheckCheck className="h-4 w-4" /> Closed
-        </Button>
-        <Button
-          size="pill"
-          className="bg-foreground flex items-center gap-2"
-          onClick={() => setPauseJob(true)}
-        >
-          <EyeOff className="h-4 w-4" /> Paused
-        </Button>
+      <div className="flex w-full flex-wrap gap-3">
+        {isDraft ? (
+          <Link
+            href={resolvedCompleteHref}
+            className={`${buttonVariants({
+              variant: "default",
+              size: "pill",
+            })} flex-1 items-center justify-center gap-2`}
+          >
+            Complete Post
+          </Link>
+        ) : null}
+        {!isDraft && !isClosed ? (
+          <Link
+            href={resolvedEditHref}
+            className={`${buttonVariants({
+              variant: "secondary",
+              size: "pill",
+            })} items-center gap-2`}
+          >
+            <Edit className="h-4 w-4" /> Edit
+          </Link>
+        ) : null}
+        {isPaused ? (
+          <Button
+            variant="default"
+            size="pill"
+            className="flex-1 items-center justify-center gap-2"
+            disabled={isPending}
+            onClick={handleOpenJob}
+          >
+            <Play className="h-4 w-4" /> Resume
+          </Button>
+        ) : null}
+        {!isDraft && !isClosed && !isPaused ? (
+          <Button
+            variant="default"
+            size="pill"
+            className="flex items-center gap-2"
+            disabled={isPending}
+            onClick={() => setCloseJob(true)}
+          >
+            <CheckCheck className="h-4 w-4" /> Closed
+          </Button>
+        ) : null}
+        {isOpen ? (
+          <Button
+            size="pill"
+            className="bg-foreground flex items-center gap-2"
+            disabled={isPending}
+            onClick={() => setPauseJob(true)}
+          >
+            <EyeOff className="h-4 w-4" /> Paused
+          </Button>
+        ) : null}
         <Button
           variant="destructive"
           size="pill"
-          className="flex items-center gap-2"
+          className={`flex items-center justify-center gap-2 ${isClosed ? "w-full" : isDraft || isPaused ? "flex-1" : ""}`}
+          disabled={isDeleting}
           onClick={() => setDeleteJob(true)}
         >
-          <Trash2 className="h-4 w-4" /> Delete
+          <Trash2 className="h-4 w-4" /> Deleted
         </Button>
       </div>
       <AlertModal
@@ -64,6 +136,7 @@ export function JobActionButtons() {
         confirmLabel="Yes, close the advertisement."
         cancelLabel="Back"
         onConfirm={handleCloseJob}
+        isLoading={isPending}
       />
       <AlertModal
         open={pauseJob}
@@ -74,6 +147,7 @@ export function JobActionButtons() {
         confirmLabel="Yes, stop the advertisement"
         cancelLabel="Back"
         onConfirm={handlePauseJob}
+        isLoading={isPending}
       />
       <DeleteModal
         open={deleteJob}
@@ -82,7 +156,10 @@ export function JobActionButtons() {
         description="The advertisement will be permanently deleted from your account and you will not be able to recover it later. Please ensure before proceeding, as this action cannot be undone."
         cancelLabel="Back"
         onConfirm={handleDeleteJob}
+        isLoading={isDeleting}
       />
     </>
   );
 }
+
+export default JobActionButtons;

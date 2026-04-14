@@ -12,7 +12,7 @@ import {
 } from "@/shared/components/ui/dialog";
 import { Check, Sparkles, X } from "lucide-react";
 import Lottie, { LottieRefCurrentProps } from "lottie-react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import animationData from "../../../../public/assets/lottie/successfully.json";
 
 type SuccessModalAction = {
@@ -42,6 +42,11 @@ export default function SuccessModal({
 }: ConfirmDialogProps) {
   const lottieRef = useRef<LottieRefCurrentProps>(null);
   const isSubmittedVariant = variant === "submitted";
+  useEffect(() => {
+    setTimeout(() => {
+      onOpenChange(false);
+    }, 3000);
+  }, [open]);
 
   const renderAction = (
     action: SuccessModalAction,
@@ -77,7 +82,7 @@ export default function SuccessModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={!isSubmittedVariant}
-       className="max-w-175 rounded-2xl p-8 text-center"
+        className="max-w-175 rounded-2xl p-8 text-center"
       >
 
         <div className="relative overflow-hidden rounded-[24px] bg-white px-6 pb-7 pt-12 text-center sm:px-8">
@@ -119,12 +124,12 @@ export default function SuccessModal({
             {description}
           </DialogDescription>
         </DialogHeader>   {
-    primaryAction || secondaryAction ? (
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        {primaryAction ? renderAction(primaryAction, "default") : null}
-        {secondaryAction ? renderAction(secondaryAction, "outline") : null}
-      </div>) : null
-  }
+          primaryAction || secondaryAction ? (
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              {primaryAction ? renderAction(primaryAction, "default") : null}
+              {secondaryAction ? renderAction(secondaryAction, "outline") : null}
+            </div>) : null
+        }
 
 
       </DialogContent >

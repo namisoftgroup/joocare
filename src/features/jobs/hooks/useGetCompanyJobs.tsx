@@ -4,10 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { JobListItem } from "../types/jobs.types";
 
 export type ManagedCompanyJob = JobListItem & {
-    status: {
+    status?: {
         status: string;
         created_at: string;
-    };
+    } | null;
 };
 
 export interface JobsPage {
@@ -54,7 +54,17 @@ export default function useGetCompanyJobs({
                 throw new Error(res.message || "Something went wrong");
             }
 
-            return res.data as JobsPage;
+            const payload = res.data as JobsPage;
+
+            return {
+                ...payload,
+                data: Array.isArray(payload.data)
+                    ? payload.data.map((job) => ({
+                        ...job,
+                        status: job.status ?? null,
+                    }))
+                    : [],
+            };
         },
         enabled: !!token,
         placeholderData: initialData,
