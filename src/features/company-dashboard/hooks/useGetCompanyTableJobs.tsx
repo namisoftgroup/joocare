@@ -31,7 +31,7 @@ export default function useGetCompanyTableJobs({ token, page }: { token: string,
                 throw new Error(res.message || "Something went wrong");
             }
 
-            return res.data as JobsPage;
+            return res.data as unknown as JobsPage;
         },
         enabled: !!token,
 

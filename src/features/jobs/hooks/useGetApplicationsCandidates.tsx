@@ -103,7 +103,7 @@ export default function useGetApplicationsCandidates({
                 throw new Error(res.message || "Something went wrong");
             }
 
-            return res.data as ApplicationsCandidatesPage;
+            return res.data as unknown as ApplicationsCandidatesPage;
         },
         enabled: !!token && Number.isFinite(slug),
         placeholderData: initialData,

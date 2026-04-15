@@ -4,7 +4,7 @@ import WizardProgress from "@/features/complete-account/components/wizard-progre
 import AlertModal from "@/shared/components/modals/AlertModal";
 import SuccessModal from "@/shared/components/modals/SuccessModal";
 import { Button } from "@/shared/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { typedZodResolver } from "@/shared/lib/typed-zod-resolver";
 import { useEffect, useMemo, useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
@@ -118,7 +118,7 @@ export default function PostJobForm() {
 
   // ─── Form ──────────────────────────────────────────────
   const methods = useForm<JobFormData>({
-    resolver: zodResolver(jobFormSchema),
+    resolver: typedZodResolver(jobFormSchema),
     defaultValues: jobFormDefaults,
     mode: "onChange",
   });
@@ -155,9 +155,10 @@ export default function PostJobForm() {
       payload: { status },
     });
 
+    const stepThreeData = stepThreeResponse.data as Record<string, any>;
     const nextReviewJob =
-      stepThreeResponse.data?.data?.job ??
-      stepThreeResponse.data?.job ??
+      stepThreeData?.data?.job ??
+      stepThreeData?.job ??
       null;
 
     if (nextReviewJob) {
@@ -286,7 +287,8 @@ export default function PostJobForm() {
         availability_id: Number(data.availability),
       });
 
-      const nextCreatedJobId = Number(stepOneResponse.data?.data?.job?.id);
+      const stepOneData = stepOneResponse.data as Record<string, any>;
+      const nextCreatedJobId = Number(stepOneData?.data?.job?.id);
 
       if (!nextCreatedJobId) {
         throw new Error("Unable to resolve created job id from step one response.");
@@ -311,9 +313,10 @@ export default function PostJobForm() {
           skills: (data.skills ?? []).map((skillId) => Number(skillId)),
         },
       });
+      const stepTwoData = stepTwoResponse.data as Record<string, any>;
       const nextReviewJob =
-        stepTwoResponse.data?.data?.job ??
-        stepTwoResponse.data?.job ??
+        stepTwoData?.data?.job ??
+        stepTwoData?.job ??
         null;
       setReviewJob(nextReviewJob as JobDetails | null);
       setCurrentStep((s) => s + 1);

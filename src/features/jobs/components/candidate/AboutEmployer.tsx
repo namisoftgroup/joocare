@@ -4,7 +4,7 @@ import { cn } from "@/shared/lib/utils";
 import Image from "next/image";
 import { CompanyDetails } from "../../types/jobs.types";
 
-export default function AboutEmployer({ employer }: { employer: CompanyDetails }) {
+export default function AboutEmployer({ employer }: { employer: CompanyDetails | null }) {
   return (
     <div className="card font-noto-sans col-span-2 rounded-2xl bg-white p-7 text-[#212529]">
       <h3 className="text-foreground mb-4 text-xl font-bold">
