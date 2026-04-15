@@ -1,6 +1,6 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { typedZodResolver } from "@/shared/lib/typed-zod-resolver";
 import { FormProvider, useForm } from "react-hook-form";
 
 import { defaultValuesWizard, steps } from "../constants/wizard.constants";
@@ -40,7 +40,7 @@ export default function CompleteAccountWizardForm() {
   const wizard = useWizard(steps.length);
 
   const methods = useForm<WizardFormData>({
-    resolver: zodResolver(WizardSchema),
+    resolver: typedZodResolver(WizardSchema),
     mode: "onChange",
   });
 
@@ -58,14 +58,14 @@ export default function CompleteAccountWizardForm() {
         commercialRegister: profileData.commercial_registration_number?.toString() || "",
         issuingCountryLicense: profileData.license_issue_country_id?.toString() || "",
         organizationSize: profileData.organization_size_id?.toString() || "",
-        commercialRegistrationIssueDate: profileData.commercial_registration_issue_date,
-        commercialRegistrationExpiryDate: profileData.commercial_registration_expiry_date || "",
+        commercialRegistrationIssueDate: profileData.commercial_registration_issue_date ? new Date(profileData.commercial_registration_issue_date) : undefined as unknown as Date,
+        commercialRegistrationExpiryDate: profileData.commercial_registration_expiry_date ? new Date(profileData.commercial_registration_expiry_date) : undefined as unknown as Date,
         employerType: profileData.employer_type_id?.toString() || "",
         medicalFacilityLicenseNumber: profileData.medical_facility_license_number?.toString() || "",
         licenseIssuingAuthority: profileData.license_issuing_authority || "",
         specialtyScopePractice: profileData.specialty_id?.toString() || "",
-        medicalRegistrationIssueDate: profileData.medical_license_issue_date || "",
-        medicalRegistrationExpiryDate: profileData.medical_license_expiry_date || "",
+        medicalRegistrationIssueDate: profileData.medical_license_issue_date ? new Date(profileData.medical_license_issue_date) : undefined as unknown as Date,
+        medicalRegistrationExpiryDate: profileData.medical_license_expiry_date ? new Date(profileData.medical_license_expiry_date) : undefined as unknown as Date,
         organizationPhoneNumber: profileData.phone_code && profileData.phone ? `${profileData.phone_code}${profileData.phone}` : "",
         organizationCountry: profileData.country_id?.toString() || "",
         organizationCity: profileData.city_id?.toString() || "",
@@ -106,16 +106,16 @@ export default function CompleteAccountWizardForm() {
       } else if (wizard.step === 1) {
         await postStepTwo({
           commercial_registration_number: data.commercialRegister || "",
-          commercial_registration_issue_date: data.commercialRegistrationIssueDate || "",
-          commercial_registration_expiry_date: data.commercialRegistrationExpiryDate || "",
+          commercial_registration_issue_date: data.commercialRegistrationIssueDate?.toISOString?.() || "",
+          commercial_registration_expiry_date: data.commercialRegistrationExpiryDate?.toISOString?.() || "",
           license_issue_country_id: data.issuingCountryLicense || "",
           organization_size_id: data.organizationSize || "",
           employer_type_id: data.employerType || "",
           medical_facility_license_number: data.medicalFacilityLicenseNumber || "",
           license_issuing_authority: data.licenseIssuingAuthority || "",
           specialty_id: data.specialtyScopePractice || "",
-          medical_license_issue_date: data.medicalRegistrationIssueDate || "",
-          medical_license_expiry_date: data.medicalRegistrationExpiryDate || "",
+          medical_license_issue_date: data.medicalRegistrationIssueDate?.toISOString?.() || "",
+          medical_license_expiry_date: data.medicalRegistrationExpiryDate?.toISOString?.() || "",
           commercial_registration_image: data.commercialRegistrationImagePath || profileData?.commercial_registration_image || "",
           medical_license_image: data.medicalLicenseImagePath || profileData?.medical_license_image || "",
         });

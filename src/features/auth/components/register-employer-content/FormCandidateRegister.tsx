@@ -1,6 +1,6 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { typedZodResolver } from "@/shared/lib/typed-zod-resolver";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
 import { InputField } from "@/shared/components/InputField";
@@ -34,7 +34,7 @@ const FormCandidateRegister = () => {
     watch,
     formState: { errors },
   } = useForm<TRegisterCandidateSchema>({
-    resolver: zodResolver(RegisterCandidateSchema),
+    resolver: typedZodResolver(RegisterCandidateSchema),
     defaultValues: {
       uploadCV: "",
       confirmRegister: false,

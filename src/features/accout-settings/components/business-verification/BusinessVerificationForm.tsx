@@ -1,6 +1,6 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { typedZodResolver } from "@/shared/lib/typed-zod-resolver";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
 import { storeUploadedFileAction } from "@/features/candidate-settings/actions/basic-info-actions";
@@ -91,7 +91,7 @@ export default function BusinessVerificationForm() {
         clearErrors,
         formState: { errors },
     } = useForm<TBusinessVerificationSchema>({
-        resolver: zodResolver(BusinessVerificationSchema),
+        resolver: typedZodResolver(BusinessVerificationSchema),
     });
 
     // update business verification
@@ -104,14 +104,14 @@ export default function BusinessVerificationForm() {
                 commercial_registration_number: companyProfileData.commercial_registration_number?.toString() || "",
                 license_issue_country_id: companyProfileData.license_issue_country_id?.toString() || "",
                 organization_size_id: companyProfileData.organization_size_id?.toString() || "",
-                commercial_registration_issue_date: companyProfileData.commercial_registration_issue_date || "",
-                commercial_registration_expiry_date: companyProfileData.commercial_registration_expiry_date || "",
+                commercial_registration_issue_date: companyProfileData.commercial_registration_issue_date ? new Date(companyProfileData.commercial_registration_issue_date) : undefined as unknown as Date,
+                commercial_registration_expiry_date: companyProfileData.commercial_registration_expiry_date ? new Date(companyProfileData.commercial_registration_expiry_date) : undefined as unknown as Date,
                 employer_type_id: companyProfileData.employer_type_id?.toString() || "",
                 medical_facility_license_number: companyProfileData.medical_facility_license_number?.toString() || "",
                 license_issuing_authority: companyProfileData.license_issuing_authority || "",
                 specialty_id: companyProfileData.specialty_id?.toString() || "",
-                medical_license_issue_date: companyProfileData.medical_license_issue_date || "",
-                medical_license_expiry_date: companyProfileData.medical_license_expiry_date || "",
+                medical_license_issue_date: companyProfileData.medical_license_issue_date ? new Date(companyProfileData.medical_license_issue_date) : undefined as unknown as Date,
+                medical_license_expiry_date: companyProfileData.medical_license_expiry_date ? new Date(companyProfileData.medical_license_expiry_date) : undefined as unknown as Date,
             });
 
             if (companyProfileData.commercial_registration_image) {
@@ -127,16 +127,16 @@ export default function BusinessVerificationForm() {
     const onSubmit: SubmitHandler<TBusinessVerificationSchema> = (data) => {
         const payload: UpdateBusinessVerificationPayload = {
             commercial_registration_number: data.commercial_registration_number,
-            commercial_registration_issue_date: data.commercial_registration_issue_date,
-            commercial_registration_expiry_date: data.commercial_registration_expiry_date,
+            commercial_registration_issue_date: data.commercial_registration_issue_date.toISOString(),
+            commercial_registration_expiry_date: data.commercial_registration_expiry_date.toISOString(),
             license_issue_country_id: Number(data.license_issue_country_id),
             organization_size_id: Number(data.organization_size_id),
             employer_type_id: Number(data.employer_type_id),
             medical_facility_license_number: data.medical_facility_license_number,
             license_issuing_authority: data.license_issuing_authority,
             specialty_id: Number(data.specialty_id),
-            medical_license_issue_date: data.medical_license_issue_date,
-            medical_license_expiry_date: data.medical_license_expiry_date,
+            medical_license_issue_date: data.medical_license_issue_date.toISOString(),
+            medical_license_expiry_date: data.medical_license_expiry_date.toISOString(),
             medical_license_image: medicalLicenseImage || (showExistingMedicalLicenseImage ? companyProfileData?.medical_license_image : "") || "",
             commercial_registration_image: commercialRegistrationImage || (showExistingCommercialRegistrationImage ? companyProfileData?.commercial_registration_image : "") || "",
         };

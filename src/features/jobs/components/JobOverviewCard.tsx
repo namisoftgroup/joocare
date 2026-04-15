@@ -18,22 +18,22 @@ export default function JobOverviewCard({ job }: { job: JobDetails }) {
         </div>
         <JobOverviewItem
           label="Job Category"
-          value={job?.category?.title}
+          value={job?.category?.title ?? "Not specified"}
           icon="/assets/icons/job-category.svg"
         />
         <JobOverviewItem
           label="Specialty"
-          value={job?.specialty?.title}
+          value={job?.specialty?.title ?? "Not specified"}
           icon="/assets/icons/specialty.svg"
         />
         <JobOverviewItem
           label="Role category"
-          value={job?.role_category?.title}
+          value={job?.role_category?.title ?? "Not specified"}
           icon="/assets/icons/role-category.svg"
         />
         <JobOverviewItem
           label="Seniority Level"
-          value={job?.seniority_level?.title}
+          value={job?.seniority_level?.title ?? "Not specified"}
           icon="/assets/icons/seniority.svg"
         />
       </div>

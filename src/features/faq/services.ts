@@ -27,10 +27,10 @@ export async function getFaqsPageData(
   }
 
   return {
-    items: data.data?.map(mapFaqItem) ?? [],
-    currentPage: data.current_page ?? page,
-    totalPages: data.last_page ?? 1,
-    pageSize: data.per_page ?? 10,
-    totalItems: data.total ?? 0,
+    items: data.data?.data?.map(mapFaqItem) ?? [],
+    currentPage: data.data?.current_page ?? page,
+    totalPages: data.data?.last_page ?? 1,
+    pageSize: data.data?.per_page ?? 10,
+    totalItems: data.data?.total ?? 0,
   };
 }

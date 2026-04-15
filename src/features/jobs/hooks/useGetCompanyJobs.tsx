@@ -3,7 +3,7 @@ import { apiFetch } from "@/shared/lib/fetch-manager";
 import { useQuery } from "@tanstack/react-query";
 import { JobListItem } from "../types/jobs.types";
 
-export type ManagedCompanyJob = JobListItem & {
+export type ManagedCompanyJob = Omit<JobListItem, 'status'> & {
     status?: {
         status: string;
         created_at: string;
@@ -54,7 +54,7 @@ export default function useGetCompanyJobs({
                 throw new Error(res.message || "Something went wrong");
             }
 
-            const payload = res.data as JobsPage;
+            const payload = res.data as unknown as JobsPage;
 
             return {
                 ...payload,

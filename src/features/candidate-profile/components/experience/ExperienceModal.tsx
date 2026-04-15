@@ -1,6 +1,6 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { typedZodResolver } from "@/shared/lib/typed-zod-resolver";
 import { Minus, Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, type SubmitHandler, useFieldArray, useForm } from "react-hook-form";
@@ -91,7 +91,7 @@ export function ExperienceModal({
     setValue,
     formState: { errors },
 } = useForm<FormData>({
-    resolver: zodResolver(experienceModalSchema),
+    resolver: typedZodResolver(experienceModalSchema),
     defaultValues,
   });
   const [dialogContentElement, setDialogContentElement] = useState<HTMLDivElement | null>(null);

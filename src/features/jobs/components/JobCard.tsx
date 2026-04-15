@@ -40,12 +40,12 @@ import { getJobLocation, getJobSalary, normalizeJobStatus } from "../utils";
 import { useQueryClient } from "@tanstack/react-query";
 
 type JobCardProps = {
-  job: JobListItem & {
+  job: Omit<JobListItem, 'status'> & {
     status?: {
       status: string;
       created_at: string;
     } | null;
-    applications_count: number
+    applications_count?: number;
   };
   href?: string;
   appliedBadge?: boolean;

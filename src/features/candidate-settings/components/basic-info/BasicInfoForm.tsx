@@ -10,7 +10,7 @@ import useGetExperiences from "@/shared/hooks/useGetExperiences";
 import useGetJobTitles from "@/shared/hooks/useGetJobTitles";
 import useGetSpecialties from "@/shared/hooks/useGetSpecialties";
 import { Button } from "@/shared/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { typedZodResolver } from "@/shared/lib/typed-zod-resolver";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -79,7 +79,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
     clearErrors,
     formState: { errors },
   } = useForm<TSettingBasicInfoSchema>({
-    resolver: zodResolver(SettingBasicInfoSchema),
+    resolver: typedZodResolver(SettingBasicInfoSchema),
     mode: "onChange",
     defaultValues,
   });

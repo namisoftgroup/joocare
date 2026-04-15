@@ -45,17 +45,17 @@ export default function CoverUploadImage() {
 
     try {
       const response = await uploadImage(file);
-      const imagePath = response?.data?.data.image;
+      const imagePath = response?.data?.data?.image;
 
       if (response?.data?.message === "Success" && imagePath) {
         setValue("uploadCoverImage", imagePath);
-        // ✅ Don't touch localPreview — keep showing the blob URL
+        // Don't touch localPreview — keep showing the blob URL
       } else {
         throw new Error("Upload failed or no image path returned");
       }
     } catch (error) {
       console.error("Failed to upload cover image", error);
-      // ❌ Only revoke on failure
+      // Only revoke on failure
       URL.revokeObjectURL(localUrl);
       setCoverLocalPreview(null);
       setValue("uploadCoverImage", null);
@@ -71,7 +71,7 @@ export default function CoverUploadImage() {
 
     try {
       const response = await uploadImage(file);
-      const imagePath = response?.data?.data.image;
+      const imagePath = response?.data?.data?.image;
 
       if (response?.data?.message === "Success" && imagePath) {
         setValue("uploadLogoImage", imagePath);
