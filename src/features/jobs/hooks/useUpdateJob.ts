@@ -7,7 +7,7 @@ export const useUpdateJob = ({ token }: { token: string }) => {
     mutationFn: ({ jobId, payload }: { jobId: number | string; payload: UpdateJobPayload }) =>
       updateJobService(jobId, payload, { token }),
     onSuccess: (res) => {
-      toast.success(res.message ?? "Job updated successfully");
+      // toast.success(res.message ?? "Job updated successfully");
     },
     onError: (error) => {
       toast.error(error.message);

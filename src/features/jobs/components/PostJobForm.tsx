@@ -62,10 +62,10 @@ function mapJobToFormData(job: JobDetails): Partial<JobFormData> {
     country: String(job.country_id ?? ""),
     city: String(job.city_id ?? ""),
     yearsOfExperience: String(job.experience_id ?? ""),
-    educationLevel: String(job.eduction_level_id ?? ""),
-    mandatoryCertifications: job.mandatory_certifications?.[0]
-      ? String(job.mandatory_certifications[0].id)
-      : "",
+    educationLevel: job.education_levels ? [String(job.education_levels)] : [],
+    mandatoryCertifications: (job.mandatory_certifications ?? []).map((item) =>
+      String(item.id),
+    ),
     availability: String(job.availability_id ?? ""),
     description: job.description ?? "",
     skills: (job.skills ?? []).map((s) => String(s.id)),
@@ -177,17 +177,12 @@ export default function PostJobForm() {
   };
 
   // ─── Build edit payload from form values ──────────────
-  const buildUpdatePayload = (data: JobFormData) => {
-    return {
-      _method: "put" as const,
+  const buildStepOnePayload = (data: JobFormData) => {
+    const basePayload = {
       job_title_id: data.title === "__other__" ? undefined : Number(data.title),
       title: data.title === "__other__" ? data.otherJobTitle?.trim() ?? "" : undefined,
       professional_license: data.license,
       has_salary: data.addSalary ? 1 : 0,
-      min_salary: Number(data.salary?.min ?? 0),
-      max_salary: Number(data.salary?.max ?? 0),
-      currency_id: Number(data.salary?.currency ?? 0),
-      salary_type_id: Number(data.salary?.type ?? 0),
       category_id: Number(data.category),
       specialty_id: Number(data.specialty),
       employment_type_id: Number(data.employmentType),
@@ -196,14 +191,61 @@ export default function PostJobForm() {
       country_id: Number(data.country),
       city_id: Number(data.city),
       experience_id: Number(data.yearsOfExperience),
-      mandatory_certifications: data.mandatoryCertifications
-        ? [Number(data.mandatoryCertifications)]
-        : [],
-      eduction_level_id: Number(data.educationLevel),
+      mandatory_certifications: (data.mandatoryCertifications ?? []).map((item) =>
+        Number(item),
+      ),
+      education_levels: (data.educationLevel ?? []).map((item) => Number(item)),
+      availability_id: Number(data.availability),
+    };
+
+    if (!data.addSalary) {
+      return basePayload;
+    }
+
+    return {
+      ...basePayload,
+      min_salary: Number(data.salary?.min),
+      max_salary: Number(data.salary?.max),
+      currency_id: Number(data.salary?.currency),
+      salary_type_id: Number(data.salary?.type),
+    };
+  };
+
+  const buildUpdatePayload = (data: JobFormData) => {
+    const basePayload = {
+      _method: "put" as const,
+      job_title_id: data.title === "__other__" ? undefined : Number(data.title),
+      title: data.title === "__other__" ? data.otherJobTitle?.trim() ?? "" : undefined,
+      professional_license: data.license,
+      has_salary: data.addSalary ? 1 : 0,
+      category_id: Number(data.category),
+      specialty_id: Number(data.specialty),
+      employment_type_id: Number(data.employmentType),
+      role_category_id: Number(data.roleCategory),
+      seniority_level_id: Number(data.seniorityLevel || 0),
+      country_id: Number(data.country),
+      city_id: Number(data.city),
+      experience_id: Number(data.yearsOfExperience),
+      mandatory_certifications: (data.mandatoryCertifications ?? []).map((item) =>
+        Number(item),
+      ),
+      education_levels: (data.educationLevel ?? []).map((item) => Number(item)),
       availability_id: Number(data.availability),
       description: data.description,
       skills: (data.skills ?? []).map((s) => Number(s)),
       status: "open",
+    };
+
+    if (!data.addSalary) {
+      return basePayload;
+    }
+
+    return {
+      ...basePayload,
+      min_salary: Number(data.salary?.min),
+      max_salary: Number(data.salary?.max),
+      currency_id: Number(data.salary?.currency),
+      salary_type_id: Number(data.salary?.type),
     };
   };
 
@@ -234,58 +276,15 @@ export default function PostJobForm() {
       if (mode === "complete" && createdJobId) {
         // For complete mode, we still call step-one to save the updated data
         const data = getValues();
-        await postStepOne({
-          job_title_id: data.title === "__other__" ? undefined : Number(data.title),
-          title: data.title === "__other__" ? data.otherJobTitle?.trim() ?? "" : undefined,
-          professional_license: data.license,
-          has_salary: data.addSalary,
-          min_salary: Number(data.salary?.min ?? 0),
-          max_salary: Number(data.salary?.max ?? 0),
-          currency_id: Number(data.salary?.currency ?? 0),
-          salary_type_id: Number(data.salary?.type ?? 0),
-          category_id: Number(data.category),
-          specialty_id: Number(data.specialty),
-          employment_type_id: Number(data.employmentType),
-          role_category_id: Number(data.roleCategory),
-          seniority_level_id: Number(data.seniorityLevel || 0),
-          country_id: Number(data.country),
-          city_id: Number(data.city),
-          experience_id: Number(data.yearsOfExperience),
-          mandatory_certifications: data.mandatoryCertifications
-            ? [Number(data.mandatoryCertifications)]
-            : [],
-          eduction_level_id: Number(data.educationLevel),
-          availability_id: Number(data.availability),
-        });
+
+        await postStepOne(buildStepOnePayload(data));
         setCurrentStep((s) => s + 1);
         return;
       }
 
       // Create mode — call step-one to create the job
       const data = getValues();
-      const stepOneResponse = await postStepOne({
-        job_title_id: data.title === "__other__" ? undefined : Number(data.title),
-        title: data.title === "__other__" ? data.otherJobTitle?.trim() ?? "" : undefined,
-        professional_license: data.license,
-        has_salary: data.addSalary,
-        min_salary: Number(data.salary?.min ?? 0),
-        max_salary: Number(data.salary?.max ?? 0),
-        currency_id: Number(data.salary?.currency ?? 0),
-        salary_type_id: Number(data.salary?.type ?? 0),
-        category_id: Number(data.category),
-        specialty_id: Number(data.specialty),
-        employment_type_id: Number(data.employmentType),
-        role_category_id: Number(data.roleCategory),
-        seniority_level_id: Number(data.seniorityLevel || 0),
-        country_id: Number(data.country),
-        city_id: Number(data.city),
-        experience_id: Number(data.yearsOfExperience),
-        mandatory_certifications: data.mandatoryCertifications
-          ? [Number(data.mandatoryCertifications)]
-          : [],
-        eduction_level_id: Number(data.educationLevel),
-        availability_id: Number(data.availability),
-      });
+      const stepOneResponse = await postStepOne(buildStepOnePayload(data));
 
       const stepOneData = stepOneResponse.data as Record<string, any>;
       const nextCreatedJobId = Number(stepOneData?.data?.job?.id);
