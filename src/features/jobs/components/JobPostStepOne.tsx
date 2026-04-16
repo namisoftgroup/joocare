@@ -78,6 +78,13 @@ export default function JobPostStepOne() {
   const [salaryTypesSearch, setSalaryTypesSearch] = useState("");
   const [currenciesSearch, setCurrenciesSearch] = useState("");
   const [newMandatoryCertification, setNewMandatoryCertification] = useState("");
+  const {
+    control,
+    register,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useFormContext<JobFormData>();
   // countries data
   const {
     countries,
@@ -87,8 +94,10 @@ export default function JobPostStepOne() {
     fetchNextPage: fetchMoreCountries,
     isFetchingNextPage: isFetchingMoreCountries,
   } = useGetCountries(countrySearch);
-  const [selectedCountryId, setSelectedCountryId] = useState<number | null>(null);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const selectedCountry = watch("country");
+  const selectedCategory = watch("category");
+  const selectedCountryId = selectedCountry ? Number(selectedCountry) : null;
+  const selectedCategoryId = selectedCategory ? Number(selectedCategory) : null;
   const {
     cities,
     isLoading: citiesLoading,
@@ -197,18 +206,11 @@ export default function JobPostStepOne() {
 
   } = useGetCurrencies(currenciesSearch);
 
-  const {
-    control,
-    register,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useFormContext<JobFormData>();
-
   const addSalary = watch("addSalary");
   const selectedJobTitle = watch("title");
   const isOtherJobTitle = selectedJobTitle === "__other__";
   const selectedMandatoryCertifications = watch("mandatoryCertifications") ?? [];
+
   const toSelectOptions = (items: LookupOptionItem[]) =>
     items.map((item) => ({
       label: item.title ?? item.name ?? "",
@@ -468,7 +470,6 @@ export default function JobPostStepOne() {
                 options={toSelectOptions(categories)}
                 onChange={(value) => {
                   field.onChange(value);
-                  setSelectedCategoryId(Number(value));
                   setValue("specialty", "");
                 }}
                 disabled={categoriesLoading}
@@ -621,7 +622,6 @@ export default function JobPostStepOne() {
                   }
                   onChange={(value) => {
                     field.onChange(value);
-                    setSelectedCountryId(Number(value));
                     setValue("city", "");
                   }}
                   options={countries.map((country) => ({
