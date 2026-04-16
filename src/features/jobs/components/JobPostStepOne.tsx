@@ -28,6 +28,7 @@ import useGetAvailabilities from "@/shared/hooks/useGetAvailabilities";
 import useGetSalaryTypes from "@/shared/hooks/useGetSalaryTypes";
 import useGetCurrencies from "@/shared/hooks/useGetCurrencies";
 import { useState } from "react";
+import { JobPostStepOneSkeleton } from "./JobPostStepOneSkeleton";
 
 const CUSTOM_CERTIFICATION_PREFIX = "__custom__:";
 
@@ -55,7 +56,9 @@ function FieldError({ name }: { name: string }) {
   return <p className="mt-1 text-xs text-red-500">{error.message}</p>;
 }
 
-export default function JobPostStepOne() {
+
+
+function JobPostStepOneContent() {
   // hooks land and token
   const locale = useLocale();
   const { data: session } = useSession();
@@ -827,4 +830,16 @@ export default function JobPostStepOne() {
       </div>
     </div>
   );
+}
+
+export default function JobPostStepOne({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}) {
+  if (isLoading) {
+    return <JobPostStepOneSkeleton />;
+  }
+
+  return <JobPostStepOneContent />;
 }

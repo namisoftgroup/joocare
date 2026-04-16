@@ -398,7 +398,7 @@ export default function PostJobForm() {
   };
 
   // ─── Loading gate ─────────────────────────────────────
-  if ((mode === "complete" || mode === "edit") && isLoadingJob) {
+  if (mode === "complete" && isLoadingJob) {
     return (
       <section className="h-min-dvh mx-auto max-w-7xl py-12">
         <div className="flex h-full items-center justify-center rounded-2xl bg-white p-6">
@@ -434,6 +434,7 @@ export default function PostJobForm() {
 
   // Are we loading from any step API?
   const isBusy = isPostingStepOne || isPostingStepTwo || isPostingStepThree || isUpdatingJob;
+  const isStepOneEditLoading = isEditMode && currentStep === 0 && (isLoadingJob || !formHydrated);
 
   // ═══════════════════════════════════════════════════════
   //  UNIFIED WIZARD — same UI for create, complete & edit
@@ -459,7 +460,7 @@ export default function PostJobForm() {
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
             <div className="min-h-80">
-              {currentStep === 0 && <JobPostStepOne />}
+              {currentStep === 0 && <JobPostStepOne isLoading={isStepOneEditLoading} />}
               {currentStep === 1 && <JobPostStepTwo />}
               {currentStep === 2 && <JobReviewPanel data={getValues()} job={reviewJob} />}
             </div>
@@ -482,7 +483,7 @@ export default function PostJobForm() {
                 <Button
                   type="button"
                   onClick={handleNext}
-                  disabled={isBusy}
+                  disabled={isBusy || isStepOneEditLoading}
                   variant="secondary"
                   hoverStyle="slidePrimary"
                   size="pill"
@@ -494,7 +495,7 @@ export default function PostJobForm() {
                 <Button
                   type="button"
                   onClick={() => handleSubmit(onSubmit)()}
-                  disabled={isSubmitting || isBusy}
+                  disabled={isSubmitting || isBusy || isStepOneEditLoading}
                   variant="secondary"
                   size="pill"
                   hoverStyle="slidePrimary"
@@ -502,25 +503,6 @@ export default function PostJobForm() {
                 >
                   {isSubmitting ? (
                     <>
-                      <svg
-                        className="h-4 w-4 animate-spin"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v8H4z"
-                        />
-                      </svg>
                       {isEditMode ? "Saving..." : "Posting..."}
                     </>
                   ) : isEditMode ? (
