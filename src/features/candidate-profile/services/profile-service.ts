@@ -87,6 +87,23 @@ function normalizeAge(age: number | string | null | undefined) {
   return null;
 }
 
+function resolveStoredFileUrl(path: string | null | undefined) {
+  if (!path) {
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  const trimmedPath = path.trim().replace(/^\/+/, "");
+  const normalizedPath = trimmedPath.startsWith("storage/")
+    ? trimmedPath.slice("storage/".length)
+    : trimmedPath;
+
+  return `https://joocare.nami-tec.com/storage/${normalizedPath}`;
+}
+
 export async function getCandidateProfile() {
   const session = await getServerSession(authOptions);
 
@@ -136,8 +153,8 @@ export async function getCandidateProfile() {
     countryId: user.country_id ? String(user.country_id) : null,
     cityId: user.city_id ? String(user.city_id) : null,
     birthDate: user.birth_date ?? user.date_of_birth ?? null,
-    image: user.image ?? null,
-    cv: user.cv ?? null,
+    image: resolveStoredFileUrl(user.image),
+    cv: resolveStoredFileUrl(user.cv),
     bio: user.bio ?? null,
     isProfileComplete: user.is_profile_complete ?? null,
     age: normalizeAge(user.age),

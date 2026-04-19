@@ -123,11 +123,10 @@ const SidebarLinks = ({ links }: ILinksProps) => {
                 <li className="shrink-0 list-none">
                   <Link
                     href={href}
-                    className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold whitespace-nowrap transition-all ${
-                      isActive
-                        ? "border-primary bg-primary-bg text-primary"
-                        : "border-border text-muted-foreground hover:border-primary hover:bg-primary-bg hover:text-primary"
-                    }`}
+                    className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold whitespace-nowrap transition-all ${isActive
+                      ? "border-primary bg-primary-bg text-primary"
+                      : "border-border text-muted-foreground hover:border-primary hover:bg-primary-bg hover:text-primary"
+                      }`}
                   >
                     {image && (
                       <div
@@ -147,11 +146,10 @@ const SidebarLinks = ({ links }: ILinksProps) => {
 
                     {Icon && (
                       <Icon
-                        className={`size-4 shrink-0 transition-colors ${
-                          isActive
-                            ? "text-primary"
-                            : "text-muted-foreground group-hover:text-primary"
-                        }`}
+                        className={`size-4 shrink-0 transition-colors ${isActive
+                          ? "text-primary"
+                          : "text-muted-foreground group-hover:text-primary"
+                          }`}
                       />
                     )}
 
@@ -166,7 +164,7 @@ const SidebarLinks = ({ links }: ILinksProps) => {
       {/* ── Desktop — original vertical sidebar ───────────────────────────── */}
       <nav
         aria-label="Company navigation"
-        className="hidden lg:block lg:min-h-[calc(100dvh-250px)]"
+        className="hidden lg:block "
       >
         <ul className="flex flex-col gap-5">
           {links.map(({ label, href, image, icon: Icon }) => {
@@ -180,11 +178,10 @@ const SidebarLinks = ({ links }: ILinksProps) => {
               <li key={href}>
                 <Link
                   href={href}
-                  className={`group flex items-center gap-3 rounded-full border-l-2 px-4 py-2 text-lg font-semibold transition-all ${
-                    isActive
-                      ? "border-primary bg-primary-bg text-primary"
-                      : "text-muted-foreground hover:border-primary hover:bg-primary-bg hover:text-primary border-transparent"
-                  }`}
+                  className={`group flex items-center gap-3 rounded-full border-l-2 px-4 py-2 text-lg font-semibold transition-all ${isActive
+                    ? "border-primary bg-primary-bg text-primary"
+                    : "text-muted-foreground hover:border-primary hover:bg-primary-bg hover:text-primary border-transparent"
+                    }`}
                 >
                   {image && (
                     <div
@@ -204,11 +201,10 @@ const SidebarLinks = ({ links }: ILinksProps) => {
 
                   {Icon && (
                     <Icon
-                      className={`size-5 shrink-0 transition-colors ${
-                        isActive
-                          ? "text-primary"
-                          : "text-muted-foreground group-hover:text-primary"
-                      }`}
+                      className={`size-5 shrink-0 transition-colors ${isActive
+                        ? "text-primary"
+                        : "text-muted-foreground group-hover:text-primary"
+                        }`}
                     />
                   )}
 
