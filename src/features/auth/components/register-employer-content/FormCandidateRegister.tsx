@@ -109,7 +109,7 @@ const FormCandidateRegister = () => {
           render={({ field }) => (
             <PhoneInputCode
               {...field}
-              defaultCountry="EG"
+              defaultCountry="AE"
               id="phoneNumber"
               className="w-full"
               placeholder="Enter phone number"

@@ -68,66 +68,70 @@ type CreateSettingBasicInfoSchemaOptions = {
 export const createSettingBasicInfoSchema = ({
   requireCv = true,
 }: CreateSettingBasicInfoSchemaOptions = {}) =>
-  z.object({
-    fullName: z
-      .string()
-      .trim()
-      .min(3, { message: "Full name must be at least 3 characters." })
-      .max(255, { message: "Full name must be at most 255 characters." }),
-    email: z
-      .string()
-      .min(1, { message: "email is required" })
-      .email({ message: "Not valid email" }),
-    phoneNumber: z
-      .string({
-        error: "phone number is required",
-      })
-      .min(10, { message: "Phone number is required" }),
-
-    jobTitle: z
-      .string({
-        error: "job title is required",
-      })
-      .min(1, { message: "Job title is required." }),
-
-    specialty: optionalSelectField(),
-
-    yearsOfExperience: optionalSelectField(),
-
-    country: z
-      .string({
-        error: "Current location country is required.",
-      })
-      .min(1, { message: "Country is required." }),
-
-    city: z
-      .string({
-        error: "Current location city is required.",
-      })
-      .min(1, { message: "City is required." }),
-    dateOfBirth: z
-      .string()
-      .default("")
-      .refine((value) => value === "" || isAtLeast18YearsOld(value), {
-        message: "You must be at least 18 years old.",
+  z
+    .object({
+      fullName: z
+        .string()
+        .trim()
+        .min(3, { message: "Full name must be at least 3 characters." })
+        .max(255, { message: "Full name must be at most 255 characters." }),
+      email: z
+        .string()
+        .min(1, { message: "email is required" })
+        .email({ message: "Not valid email" }),
+      phoneNumber: z
+        .string({
+          error: "phone number is required",
+        })
+        .min(10, { message: "Phone number is required" }),
+      jobTitle: z
+        .string({
+          error: "job title is required",
+        })
+        .min(1, { message: "Job title is required." }),
+      otherJobTitle: z.string().default(""),
+      specialty: optionalSelectField(),
+      yearsOfExperience: optionalSelectField(),
+      country: z
+        .string({
+          error: "Current location country is required.",
+        })
+        .min(1, { message: "Country is required." }),
+      city: z
+        .string({
+          error: "Current location city is required.",
+        })
+        .min(1, { message: "City is required." }),
+      dateOfBirth: z
+        .string()
+        .default("")
+        .refine((value) => value === "" || isAtLeast18YearsOld(value), {
+          message: "You must be at least 18 years old.",
+        }),
+      profileImage: optionalFileArrayField({
+        required: false,
+        maxSize: MAX_IMAGE_SIZE,
+        allowedTypes: ALLOWED_IMAGE_TYPES,
+        requiredMessage: "Profile image is required.",
+        invalidTypeMessage: "Profile image must be JPG or PNG.",
+        invalidSizeMessage: "Profile image size must not exceed 2MB.",
       }),
-    profileImage: optionalFileArrayField({
-      required: false,
-      maxSize: MAX_IMAGE_SIZE,
-      allowedTypes: ALLOWED_IMAGE_TYPES,
-      requiredMessage: "Profile image is required.",
-      invalidTypeMessage: "Profile image must be JPG or PNG.",
-      invalidSizeMessage: "Profile image size must not exceed 2MB.",
-    }),
-    uploadCV: optionalFileArrayField({
-      required: requireCv,
-      maxSize: MAX_CV_SIZE,
-      allowedTypes: ALLOWED_CV_TYPES,
-      requiredMessage: "CV is required.",
-      invalidTypeMessage: "CV must be a PDF or Word document.",
-      invalidSizeMessage: "CV size must not exceed 5MB.",
-    }),
-  });
+      uploadCV: optionalFileArrayField({
+        required: requireCv,
+        maxSize: MAX_CV_SIZE,
+        allowedTypes: ALLOWED_CV_TYPES,
+        requiredMessage: "CV is required.",
+        invalidTypeMessage: "CV must be a PDF or Word document.",
+        invalidSizeMessage: "CV size must not exceed 5MB.",
+      }),
+    })
+    .refine(
+      (data) => data.jobTitle !== "__other__" || Boolean(data.otherJobTitle.trim()),
+      {
+        message: "Please enter the other job title.",
+        path: ["otherJobTitle"],
+      },
+    );
 
 export const SettingBasicInfoSchema = createSettingBasicInfoSchema();
 

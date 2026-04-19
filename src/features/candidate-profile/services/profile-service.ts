@@ -12,6 +12,7 @@ import type {
   CandidateExperienceViewModel,
   CandidateProfileViewModel,
   CandidateSkillViewModel,
+  CandidateProfileApiLookup,
 } from "../types/profile.types";
 
 function normalizeDateLabel(value: string | null) {
@@ -87,6 +88,16 @@ function normalizeAge(age: number | string | null | undefined) {
   return null;
 }
 
+function resolveJobTitle(
+  title: CandidateProfileApiLookup | string | null | undefined,
+) {
+  if (typeof title === "string") {
+    return title.trim() || null;
+  }
+
+  return title?.title ?? title?.name ?? null;
+}
+
 function resolveStoredFileUrl(path: string | null | undefined) {
   if (!path) {
     return null;
@@ -129,7 +140,7 @@ export async function getCandidateProfile() {
 
   const country = user.country?.name ?? null;
   const city = user.city?.name ?? null;
-  const jobTitle = user.job_title?.title ?? null;
+  const jobTitle = resolveJobTitle(user.title);
   const fullPhone =
     user.phone && user.phone_code ? `${user.phone_code}${user.phone}` : user.phone;
   const skills = user.skills.map((skill) => ({

@@ -15,13 +15,14 @@ export default async function CandidateProfileLayout({
       />
       <main className="layout-shell pb-12">
         <section className="layout-content">
-          {" "}
-          <section className="mt-4 grid grid-cols-12 items-start gap-4 lg:mt-6">
-            <section className="col-span-12 lg:col-span-3">
+          <section className="mt-4 grid grid-cols-12 gap-4 lg:mt-6 lg:items-stretch">
+            <section className="col-span-12 lg:col-span-3 lg:h-full">
               <CandidateSideContentLinks isCompleted={profile?.isProfileComplete} />
             </section>
 
-            <section className="col-span-12 lg:col-span-9">{children}</section>
+            <section className="col-span-12 lg:col-span-9 lg:min-w-0">
+              {children}
+            </section>
           </section>
         </section>
       </main>

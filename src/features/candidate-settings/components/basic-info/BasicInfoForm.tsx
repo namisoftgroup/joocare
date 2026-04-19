@@ -37,6 +37,8 @@ interface BasicInfoFormProps {
   profile: CandidateSettingsProfile;
 }
 
+const OTHER_JOB_TITLE_VALUE = "__other__";
+
 const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
   const locale = useLocale();
   const router = useRouter();
@@ -58,7 +60,8 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
         profile.phoneCode && profile.phone
           ? `${profile.phoneCode}${profile.phone}`
           : profile.phone,
-      jobTitle: profile.jobTitleId,
+      jobTitle: profile.jobTitleId || (profile.jobTitle ? OTHER_JOB_TITLE_VALUE : ""),
+      otherJobTitle: profile.jobTitleId ? "" : profile.jobTitle,
       specialty: profile.specialtyId,
       yearsOfExperience: profile.experienceId,
       country: profile.countryId,
@@ -93,6 +96,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
   });
 
   const selectedCountryId = useWatch({ control, name: "country" });
+  const selectedJobTitle = useWatch({ control, name: "jobTitle" });
   const previousCountryId = useRef<string | undefined>(profile.countryId);
   const {
     jobTitles,
@@ -146,6 +150,12 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
   }, [selectedCountryId, setValue]);
 
   useEffect(() => {
+    if (selectedJobTitle !== OTHER_JOB_TITLE_VALUE) {
+      setValue("otherJobTitle", "");
+    }
+  }, [selectedJobTitle, setValue]);
+
+  useEffect(() => {
     setUploadedImagePath(null);
     setUploadedCvPath(null);
     setShowExistingProfileImage(Boolean(profile.image));
@@ -164,6 +174,21 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
       return decodeURIComponent(profile.cv.split("/").filter(Boolean).pop() ?? "Current CV");
     }
   }, [profile.cv]);
+
+  const jobTitleOptions = useMemo(
+    () => [
+      ...jobTitles
+        .map((jobTitle) => ({
+          label: String(jobTitle.title ?? ""),
+          value: String(jobTitle.id),
+        }))
+        .filter((jobTitle) => jobTitle.label),
+      { label: "Other", value: OTHER_JOB_TITLE_VALUE },
+    ],
+    [jobTitles],
+  );
+
+  const isOtherJobTitle = selectedJobTitle === OTHER_JOB_TITLE_VALUE;
 
   useEffect(() => {
     if (
@@ -192,7 +217,11 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
       formData.append("name", data.fullName.trim());
       formData.append("phone", parsedPhone.nationalNumber ?? "");
       formData.append("phone_code", `+${parsedPhone.countryCallingCode ?? ""}`);
-      formData.append("job_title_id", data.jobTitle);
+      if (data.jobTitle === OTHER_JOB_TITLE_VALUE) {
+        formData.append("title", data.otherJobTitle.trim());
+      } else {
+        formData.append("job_title_id", data.jobTitle);
+      }
       formData.append("specialty_id", data.specialty);
       formData.append("country_id", data.country);
       formData.append("city_id", data.city);
@@ -307,7 +336,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
           control={control}
           render={({ field }) => (
             <PhoneInputCode
-              defaultCountry="EG"
+              defaultCountry="AE"
               id="phoneNumber"
               className="w-full"
               placeholder="ex:52 987 6543"
@@ -341,10 +370,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
                 ? jobTitlesError.message
                 : undefined)
             }
-            options={jobTitles.map((jobTitle) => ({
-              label: jobTitle.title,
-              value: String(jobTitle.id),
-            }))}
+            options={jobTitleOptions}
             disabled={isJobTitlesLoading}
             onReachEnd={() => fetchMoreJobTitles()}
             hasNextPage={Boolean(hasMoreJobTitles)}
@@ -353,6 +379,17 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
           />
         )}
       />
+
+      {isOtherJobTitle && (
+        <InputField
+          id="otherJobTitle"
+          type="text"
+          label="Other Job Title"
+          placeholder="ex: Consultant Internist"
+          {...register("otherJobTitle")}
+          error={errors.otherJobTitle?.message}
+        />
+      )}
 
       <div className="flex flex-col items-center gap-2 lg:flex-row">
         <Controller
