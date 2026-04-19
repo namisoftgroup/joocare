@@ -28,7 +28,7 @@ import {
 } from "../../actions/basic-info-actions";
 import type { CandidateSettingsProfile } from "../../services/basic-info-service";
 import {
-  SettingBasicInfoSchema,
+  createSettingBasicInfoSchema,
   type TSettingBasicInfoSchema,
 } from "../../validation/basic-info-schema";
 import ProfileImage from "./ProfileImage";
@@ -48,6 +48,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
   const [citySearch, setCitySearch] = useState("");
   const [uploadedImagePath, setUploadedImagePath] = useState<string | null>(null);
   const [uploadedCvPath, setUploadedCvPath] = useState<string | null>(null);
+  const [showExistingProfileImage, setShowExistingProfileImage] = useState(Boolean(profile.image));
   const [showExistingCv, setShowExistingCv] = useState(Boolean(profile.cv));
   const defaultValues = useMemo<TSettingBasicInfoSchema>(
     () => ({
@@ -68,6 +69,13 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
     }),
     [profile],
   );
+  const basicInfoSchema = useMemo(
+    () =>
+      createSettingBasicInfoSchema({
+        requireCv: !(profile.cv && showExistingCv),
+      }),
+    [profile.cv, showExistingCv],
+  );
 
   const {
     register,
@@ -79,7 +87,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
     clearErrors,
     formState: { errors },
   } = useForm<TSettingBasicInfoSchema>({
-    resolver: typedZodResolver(SettingBasicInfoSchema),
+    resolver: typedZodResolver(basicInfoSchema),
     mode: "onChange",
     defaultValues,
   });
@@ -140,6 +148,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
   useEffect(() => {
     setUploadedImagePath(null);
     setUploadedCvPath(null);
+    setShowExistingProfileImage(Boolean(profile.image));
     setShowExistingCv(Boolean(profile.cv));
   }, [profile.image, profile.cv]);
 
@@ -190,7 +199,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
       formData.append("experience_id", data.yearsOfExperience);
       formData.append("birth_date", data.dateOfBirth);
 
-      if (uploadedImagePath) {
+      if (uploadedImagePath !== null) {
         formData.append("image", uploadedImagePath);
       }
 
@@ -224,7 +233,13 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
           control={control}
           render={({ field }) => (
             <ProfileImage
-              value={field.value?.length ? field.value : profile.image}
+              value={
+                field.value?.length
+                  ? field.value
+                  : showExistingProfileImage
+                    ? profile.image
+                    : null
+              }
               onChange={async (files) => {
                 field.onChange(files);
 
@@ -234,6 +249,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
                   return;
                 }
 
+                setShowExistingProfileImage(false);
                 clearErrors("profileImage");
 
                 try {
@@ -250,6 +266,12 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
                     message,
                   });
                 }
+              }}
+              onRemove={() => {
+                setShowExistingProfileImage(false);
+                setUploadedImagePath("");
+                field.onChange([]);
+                clearErrors("profileImage");
               }}
               error={errors.profileImage?.message}
             />
@@ -471,9 +493,9 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
         render={({ field }) => (
           <StoredFilepondUpload
             label="Upload CV"
-            hint={`"Optional"`}
             files={field.value}
             onChange={field.onChange}
+            required={!(profile.cv && showExistingCv)}
             allowImagePreview={false}
             acceptedFileTypes={[
               "application/pdf",

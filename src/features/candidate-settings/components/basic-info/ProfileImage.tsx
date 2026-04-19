@@ -1,17 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useRef } from "react";
-import { Plus } from "lucide-react";
+import { useEffect, useMemo, useRef } from "react";
+import { Plus, Trash2 } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 
 interface ProfileImageProps {
   value?: File[] | string | null;
   onChange: (files: File[]) => void;
+  onRemove?: () => void;
   error?: string | boolean;
 }
 
-const ProfileImage = ({ value, onChange, error }: ProfileImageProps) => {
+const ProfileImage = ({ value, onChange, onRemove, error }: ProfileImageProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const preview = useMemo(() => {
@@ -24,6 +25,16 @@ const ProfileImage = ({ value, onChange, error }: ProfileImageProps) => {
     return typeof value === "string" ? value : null;
   }, [value]);
 
+  useEffect(() => {
+    if (!preview || typeof value === "string") {
+      return;
+    }
+
+    return () => {
+      URL.revokeObjectURL(preview);
+    };
+  }, [preview, value]);
+
   return (
     <div className="w-full">
       <div className="relative flex justify-center">
@@ -34,7 +45,7 @@ const ProfileImage = ({ value, onChange, error }: ProfileImageProps) => {
           )}
         >
           <Image
-            src={preview ? preview : "/assets/image_2.svg"}
+            src={preview ? '' + preview : "/avatar.jpg"}
             alt="Profile"
             fill
             className="rounded-full object-cover"
@@ -56,12 +67,31 @@ const ProfileImage = ({ value, onChange, error }: ProfileImageProps) => {
             }}
           />
 
-          <div
-            onClick={() => inputRef.current?.click()}
-            className="bg-primary absolute right-3 bottom-0 flex h-7 w-7 items-center justify-center rounded-full transition"
-          >
-            <Plus width={16} className="text-white" />
-          </div>
+          {preview ? (
+            <button
+              type="button"
+              onClick={() => {
+                inputRef.current?.setAttribute("value", "");
+                if (inputRef.current) {
+                  inputRef.current.value = "";
+                }
+                onRemove?.();
+              }}
+              className="absolute right-3 bottom-0 flex h-7 w-7 items-center justify-center rounded-full bg-red-500 transition"
+              aria-label="Remove profile image"
+            >
+              <Trash2 width={16} className="text-white" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              className="bg-primary absolute right-3 bottom-0 flex h-7 w-7 items-center justify-center rounded-full transition"
+              aria-label="Upload profile image"
+            >
+              <Plus width={16} className="text-white" />
+            </button>
+          )}
         </div>
       </div>
       {typeof error === "string" && error ? (
