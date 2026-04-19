@@ -3,6 +3,7 @@
 import { InputField } from "@/shared/components/InputField";
 import { MultiSelectInputField } from "@/shared/components/MultiSelectInputField";
 import { SelectInputField } from "@/shared/components/SelectInputField";
+import { Button } from "@/shared/components/ui/button";
 import { Switch } from "@/shared/components/ui/switch";
 import { Controller, useFormContext } from "react-hook-form";
 import { JobFormData } from "../validation/job-post-schema";
@@ -27,6 +28,9 @@ import useGetAvailabilities from "@/shared/hooks/useGetAvailabilities";
 import useGetSalaryTypes from "@/shared/hooks/useGetSalaryTypes";
 import useGetCurrencies from "@/shared/hooks/useGetCurrencies";
 import { useState } from "react";
+import { JobPostStepOneSkeleton } from "./JobPostStepOneSkeleton";
+
+const CUSTOM_CERTIFICATION_PREFIX = "__custom__:";
 
 type LookupOptionItem = {
   id?: number | string;
@@ -52,7 +56,9 @@ function FieldError({ name }: { name: string }) {
   return <p className="mt-1 text-xs text-red-500">{error.message}</p>;
 }
 
-export default function JobPostStepOne() {
+
+
+function JobPostStepOneContent() {
   // hooks land and token
   const locale = useLocale();
   const { data: session } = useSession();
@@ -74,6 +80,14 @@ export default function JobPostStepOne() {
   const [availabilitiesSearch, setAvailabilitiesSearch] = useState("");
   const [salaryTypesSearch, setSalaryTypesSearch] = useState("");
   const [currenciesSearch, setCurrenciesSearch] = useState("");
+  const [newMandatoryCertification, setNewMandatoryCertification] = useState("");
+  const {
+    control,
+    register,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useFormContext<JobFormData>();
   // countries data
   const {
     countries,
@@ -83,8 +97,10 @@ export default function JobPostStepOne() {
     fetchNextPage: fetchMoreCountries,
     isFetchingNextPage: isFetchingMoreCountries,
   } = useGetCountries(countrySearch);
-  const [selectedCountryId, setSelectedCountryId] = useState<number | null>(null);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const selectedCountry = watch("country");
+  const selectedCategory = watch("category");
+  const selectedCountryId = selectedCountry ? Number(selectedCountry) : null;
+  const selectedCategoryId = selectedCategory ? Number(selectedCategory) : null;
   const {
     cities,
     isLoading: citiesLoading,
@@ -193,22 +209,44 @@ export default function JobPostStepOne() {
 
   } = useGetCurrencies(currenciesSearch);
 
-  const {
-    control,
-    register,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useFormContext<JobFormData>();
-
   const addSalary = watch("addSalary");
   const selectedJobTitle = watch("title");
   const isOtherJobTitle = selectedJobTitle === "__other__";
+  const selectedMandatoryCertifications = watch("mandatoryCertifications") ?? [];
+
   const toSelectOptions = (items: LookupOptionItem[]) =>
     items.map((item) => ({
       label: item.title ?? item.name ?? "",
       value: String(item.id ?? ""),
     }));
+
+  const mandatoryCertificationOptions = [
+    ...toSelectOptions(mandatoryCertifications),
+    ...selectedMandatoryCertifications
+      .filter((item) => item.startsWith(CUSTOM_CERTIFICATION_PREFIX))
+      .map((item) => ({
+        label: item.slice(CUSTOM_CERTIFICATION_PREFIX.length),
+        value: item,
+      })),
+  ];
+
+  const addCustomMandatoryCertification = () => {
+    const trimmedValue = newMandatoryCertification.trim();
+    if (!trimmedValue) return;
+
+    const nextValue = `${CUSTOM_CERTIFICATION_PREFIX}${trimmedValue}`;
+    if (selectedMandatoryCertifications.includes(nextValue)) {
+      setNewMandatoryCertification("");
+      return;
+    }
+
+    setValue(
+      "mandatoryCertifications",
+      [...selectedMandatoryCertifications, nextValue],
+      { shouldDirty: true, shouldTouch: true, shouldValidate: true },
+    );
+    setNewMandatoryCertification("");
+  };
 
   return (
     <div className="space-y-4">
@@ -435,7 +473,6 @@ export default function JobPostStepOne() {
                 options={toSelectOptions(categories)}
                 onChange={(value) => {
                   field.onChange(value);
-                  setSelectedCategoryId(Number(value));
                   setValue("specialty", "");
                 }}
                 disabled={categoriesLoading}
@@ -588,7 +625,6 @@ export default function JobPostStepOne() {
                   }
                   onChange={(value) => {
                     field.onChange(value);
-                    setSelectedCountryId(Number(value));
                     setValue("city", "");
                   }}
                   options={countries.map((country) => ({
@@ -703,26 +739,57 @@ export default function JobPostStepOne() {
               control={control}
               name="mandatoryCertifications"
               render={({ field }) => (
-                <MultiSelectInputField
-                  {...field}
-                  id="mandatory-certifications"
-                  label="Mandatory Certifications"
-                  placeholder="select"
-                  className="bg-white"
-                  error={
-                    errors.mandatoryCertifications?.message ??
-                    (mandatoryCertificationsError instanceof Error
-                      ? mandatoryCertificationsError.message
-                      : undefined)
-                  }
-                  options={toSelectOptions(mandatoryCertifications)}
-                  disabled={isMandatoryCertificationsLoading}
-                  onReachEnd={() => fetchMoreMandatoryCertifications()}
-                  hasNextPage={Boolean(hasMoreMandatoryCertifications)}
-                  isFetchingNextPage={isFetchingMoreMandatoryCertifications}
-                  withSearchInput
-                  onSearchChange={setMandatoryCertificationsSearch}
-                />
+                <div className="space-y-3">
+                  <MultiSelectInputField
+                    {...field}
+                    id="mandatory-certifications"
+                    label="Mandatory Certifications"
+                    placeholder="select"
+                    className="bg-white"
+                    error={
+                      errors.mandatoryCertifications?.message ??
+                      (mandatoryCertificationsError instanceof Error
+                        ? mandatoryCertificationsError.message
+                        : undefined)
+                    }
+                    options={mandatoryCertificationOptions}
+                    disabled={isMandatoryCertificationsLoading}
+                    onReachEnd={() => fetchMoreMandatoryCertifications()}
+                    hasNextPage={Boolean(hasMoreMandatoryCertifications)}
+                    isFetchingNextPage={isFetchingMoreMandatoryCertifications}
+                    withSearchInput
+                    onSearchChange={setMandatoryCertificationsSearch}
+                  />
+
+                  <div className="flex items-end gap-3">
+                    <InputField
+                      id="new-mandatory-certification"
+                      label="Add new certification"
+                      placeholder="Type a certification title"
+                      value={newMandatoryCertification}
+                      onChange={(event) =>
+                        setNewMandatoryCertification(event.currentTarget.value)
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          event.preventDefault();
+                          addCustomMandatoryCertification();
+                        }
+                      }}
+                      className="bg-white"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="pill"
+                      hoverStyle="slidePrimary"
+                      className="mb-0.5 shrink-0"
+                      onClick={addCustomMandatoryCertification}
+                    >
+                      Add new
+                    </Button>
+                  </div>
+                </div>
               )}
             />
           </div>
@@ -763,4 +830,16 @@ export default function JobPostStepOne() {
       </div>
     </div>
   );
+}
+
+export default function JobPostStepOne({
+  isLoading = false,
+}: {
+  isLoading?: boolean;
+}) {
+  if (isLoading) {
+    return <JobPostStepOneSkeleton />;
+  }
+
+  return <JobPostStepOneContent />;
 }
