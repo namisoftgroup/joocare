@@ -48,8 +48,8 @@ export default async function JobDetailsPage({
 
   return (
     <section className="bg-body-bg">
-      <section className="pe-3 lg:pe-25">
-        <section className="layout-content mt-4 ">
+      <section className="">
+        <section className="layout-content mt-4">
           <JobHeader
             logoSrc={job.company?.image ?? "/assets/comp-logo.svg"}
             title={jobTitle}
@@ -68,7 +68,7 @@ export default async function JobDetailsPage({
             }
           />
 
-          <div className="grid grid-cols-1 gap-5 pt-7 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 pt-7 xl:grid-cols-3">
             <div className="col-span-2 flex flex-col gap-8">
               <JobDescriptionCard job={job} />
             </div>

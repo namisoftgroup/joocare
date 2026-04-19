@@ -1,10 +1,10 @@
 export type JobStepOnePayload = {
     job_title_id?: number,
     professional_license: string,
-    min_salary: number,
-    max_salary: number,
-    currency_id: number,
-    salary_type_id: number,
+    min_salary?: number,
+    max_salary?: number,
+    currency_id?: number,
+    salary_type_id?: number,
     category_id: number,
     specialty_id: number,
     employment_type_id: number,
@@ -13,10 +13,10 @@ export type JobStepOnePayload = {
     country_id: number,
     city_id: number,
     experience_id: number,
-    mandatory_certifications: number[],
-    eduction_level_id: number,
+    mandatory_certifications: Array<number | string>,
+    education_levels: number[],
     availability_id: number,
-    has_salary: boolean,
+    has_salary: 0 | 1,
     title?: string,
 }
 

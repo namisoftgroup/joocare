@@ -5,8 +5,17 @@ import React, { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { JobFormData } from "../validation/job-post-schema";
 import "ckeditor5/ckeditor5.css";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
+// import { CKEditor } from "@ckeditor/ckeditor5-react";
+// import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
+import dynamic from "next/dynamic";
+const CKEditor = dynamic(
+  () => import("@ckeditor/ckeditor5-react").then((mod) => mod.CKEditor),
+  { ssr: false }
+);
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
+
 import { MultiSelectInputField } from "@/shared/components/MultiSelectInputField";
 import useGetSkills from "@/shared/hooks/useGetSkills";
 
@@ -39,10 +48,13 @@ export default function JobPostStepTwo() {
                   Job Description
                 </label>
                 <CKEditor
-                  editor={ClassicEditor as any}
+                  editor={ClassicEditor}
                   data={field.value || ""}
                   onChange={(_, editor) => {
                     field.onChange(editor.getData());
+                  }}
+                  config={{
+                    licenseKey: "GPL",
                   }}
                 />
                 {errors.description && (

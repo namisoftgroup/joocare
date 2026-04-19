@@ -27,6 +27,7 @@ import {
   DollarSign,
   Dot,
   Edit,
+  Edit2,
   EyeOff,
   MapPin,
   Play,
@@ -70,8 +71,6 @@ export default function JobCard({ resumeMatch,
     onSuccess: () => {
       setCloseJob(false);
       setPauseJob(false);
-      queryClient.invalidateQueries({ queryKey: ["company-profile"] });
-
     },
   });
   const { deleteJob: deleteCompanyJob, isPending: isDeleting } = useDeleteCompanyJob(job.id, {
@@ -110,6 +109,7 @@ export default function JobCard({ resumeMatch,
     updateStatus("open");
   };
 
+
   return (
     <>
       <Card className="max-lg:py-2">
@@ -134,19 +134,30 @@ export default function JobCard({ resumeMatch,
           {!resumeMatch ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <CircleEllipsis color="var(--muted-foreground)" />
+                <CircleEllipsis color="var(--muted-foreground)" className="cursor-pointer" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem className="flex gap-2">
-                  <Link
-                    href={`/company/post-job?editId=${job.id}`}
-                    className="flex gap-2 items-center ">
-                    <Edit /> <span>Edit</span>
-                  </Link>
-                </DropdownMenuItem>
+                {normalizedStatus !== "draft" && normalizedStatus !== 'closed' && job.status?.status !== undefined && job.status?.status !== null && (
+                  <DropdownMenuItem className="flex gap-2">
+                    <Link
+                      href={`/company/post-job?editId=${job.id}`}
+                      className="flex gap-2 items-center w-full">
+                      <Edit /> <span>Edit</span>
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                {(normalizedStatus === "draft" || job.status?.status === undefined || job.status?.status === null) && (
+                  <DropdownMenuItem className="flex gap-2">
+                    <Link
+                      href={`/company/post-job?jobId=${job.id}`}
+                      className="flex gap-2 items-center w-full">
+                      <Edit2 /> <span>Complete</span>
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 {normalizedStatus !== "open" ? (
                   <DropdownMenuItem
-                    className="flex gap-2"
+                    className="flex gap-2 cursor-pointer"
                     disabled={isPending}
                     onClick={handleOpenJob}
                   >
@@ -154,7 +165,7 @@ export default function JobCard({ resumeMatch,
                   </DropdownMenuItem>
                 ) : null}
                 <DropdownMenuItem
-                  className="flex gap-2"
+                  className="flex gap-2 cursor-pointer"
                   disabled={isPending}
                   hidden={normalizedStatus === "closed"}
                   onClick={() => setCloseJob(true)}
@@ -162,7 +173,7 @@ export default function JobCard({ resumeMatch,
                   <CheckCheck /> <span>closed</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="flex gap-2"
+                  className="flex gap-2 cursor-pointer"
                   disabled={isPending}
                   hidden={normalizedStatus === "paused"}
                   onClick={() => setPauseJob(true)}
@@ -170,7 +181,7 @@ export default function JobCard({ resumeMatch,
                   <EyeOff /> <span>Pause</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="text-destructive flex gap-2"
+                  className="text-destructive flex gap-2 cursor-pointer"
                   disabled={isDeleting}
                   onClick={() => setDeleteJob(true)}
                 >
@@ -209,7 +220,15 @@ export default function JobCard({ resumeMatch,
                 {specialty}
               </li>
             </ul>
-            <p className="text-muted-foreground grow h-auto text-sm">{excerpt}</p>
+            {/* <p className="text-muted-foreground grow h-auto text-sm">{excerpt}</p> */}
+            <div
+              className="prose prose-sm max-w-none border-b pb-5"
+              dangerouslySetInnerHTML={{
+                __html:
+                  excerpt ||
+                  "<p>No description available.</p>",
+              }}
+            />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4 max-lg:px-2 flex-1 justify-end ">

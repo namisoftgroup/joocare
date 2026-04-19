@@ -60,12 +60,13 @@ type HomeApiResponse = {
       jobs?: Array<{
         id?: number | string;
         title?: string | null;
-        created_at?: string | null;
+        updated_at?: string | null;
         company?: { name?: string | null } | string | null;
         job_title?: { title?: string | null } | null;
         country?: { name?: string | null } | null;
         city?: { name?: string | null } | null;
         employment_type?: { title?: string | null } | null;
+        image?: string | null;
       }>;
     };
     rates?: {
@@ -75,7 +76,9 @@ type HomeApiResponse = {
         rate?: string | number | null;
         comment?: string | null;
         created_at?: string | null;
-        user?: { name?: string | null } | null;
+        name?: string | null;
+        date?: string | null;
+        text?: string | null;
       }>;
     };
     faqs?: {
@@ -226,7 +229,9 @@ export async function getHomePageData(locale: string): Promise<HomePageData> {
                 : job.company?.name ?? "Joocare Employer",
             location: locationParts.join(", ") || "Location not specified",
             type: job.employment_type?.title ?? "Not specified",
-            timeLabel: buildJobTimeLabel(job.created_at),
+            timeLabel: buildJobTimeLabel(job.updated_at),
+            image: job.image ?? "/assets/recent-job-image.svg",
+            updated_at: job.updated_at ?? "",
           };
         }) ?? [],
     },
@@ -235,8 +240,8 @@ export async function getHomePageData(locale: string): Promise<HomePageData> {
       items:
         rates?.rates?.map((rate) => ({
           id: String(rate.id ?? ""),
-          name: rate.user?.name ?? "Anonymous professional",
-          date: rate.created_at ? formatDate(rate.created_at) : "",
+          name: rate?.name ?? "Anonymous professional",
+          date: rate.date,
           text: rate.comment ?? "",
           rate: Number(rate.rate ?? 0),
         })) ?? [],

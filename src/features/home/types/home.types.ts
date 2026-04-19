@@ -34,14 +34,18 @@ export type HomeRecentJob = {
   location: string;
   type: string;
   timeLabel: string;
+  image: string;
+  updated_at: string;
 };
 
 export type HomeRate = {
-  id: string;
-  name: string;
-  date: string;
-  text: string;
-  rate: number;
+  id?: number | string;
+  rate?: string | number | null;
+  comment?: string | null;
+  created_at?: string | null;
+  name?: string | null;
+  date?: string | null;
+  text?: string | null;
 };
 
 export type HomeFaq = {

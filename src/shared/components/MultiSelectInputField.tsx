@@ -7,6 +7,7 @@ import {
   Combobox,
   ComboboxContent,
   ComboboxEmpty,
+  ComboboxInput,
   ComboboxItem,
   ComboboxList,
   ComboboxTrigger,
@@ -26,6 +27,13 @@ type MultiSelectInputFieldProps = {
   className?: string;
   disabled?: boolean;
   hint?: string;
+  onReachEnd?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  withSearchInput?: boolean;
+  searchPlaceholder?: string;
+  onSearchChange?: (value: string) => void;
+  portalContainer?: HTMLElement | null;
 };
 
 export const MultiSelectInputField = React.forwardRef<
@@ -45,17 +53,52 @@ export const MultiSelectInputField = React.forwardRef<
       containerStyles,
       disabled = false,
       hint,
+      onReachEnd,
+      hasNextPage,
+      isFetchingNextPage,
+      withSearchInput = false,
+      searchPlaceholder = "Search...",
+      onSearchChange,
+      portalContainer,
       ...props
     },
     ref,
   ) => {
+    const listRef = React.useRef<HTMLDivElement | null>(null);
+    const observerRef = React.useRef<IntersectionObserver | null>(null);
+
+    const handleObserver = React.useCallback(
+      (node: HTMLDivElement | null) => {
+        if (isFetchingNextPage) return;
+
+        if (observerRef.current) {
+          observerRef.current.disconnect();
+        }
+
+        observerRef.current = new IntersectionObserver(
+          (entries) => {
+            if (
+              entries[0].isIntersecting &&
+              hasNextPage &&
+              !isFetchingNextPage
+            ) {
+              onReachEnd?.();
+            }
+          },
+          {
+            root: listRef.current,
+            rootMargin: "100px",
+          },
+        );
+
+        if (node) observerRef.current.observe(node);
+      },
+      [hasNextPage, isFetchingNextPage, onReachEnd],
+    );
+
     const selectedOptions = options.filter((o) =>
       value.includes(o.value ?? ""),
     );
-
-    console.log(props);
-
-    console.log(selectedOptions);
 
     return (
       <div className={cn("flex w-full flex-col", containerStyles)}>
@@ -76,8 +119,6 @@ export const MultiSelectInputField = React.forwardRef<
           multiple
           value={selectedOptions}
           onValueChange={(raw) => {
-            console.log(raw);
-
             const selected = (raw as Option[]).map((o) => o.value ?? "");
             onChange?.(selected);
           }}
@@ -121,23 +162,41 @@ export const MultiSelectInputField = React.forwardRef<
             )}
           </ComboboxTrigger>
 
-          <ComboboxContent>
+          <ComboboxContent portalContainer={portalContainer}>
+            {withSearchInput && (
+              <ComboboxInput
+                showTrigger={false}
+                placeholder={searchPlaceholder}
+                onChange={(event) => onSearchChange?.(event.currentTarget.value)}
+              />
+            )}
             <ComboboxEmpty>No results found.</ComboboxEmpty>
-            <ComboboxList>
+            <ComboboxList ref={listRef} className="max-h-60 overflow-y-auto">
               {(item) => (
-                <ComboboxItem key={item.value} value={item}>
-                  {item.image && (
-                    <Image
-                      src={item.image}
-                      alt={item.label}
-                      width={30}
-                      height={15}
-                    />
+                <React.Fragment key={item.value}>
+                  <ComboboxItem value={item}>
+                    {item.image && (
+                      <Image
+                        src={item.image}
+                        alt={item.label}
+                        width={30}
+                        height={15}
+                      />
+                    )}
+                    {item.label}
+                  </ComboboxItem>
+
+                  {item === options[options.length - 1] && (
+                    <div ref={handleObserver} className="h-1" />
                   )}
-                  {item.label}
-                </ComboboxItem>
+                </React.Fragment>
               )}
             </ComboboxList>
+            {isFetchingNextPage && (
+              <div className="text-muted-foreground px-2 pb-2 text-center text-xs">
+                Loading...
+              </div>
+            )}
           </ComboboxContent>
         </Combobox>
 

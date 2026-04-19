@@ -11,6 +11,16 @@ export type NamedEntity = {
   updated_at: string;
 };
 
+export type JobMandatoryCertification = {
+  id: number;
+  title: string | null;
+  job_id: number;
+  mandatory_certification_id: number | null;
+  mandatory_certification: NamedEntity | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type WithCategory = {
   id: number;
   title: string;
@@ -180,9 +190,7 @@ export type JobDetails = {
   experience_id: number | null;
   experience: NamedEntity | null;
 
-  eduction_level_id: number | null;
-  eduction_level: NamedEntity | null;
-  education_level?: NamedEntity | null;
+  education_levels: NamedEntity[];
 
   availability_id: number | null;
   availability: NamedEntity | null;
@@ -205,7 +213,7 @@ export type JobDetails = {
   salary_type: NamedEntity | null;
 
   skills: NamedEntity[];
-  mandatory_certifications: NamedEntity[];
+  mandatory_certifications: JobMandatoryCertification[];
 
   current_status: {
     id: number;

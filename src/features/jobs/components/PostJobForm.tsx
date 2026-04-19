@@ -37,6 +37,40 @@ type FormMode = "create" | "complete" | "edit";
 
 const STEPS = ["Job Details", "Job Description & Requirements", "Job Preview"];
 const LAST_STEP = STEPS.length - 1;
+const CUSTOM_CERTIFICATION_PREFIX = "__custom__:";
+
+function normalizeMandatoryCertificationValue(value: string) {
+  return value.startsWith(CUSTOM_CERTIFICATION_PREFIX)
+    ? value.slice(CUSTOM_CERTIFICATION_PREFIX.length)
+    : Number(value);
+}
+
+function getJobFromMutationResponse(response: unknown): JobDetails | null {
+  if (!response || typeof response !== "object") return null;
+
+  const responseRecord = response as { data?: unknown; job?: unknown };
+
+  if (responseRecord.data && typeof responseRecord.data === "object") {
+    const nestedData = responseRecord.data as { job?: unknown; data?: unknown };
+
+    if (nestedData.job && typeof nestedData.job === "object") {
+      return nestedData.job as JobDetails;
+    }
+
+    if (nestedData.data && typeof nestedData.data === "object") {
+      const deeperData = nestedData.data as { job?: unknown };
+      if (deeperData.job && typeof deeperData.job === "object") {
+        return deeperData.job as JobDetails;
+      }
+    }
+  }
+
+  if (responseRecord.job && typeof responseRecord.job === "object") {
+    return responseRecord.job as JobDetails;
+  }
+
+  return null;
+}
 
 // ─── Map API job → form defaults ────────────────────────
 function mapJobToFormData(job: JobDetails): Partial<JobFormData> {
@@ -62,10 +96,20 @@ function mapJobToFormData(job: JobDetails): Partial<JobFormData> {
     country: String(job.country_id ?? ""),
     city: String(job.city_id ?? ""),
     yearsOfExperience: String(job.experience_id ?? ""),
-    educationLevel: String(job.eduction_level_id ?? ""),
-    mandatoryCertifications: job.mandatory_certifications?.[0]
-      ? String(job.mandatory_certifications[0].id)
-      : "",
+    educationLevel: (job.education_levels ?? []).map((item) => String(item.id)),
+    mandatoryCertifications: (job.mandatory_certifications ?? [])
+      .map((item) => {
+        if (item.mandatory_certification_id != null) {
+          return String(item.mandatory_certification_id);
+        }
+
+        if (item.title?.trim()) {
+          return `${CUSTOM_CERTIFICATION_PREFIX}${item.title.trim()}`;
+        }
+
+        return null;
+      })
+      .filter((item): item is string => Boolean(item)),
     availability: String(job.availability_id ?? ""),
     description: job.description ?? "",
     skills: (job.skills ?? []).map((s) => String(s.id)),
@@ -155,14 +199,10 @@ export default function PostJobForm() {
       payload: { status },
     });
 
-    const stepThreeData = stepThreeResponse.data as Record<string, any>;
-    const nextReviewJob =
-      stepThreeData?.data?.job ??
-      stepThreeData?.job ??
-      null;
+    const nextReviewJob = getJobFromMutationResponse(stepThreeResponse.data);
 
     if (nextReviewJob) {
-      setReviewJob(nextReviewJob as JobDetails);
+      setReviewJob(nextReviewJob);
     }
   };
 
@@ -177,17 +217,12 @@ export default function PostJobForm() {
   };
 
   // ─── Build edit payload from form values ──────────────
-  const buildUpdatePayload = (data: JobFormData) => {
-    return {
-      _method: "put" as const,
+  const buildStepOnePayload = (data: JobFormData) => {
+    const basePayload = {
       job_title_id: data.title === "__other__" ? undefined : Number(data.title),
       title: data.title === "__other__" ? data.otherJobTitle?.trim() ?? "" : undefined,
       professional_license: data.license,
       has_salary: data.addSalary ? 1 : 0,
-      min_salary: Number(data.salary?.min ?? 0),
-      max_salary: Number(data.salary?.max ?? 0),
-      currency_id: Number(data.salary?.currency ?? 0),
-      salary_type_id: Number(data.salary?.type ?? 0),
       category_id: Number(data.category),
       specialty_id: Number(data.specialty),
       employment_type_id: Number(data.employmentType),
@@ -196,14 +231,61 @@ export default function PostJobForm() {
       country_id: Number(data.country),
       city_id: Number(data.city),
       experience_id: Number(data.yearsOfExperience),
-      mandatory_certifications: data.mandatoryCertifications
-        ? [Number(data.mandatoryCertifications)]
-        : [],
-      eduction_level_id: Number(data.educationLevel),
+      mandatory_certifications: (data.mandatoryCertifications ?? []).map(
+        normalizeMandatoryCertificationValue,
+      ),
+      education_levels: (data.educationLevel ?? []).map((item) => Number(item)),
+      availability_id: Number(data.availability),
+    };
+
+    if (!data.addSalary) {
+      return basePayload;
+    }
+
+    return {
+      ...basePayload,
+      min_salary: Number(data.salary?.min),
+      max_salary: Number(data.salary?.max),
+      currency_id: Number(data.salary?.currency),
+      salary_type_id: Number(data.salary?.type),
+    };
+  };
+
+  const buildUpdatePayload = (data: JobFormData) => {
+    const basePayload = {
+      _method: "put" as const,
+      job_title_id: data.title === "__other__" ? undefined : Number(data.title),
+      title: data.title === "__other__" ? data.otherJobTitle?.trim() ?? "" : undefined,
+      professional_license: data.license,
+      has_salary: data.addSalary ? 1 : 0,
+      category_id: Number(data.category),
+      specialty_id: Number(data.specialty),
+      employment_type_id: Number(data.employmentType),
+      role_category_id: Number(data.roleCategory),
+      seniority_level_id: Number(data.seniorityLevel || 0),
+      country_id: Number(data.country),
+      city_id: Number(data.city),
+      experience_id: Number(data.yearsOfExperience),
+      mandatory_certifications: (data.mandatoryCertifications ?? []).map(
+        normalizeMandatoryCertificationValue,
+      ),
+      education_levels: (data.educationLevel ?? []).map((item) => Number(item)),
       availability_id: Number(data.availability),
       description: data.description,
       skills: (data.skills ?? []).map((s) => Number(s)),
       status: "open",
+    };
+
+    if (!data.addSalary) {
+      return basePayload;
+    }
+
+    return {
+      ...basePayload,
+      min_salary: Number(data.salary?.min),
+      max_salary: Number(data.salary?.max),
+      currency_id: Number(data.salary?.currency),
+      salary_type_id: Number(data.salary?.type),
     };
   };
 
@@ -234,61 +316,18 @@ export default function PostJobForm() {
       if (mode === "complete" && createdJobId) {
         // For complete mode, we still call step-one to save the updated data
         const data = getValues();
-        await postStepOne({
-          job_title_id: data.title === "__other__" ? undefined : Number(data.title),
-          title: data.title === "__other__" ? data.otherJobTitle?.trim() ?? "" : undefined,
-          professional_license: data.license,
-          has_salary: data.addSalary,
-          min_salary: Number(data.salary?.min ?? 0),
-          max_salary: Number(data.salary?.max ?? 0),
-          currency_id: Number(data.salary?.currency ?? 0),
-          salary_type_id: Number(data.salary?.type ?? 0),
-          category_id: Number(data.category),
-          specialty_id: Number(data.specialty),
-          employment_type_id: Number(data.employmentType),
-          role_category_id: Number(data.roleCategory),
-          seniority_level_id: Number(data.seniorityLevel || 0),
-          country_id: Number(data.country),
-          city_id: Number(data.city),
-          experience_id: Number(data.yearsOfExperience),
-          mandatory_certifications: data.mandatoryCertifications
-            ? [Number(data.mandatoryCertifications)]
-            : [],
-          eduction_level_id: Number(data.educationLevel),
-          availability_id: Number(data.availability),
-        });
+
+        await postStepOne(buildStepOnePayload(data));
         setCurrentStep((s) => s + 1);
         return;
       }
 
       // Create mode — call step-one to create the job
       const data = getValues();
-      const stepOneResponse = await postStepOne({
-        job_title_id: data.title === "__other__" ? undefined : Number(data.title),
-        title: data.title === "__other__" ? data.otherJobTitle?.trim() ?? "" : undefined,
-        professional_license: data.license,
-        has_salary: data.addSalary,
-        min_salary: Number(data.salary?.min ?? 0),
-        max_salary: Number(data.salary?.max ?? 0),
-        currency_id: Number(data.salary?.currency ?? 0),
-        salary_type_id: Number(data.salary?.type ?? 0),
-        category_id: Number(data.category),
-        specialty_id: Number(data.specialty),
-        employment_type_id: Number(data.employmentType),
-        role_category_id: Number(data.roleCategory),
-        seniority_level_id: Number(data.seniorityLevel || 0),
-        country_id: Number(data.country),
-        city_id: Number(data.city),
-        experience_id: Number(data.yearsOfExperience),
-        mandatory_certifications: data.mandatoryCertifications
-          ? [Number(data.mandatoryCertifications)]
-          : [],
-        eduction_level_id: Number(data.educationLevel),
-        availability_id: Number(data.availability),
-      });
+      const stepOneResponse = await postStepOne(buildStepOnePayload(data));
 
-      const stepOneData = stepOneResponse.data as Record<string, any>;
-      const nextCreatedJobId = Number(stepOneData?.data?.job?.id);
+      const nextCreatedJob = getJobFromMutationResponse(stepOneResponse.data);
+      const nextCreatedJobId = Number(nextCreatedJob?.id);
 
       if (!nextCreatedJobId) {
         throw new Error("Unable to resolve created job id from step one response.");
@@ -313,12 +352,8 @@ export default function PostJobForm() {
           skills: (data.skills ?? []).map((skillId) => Number(skillId)),
         },
       });
-      const stepTwoData = stepTwoResponse.data as Record<string, any>;
-      const nextReviewJob =
-        stepTwoData?.data?.job ??
-        stepTwoData?.job ??
-        null;
-      setReviewJob(nextReviewJob as JobDetails | null);
+      const nextReviewJob = getJobFromMutationResponse(stepTwoResponse.data);
+      setReviewJob(nextReviewJob);
       setCurrentStep((s) => s + 1);
       return;
     }
@@ -363,7 +398,7 @@ export default function PostJobForm() {
   };
 
   // ─── Loading gate ─────────────────────────────────────
-  if ((mode === "complete" || mode === "edit") && isLoadingJob) {
+  if (mode === "complete" && isLoadingJob) {
     return (
       <section className="h-min-dvh mx-auto max-w-7xl py-12">
         <div className="flex h-full items-center justify-center rounded-2xl bg-white p-6">
@@ -399,6 +434,7 @@ export default function PostJobForm() {
 
   // Are we loading from any step API?
   const isBusy = isPostingStepOne || isPostingStepTwo || isPostingStepThree || isUpdatingJob;
+  const isStepOneEditLoading = isEditMode && currentStep === 0 && (isLoadingJob || !formHydrated);
 
   // ═══════════════════════════════════════════════════════
   //  UNIFIED WIZARD — same UI for create, complete & edit
@@ -424,7 +460,7 @@ export default function PostJobForm() {
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
             <div className="min-h-80">
-              {currentStep === 0 && <JobPostStepOne />}
+              {currentStep === 0 && <JobPostStepOne isLoading={isStepOneEditLoading} />}
               {currentStep === 1 && <JobPostStepTwo />}
               {currentStep === 2 && <JobReviewPanel data={getValues()} job={reviewJob} />}
             </div>
@@ -447,7 +483,7 @@ export default function PostJobForm() {
                 <Button
                   type="button"
                   onClick={handleNext}
-                  disabled={isBusy}
+                  disabled={isBusy || isStepOneEditLoading}
                   variant="secondary"
                   hoverStyle="slidePrimary"
                   size="pill"
@@ -459,7 +495,7 @@ export default function PostJobForm() {
                 <Button
                   type="button"
                   onClick={() => handleSubmit(onSubmit)()}
-                  disabled={isSubmitting || isBusy}
+                  disabled={isSubmitting || isBusy || isStepOneEditLoading}
                   variant="secondary"
                   size="pill"
                   hoverStyle="slidePrimary"
@@ -467,25 +503,6 @@ export default function PostJobForm() {
                 >
                   {isSubmitting ? (
                     <>
-                      <svg
-                        className="h-4 w-4 animate-spin"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v8H4z"
-                        />
-                      </svg>
                       {isEditMode ? "Saving..." : "Posting..."}
                     </>
                   ) : isEditMode ? (
