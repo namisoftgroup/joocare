@@ -89,12 +89,14 @@ export default function CompleteAccountWizardForm() {
         organizationSize: profileData.organization_size_id?.toString() || "",
         commercialRegistrationIssueDate: formatDateForInput(profileData.commercial_registration_issue_date),
         commercialRegistrationExpiryDate: formatDateForInput(profileData.commercial_registration_expiry_date),
+        commercialRegistrationImagePath: profileData.commercial_registration_image || "",
         employerType: profileData.employer_type_id?.toString() || "",
         medicalFacilityLicenseNumber: profileData.medical_facility_license_number?.toString() || "",
         licenseIssuingAuthority: profileData.license_issuing_authority || "",
         specialtyScopePractice: profileData.specialty_id?.toString() || "",
         medicalRegistrationIssueDate: formatDateForInput(profileData.medical_license_issue_date),
         medicalRegistrationExpiryDate: formatDateForInput(profileData.medical_license_expiry_date),
+        medicalLicenseImagePath: profileData.medical_license_image || "",
         organizationPhoneNumber: profileData.phone_code && profileData.phone
           ? `${profileData.phone_code}${cleanPhone(profileData.phone)}`
           : "",

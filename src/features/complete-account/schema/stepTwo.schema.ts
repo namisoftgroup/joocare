@@ -26,7 +26,7 @@ export const stepTwoSchema = z.object({
   commercialRegistrationIssueDate: dateField("Issue date is required"),
   commercialRegistrationExpiryDate: dateField("Expiry date is required"),
   commercialRegistrationImage: z.any().optional(),
-  commercialRegistrationImagePath: z.string().min(1, { message: "Commercial Registration Image is required" }),
+  commercialRegistrationImagePath: z.string("Commercial registration image path is required").min(1, { message: "Commercial registration image path is required" }),
   employerType: z.string().min(1, { message: "employer type is required" }),
   medicalFacilityLicenseNumber: z.string().min(1, { message: "This field is required" }).max(20, { message: "Medical facility license number must be at most 20 characters" }),
   licenseIssuingAuthority: z
@@ -41,7 +41,7 @@ export const stepTwoSchema = z.object({
   medicalRegistrationIssueDate: dateField("Medical issue date is required"),
   medicalRegistrationExpiryDate: dateField("Medical expiry date is required"),
   medicalLicenseImage: z.any().optional(),
-  medicalLicenseImagePath: z.string().optional()
+  medicalLicenseImagePath: z.string("Medical license image path is required").min(1, { message: "Medical license image path is required" }),
 }).refine((data) => parseDateValue(data.commercialRegistrationIssueDate) <= today, {
   path: ["commercialRegistrationIssueDate"],
 })
@@ -58,7 +58,7 @@ export const stepTwoSchema = z.object({
       path: ["commercialRegistrationExpiryDate"],
     }
   ).refine((data) => parseDateValue(data.medicalRegistrationIssueDate) <= today, {
-  path: ["medicalRegistrationIssueDate"],
+    path: ["medicalRegistrationIssueDate"],
   })
   .refine((data) => parseDateValue(data.medicalRegistrationExpiryDate) >= today, {
     message: "Medical license expiry date must be today or a future date",
