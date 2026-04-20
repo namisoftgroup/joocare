@@ -23,6 +23,7 @@ export const steps: StepConfig[] = [
       "commercialRegistrationIssueDate",
       "commercialRegistrationExpiryDate",
       "commercialRegistrationImage",
+      "commercialRegistrationImagePath",
       "employerType",
       "medicalFacilityLicenseNumber",
       "licenseIssuingAuthority",
@@ -30,6 +31,7 @@ export const steps: StepConfig[] = [
       "medicalRegistrationIssueDate",
       "medicalRegistrationExpiryDate",
       "medicalLicenseImage",
+      "medicalLicenseImagePath",
     ],
   },
   {
@@ -61,6 +63,7 @@ export const defaultValuesWizard: WizardFormData = {
   commercialRegistrationIssueDate: "",
   commercialRegistrationExpiryDate: "",
   commercialRegistrationImage: "",
+  commercialRegistrationImagePath: "",
   employerType: "",
   medicalFacilityLicenseNumber: "",
   licenseIssuingAuthority: "",
@@ -68,6 +71,7 @@ export const defaultValuesWizard: WizardFormData = {
   medicalRegistrationIssueDate: "",
   medicalRegistrationExpiryDate: "",
   medicalLicenseImage: "",
+  medicalLicenseImagePath: "",
 
   // default data step three
   uploadCoverImage: "",
