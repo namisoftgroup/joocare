@@ -28,7 +28,7 @@ import {
 } from "../../actions/basic-info-actions";
 import type { CandidateSettingsProfile } from "../../services/basic-info-service";
 import {
-  SettingBasicInfoSchema,
+  createSettingBasicInfoSchema,
   type TSettingBasicInfoSchema,
 } from "../../validation/basic-info-schema";
 import ProfileImage from "./ProfileImage";
@@ -36,6 +36,8 @@ import ProfileImage from "./ProfileImage";
 interface BasicInfoFormProps {
   profile: CandidateSettingsProfile;
 }
+
+const OTHER_JOB_TITLE_VALUE = "__other__";
 
 const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
   const locale = useLocale();
@@ -48,6 +50,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
   const [citySearch, setCitySearch] = useState("");
   const [uploadedImagePath, setUploadedImagePath] = useState<string | null>(null);
   const [uploadedCvPath, setUploadedCvPath] = useState<string | null>(null);
+  const [showExistingProfileImage, setShowExistingProfileImage] = useState(Boolean(profile.image));
   const [showExistingCv, setShowExistingCv] = useState(Boolean(profile.cv));
   const defaultValues = useMemo<TSettingBasicInfoSchema>(
     () => ({
@@ -57,7 +60,8 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
         profile.phoneCode && profile.phone
           ? `${profile.phoneCode}${profile.phone}`
           : profile.phone,
-      jobTitle: profile.jobTitleId,
+      jobTitle: profile.jobTitleId || (profile.jobTitle ? OTHER_JOB_TITLE_VALUE : ""),
+      otherJobTitle: profile.jobTitleId ? "" : profile.jobTitle,
       specialty: profile.specialtyId,
       yearsOfExperience: profile.experienceId,
       country: profile.countryId,
@@ -67,6 +71,13 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
       uploadCV: [],
     }),
     [profile],
+  );
+  const basicInfoSchema = useMemo(
+    () =>
+      createSettingBasicInfoSchema({
+        requireCv: !(profile.cv && showExistingCv),
+      }),
+    [profile.cv, showExistingCv],
   );
 
   const {
@@ -79,12 +90,13 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
     clearErrors,
     formState: { errors },
   } = useForm<TSettingBasicInfoSchema>({
-    resolver: typedZodResolver(SettingBasicInfoSchema),
+    resolver: typedZodResolver(basicInfoSchema),
     mode: "onChange",
     defaultValues,
   });
 
   const selectedCountryId = useWatch({ control, name: "country" });
+  const selectedJobTitle = useWatch({ control, name: "jobTitle" });
   const previousCountryId = useRef<string | undefined>(profile.countryId);
   const {
     jobTitles,
@@ -138,8 +150,15 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
   }, [selectedCountryId, setValue]);
 
   useEffect(() => {
+    if (selectedJobTitle !== OTHER_JOB_TITLE_VALUE) {
+      setValue("otherJobTitle", "");
+    }
+  }, [selectedJobTitle, setValue]);
+
+  useEffect(() => {
     setUploadedImagePath(null);
     setUploadedCvPath(null);
+    setShowExistingProfileImage(Boolean(profile.image));
     setShowExistingCv(Boolean(profile.cv));
   }, [profile.image, profile.cv]);
 
@@ -155,6 +174,21 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
       return decodeURIComponent(profile.cv.split("/").filter(Boolean).pop() ?? "Current CV");
     }
   }, [profile.cv]);
+
+  const jobTitleOptions = useMemo(
+    () => [
+      ...jobTitles
+        .map((jobTitle) => ({
+          label: String(jobTitle.title ?? ""),
+          value: String(jobTitle.id),
+        }))
+        .filter((jobTitle) => jobTitle.label),
+      { label: "Other", value: OTHER_JOB_TITLE_VALUE },
+    ],
+    [jobTitles],
+  );
+
+  const isOtherJobTitle = selectedJobTitle === OTHER_JOB_TITLE_VALUE;
 
   useEffect(() => {
     if (
@@ -183,14 +217,18 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
       formData.append("name", data.fullName.trim());
       formData.append("phone", parsedPhone.nationalNumber ?? "");
       formData.append("phone_code", `+${parsedPhone.countryCallingCode ?? ""}`);
-      formData.append("job_title_id", data.jobTitle);
+      if (data.jobTitle === OTHER_JOB_TITLE_VALUE) {
+        formData.append("title", data.otherJobTitle.trim());
+      } else {
+        formData.append("job_title_id", data.jobTitle);
+      }
       formData.append("specialty_id", data.specialty);
       formData.append("country_id", data.country);
       formData.append("city_id", data.city);
       formData.append("experience_id", data.yearsOfExperience);
       formData.append("birth_date", data.dateOfBirth);
 
-      if (uploadedImagePath) {
+      if (uploadedImagePath !== null) {
         formData.append("image", uploadedImagePath);
       }
 
@@ -200,7 +238,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
 
       const response = await updateCandidateBasicInfoAction(formData, locale);
       toast.success(response.message ?? "Profile updated successfully.");
-      router.refresh();
+      router.push("/candidate/profile");
     } catch (error) {
       const message =
         error instanceof Error
@@ -224,7 +262,13 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
           control={control}
           render={({ field }) => (
             <ProfileImage
-              value={field.value?.length ? field.value : profile.image}
+              value={
+                field.value?.length
+                  ? field.value
+                  : showExistingProfileImage
+                    ? profile.image
+                    : null
+              }
               onChange={async (files) => {
                 field.onChange(files);
 
@@ -234,6 +278,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
                   return;
                 }
 
+                setShowExistingProfileImage(false);
                 clearErrors("profileImage");
 
                 try {
@@ -250,6 +295,12 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
                     message,
                   });
                 }
+              }}
+              onRemove={() => {
+                setShowExistingProfileImage(false);
+                setUploadedImagePath("");
+                field.onChange([]);
+                clearErrors("profileImage");
               }}
               error={errors.profileImage?.message}
             />
@@ -285,7 +336,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
           control={control}
           render={({ field }) => (
             <PhoneInputCode
-              defaultCountry="EG"
+              defaultCountry="AE"
               id="phoneNumber"
               className="w-full"
               placeholder="ex:52 987 6543"
@@ -319,10 +370,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
                 ? jobTitlesError.message
                 : undefined)
             }
-            options={jobTitles.map((jobTitle) => ({
-              label: jobTitle.title,
-              value: String(jobTitle.id),
-            }))}
+            options={jobTitleOptions}
             disabled={isJobTitlesLoading}
             onReachEnd={() => fetchMoreJobTitles()}
             hasNextPage={Boolean(hasMoreJobTitles)}
@@ -331,6 +379,17 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
           />
         )}
       />
+
+      {isOtherJobTitle && (
+        <InputField
+          id="otherJobTitle"
+          type="text"
+          label="Other Job Title"
+          placeholder="ex: Consultant Internist"
+          {...register("otherJobTitle")}
+          error={errors.otherJobTitle?.message}
+        />
+      )}
 
       <div className="flex flex-col items-center gap-2 lg:flex-row">
         <Controller
@@ -471,9 +530,9 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
         render={({ field }) => (
           <StoredFilepondUpload
             label="Upload CV"
-            hint={`"Optional"`}
             files={field.value}
             onChange={field.onChange}
+            required={!(profile.cv && showExistingCv)}
             allowImagePreview={false}
             acceptedFileTypes={[
               "application/pdf",

@@ -42,7 +42,7 @@ export default function UserDropDown({
   const subtitle = isEmployer
     ? "Company account"
     : "Candidate account";
-  const imageSrc = session?.user?.image || "/profile-placeholder.svg";
+  const imageSrc = session?.user?.image || "/avatar.jpg";
   const itemClass =
     "group cursor-pointer  flex items-center gap-2 text-md font-semibold text-muted-foreground " +
     "bg-transparent hover:bg-transparent focus:bg-transparent data-[highlighted]:bg-transparent " +
@@ -53,13 +53,13 @@ export default function UserDropDown({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="border-border group relative h-[55px] w-[55px] rounded-full"
+          className="border-border group relative h-13.75 w-13.75 rounded-full"
         >
           <Image
             src={imageSrc}
             alt="User Avatar"
             fill
-            className="rounded-full object-cover"
+            className="rounded-full "
           />{" "}
           <span className="border-border absolute -right-3 -bottom-2 flex h-6 w-6 items-center justify-center rounded-full border bg-white">
             <ChevronDown
@@ -80,7 +80,7 @@ export default function UserDropDown({
                 alt="Profile"
                 width={60}
                 height={60}
-                className="rounded-full"
+                className="rounded-full h-13.75 w-13.75"
               />
               <div>
                 <p className="text-lg font-semibold text-black">{displayName}</p>

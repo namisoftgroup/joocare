@@ -57,7 +57,7 @@ export type CandidateProfileApiUser = {
   phone: string | null;
   phone_code: string | null;
   job_title_id: number | null;
-  job_title: CandidateProfileApiLookup | null;
+  title: CandidateProfileApiLookup | string | null;
   country_id: number | null;
   country: CandidateProfileApiLookup | null;
   city_id: number | null;
