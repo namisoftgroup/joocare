@@ -40,9 +40,9 @@ const optionalUrl = z
     }
   );
 export const stepThreeSchema = z.object({
-  uploadCoverImage: imageFileSchema,
+  uploadCoverImage: z.string("cover image is required").min(1, { message: "cover image is required" }),
 
-  uploadLogoImage: imageFileSchema,
+  uploadLogoImage: z.string("logo image is required").min(1, { message: "logo image is required" }),
 
   organizationPhoneNumber: z.string().optional(),
 

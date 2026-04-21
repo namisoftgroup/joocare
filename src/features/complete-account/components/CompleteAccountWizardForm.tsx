@@ -72,8 +72,8 @@ export default function CompleteAccountWizardForm() {
   useEffect(() => {
     if (profileData) {
       const profileImages = profileData as typeof profileData & {
-        cover_image?: string | null;
-        logo_image?: string | null;
+        cover?: string | null;
+        image?: string | null;
       };
 
       methods.reset({
@@ -110,8 +110,8 @@ export default function CompleteAccountWizardForm() {
         instagram: profileData.instagram || "",
         snapchat: profileData.snapchat || "",
         website: profileData.website || "",
-        uploadCoverImage: profileImages.cover_image || "",
-        uploadLogoImage: profileImages.logo_image || "",
+        uploadCoverImage: profileImages.cover || "",
+        uploadLogoImage: profileImages.image || "",
       });
     }
   }, [profileData, methods]);
@@ -176,8 +176,8 @@ export default function CompleteAccountWizardForm() {
         city_id: Number(data.organizationCity),
         established_date: data.dateOfEstablishment || "",
         bio: data.aboutOrganization || "",
-        cover_image: data.uploadCoverImage || "",
-        logo_image: data.uploadLogoImage || "",
+        cover: data.uploadCoverImage || "",
+        image: data.uploadLogoImage || "",
       });
       setIsOpenSuccessModal(true);
       // console.log("All steps submitted successfully!");

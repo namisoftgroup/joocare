@@ -224,7 +224,7 @@ export default function StepTwo() {
               }}
               allowMultiple={false}
               maxFiles={1}
-              error={errors.commercialRegistrationImage?.message as string}
+              error={errors.commercialRegistrationImagePath?.message as string}
             />
           )}
         />
@@ -388,7 +388,7 @@ export default function StepTwo() {
                 setValue("medicalLicenseImagePath", "");
                 field.onChange([]);
               }}
-              error={errors.medicalLicenseImage?.message?.toString()}
+              error={errors.medicalLicenseImagePath?.message?.toString()}
             />
           )}
         />

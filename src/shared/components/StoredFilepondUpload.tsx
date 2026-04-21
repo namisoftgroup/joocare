@@ -194,7 +194,7 @@ export function StoredFilepondUpload({
             ? async (_source, load, serverError) => {
               try {
                 const response = await fetch(resolvedExistingFileUrl!);
-                
+
 
                 if (!response.ok) {
                   throw new Error("Failed to load file.");
@@ -228,12 +228,12 @@ export function StoredFilepondUpload({
           }
         }}
         onremovefile={(_error, fileItem) => {
-          if (fileItem?.origin === FileOrigin.LOCAL) {
-            onExistingFileRemove?.();
-            return;
-          }
+          // if (fileItem?.origin === FileOrigin.LOCAL) {
+          //   return;
+          // }
+          onExistingFileRemove?.();
 
-          onStoredPathChange?.(null);
+          // onStoredPathChange?.(null);
         }}
         labelIdle={`
           <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
