@@ -103,8 +103,12 @@ function JobPostStepOneContent() {
   } = useGetCountries(countrySearch);
   const selectedCountry = watch("country");
   const selectedCategory = watch("category");
+  const selectedRoleCategory = watch("roleCategory");
   const selectedCountryId = selectedCountry ? Number(selectedCountry) : null;
   const selectedCategoryId = selectedCategory ? Number(selectedCategory) : null;
+  const selectedRoleCategoryId = selectedRoleCategory
+    ? Number(selectedRoleCategory)
+    : null;
   const {
     cities,
     isLoading: citiesLoading,
@@ -176,9 +180,12 @@ function JobPostStepOneContent() {
     isLoading: seniorityLevelsLoading,
     error: seniorityLevelsError,
     hasNextPage: seniorityLevelsHasNextPage,
-    fetchNextPage: fetchseniorityLevelsNextPage,
+    fetchNextPage: fetchSeniorityLevelsNextPage,
     isFetchingNextPage: seniorityLevelsFetchingNextPage,
-  } = useGetSeniorityLevels(seniorityLevelsSearch);
+  } = useGetSeniorityLevels(
+    seniorityLevelsSearch,
+    selectedRoleCategoryId ?? undefined,
+  );
   const {
     experiences,
     isLoading: isExperiencesLoading,
@@ -504,7 +511,7 @@ function JobPostStepOneContent() {
               <SelectInputField
                 {...field}
                 id="category"
-                label="Category"
+                label="Job Category"
                 error={
                   errors.category?.message ??
                   (categoriesError instanceof Error
@@ -602,10 +609,14 @@ function JobPostStepOneContent() {
                       ? roleCategoriesError.message
                       : undefined)
                   }
-                  options={toSelectOptions(roleCategories)}
-                  disabled={roleCategoriesLoading}
-                  onReachEnd={() => fetchRoleCategoriesNextPage()}
-                  hasNextPage={Boolean(roleCategoriesHasNextPage)}
+                options={toSelectOptions(roleCategories)}
+                onChange={(value) => {
+                  field.onChange(value);
+                  setValue("seniorityLevel", "");
+                }}
+                disabled={roleCategoriesLoading}
+                onReachEnd={() => fetchRoleCategoriesNextPage()}
+                hasNextPage={Boolean(roleCategoriesHasNextPage)}
                   isFetchingNextPage={roleCategoriesFetchingNextPage}
                   onSearchChange={setRoleCategorySearch}
                 />
@@ -630,8 +641,8 @@ function JobPostStepOneContent() {
                       : undefined)
                   }
                   options={toSelectOptions(seniorityLevels)}
-                  disabled={seniorityLevelsLoading}
-                  onReachEnd={() => fetchseniorityLevelsNextPage()}
+                  disabled={seniorityLevelsLoading || !selectedRoleCategoryId}
+                  onReachEnd={() => fetchSeniorityLevelsNextPage()}
                   hasNextPage={Boolean(seniorityLevelsHasNextPage)}
                   isFetchingNextPage={seniorityLevelsFetchingNextPage}
                   onSearchChange={setSeniorityLevelsSearch}
