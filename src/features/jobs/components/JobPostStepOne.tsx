@@ -103,8 +103,12 @@ function JobPostStepOneContent() {
   } = useGetCountries(countrySearch);
   const selectedCountry = watch("country");
   const selectedCategory = watch("category");
+  const selectedRoleCategory = watch("roleCategory");
   const selectedCountryId = selectedCountry ? Number(selectedCountry) : null;
   const selectedCategoryId = selectedCategory ? Number(selectedCategory) : null;
+  const selectedRoleCategoryId = selectedRoleCategory
+    ? Number(selectedRoleCategory)
+    : null;
   const {
     cities,
     isLoading: citiesLoading,
@@ -178,7 +182,10 @@ function JobPostStepOneContent() {
     hasNextPage: seniorityLevelsHasNextPage,
     fetchNextPage: fetchSeniorityLevelsNextPage,
     isFetchingNextPage: seniorityLevelsFetchingNextPage,
-  } = useGetSeniorityLevels(seniorityLevelsSearch);
+  } = useGetSeniorityLevels(
+    seniorityLevelsSearch,
+    selectedRoleCategoryId ?? undefined,
+  );
   const {
     experiences,
     isLoading: isExperiencesLoading,
@@ -602,10 +609,14 @@ function JobPostStepOneContent() {
                       ? roleCategoriesError.message
                       : undefined)
                   }
-                  options={toSelectOptions(roleCategories)}
-                  disabled={roleCategoriesLoading}
-                  onReachEnd={() => fetchRoleCategoriesNextPage()}
-                  hasNextPage={Boolean(roleCategoriesHasNextPage)}
+                options={toSelectOptions(roleCategories)}
+                onChange={(value) => {
+                  field.onChange(value);
+                  setValue("seniorityLevel", "");
+                }}
+                disabled={roleCategoriesLoading}
+                onReachEnd={() => fetchRoleCategoriesNextPage()}
+                hasNextPage={Boolean(roleCategoriesHasNextPage)}
                   isFetchingNextPage={roleCategoriesFetchingNextPage}
                   onSearchChange={setRoleCategorySearch}
                 />
@@ -630,7 +641,7 @@ function JobPostStepOneContent() {
                       : undefined)
                   }
                   options={toSelectOptions(seniorityLevels)}
-                  disabled={seniorityLevelsLoading}
+                  disabled={seniorityLevelsLoading || !selectedRoleCategoryId}
                   onReachEnd={() => fetchSeniorityLevelsNextPage()}
                   hasNextPage={Boolean(seniorityLevelsHasNextPage)}
                   isFetchingNextPage={seniorityLevelsFetchingNextPage}
