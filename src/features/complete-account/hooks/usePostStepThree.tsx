@@ -26,7 +26,9 @@ export const usePostStepThree = ({ token }: { token: string }) => {
         onSuccess: async (res) => {
             toast.success(res.message);
             await queryClient.invalidateQueries({ queryKey: ["company-profile"] });
-            router.push("/company/company-profile");
+            setTimeout(() => {
+                router.push("/company/company-profile");
+            }, 3000);
         },
         onError: (error) => {
             toast.error(error.message);

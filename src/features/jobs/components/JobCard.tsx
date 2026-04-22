@@ -123,6 +123,7 @@ export default function JobCard({ resumeMatch,
             height={46}
             src={companyLogo || "/assets/comp-logo.svg"}
             alt={`${company} logo`}
+            className="rounded-2xl"
           />
           <div className="flex grow flex-col gap-1">
             <h6 className="text-secondary text-lg font-semibold">
