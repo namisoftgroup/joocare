@@ -229,8 +229,10 @@ export default function PostJobForm() {
       await submitStepThreeStatus("draft");
       setSaveDraftOpen(false);
       setSaveSuccessOpen(true);
-      router.push("/company/job-management");
-      queryClient.invalidateQueries({ queryKey: ['company-jobs'] });
+      queryClient.refetchQueries({ queryKey: ['company-jobs'] });
+      setTimeout(() => {
+        router.push("/company/job-management");
+      }, 3000);
     } catch {
       // errors are already handled in mutation onError toast
     }
@@ -414,7 +416,9 @@ export default function PostJobForm() {
       await submitStepThreeStatus("open");
       setSubmitted(true);
       setPostSuccess(true);
-      router.push("/company/job-management");
+      setTimeout(() => {
+        router.push("/company/job-management");
+      }, 3000);
       queryClient.invalidateQueries({ queryKey: ['company-jobs'] });
     } catch {
       // errors are already handled in mutation onError toast
@@ -431,8 +435,9 @@ export default function PostJobForm() {
       const payload = buildUpdatePayload(data);
       await updateJob({ jobId: existingJobId, payload });
       setPostSuccess(true);
-      router.push("/company/job-management");
-      queryClient.invalidateQueries({ queryKey: ['company-jobs'] });
+      setTimeout(() => {
+        router.push("/company/job-management");
+      }, 3000);
       queryClient.invalidateQueries({ queryKey: ['company-job', existingJobId] });
     } catch {
       // errors are already handled in mutation onError toast
