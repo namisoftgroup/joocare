@@ -16,7 +16,7 @@ export default function PositionCard({
 }: positionCardProps) {
   return (
     <div className="flex items-center gap-6">
-      <Image src={logoSrc} alt={`${company} logo`} width={96} height={86} />
+      <Image src={logoSrc} alt={`${company} logo`} width={96} height={86} className="rounded-2xl w-24 h-22" />
       <div>
         <h6 className="text-foreground text-2xl font-semibold">{title}</h6>
         <p className="flex items-center gap-2">

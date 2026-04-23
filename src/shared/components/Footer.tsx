@@ -4,7 +4,6 @@ import { Facebook, Ghost, Instagram, Linkedin, Twitter } from "lucide-react";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import { settingService } from "../services/settings-services";
-import BackToTopButton from "./BackToTopButton";
 
 const Footer = async () => {
   const currentYear = new Date().getFullYear();
@@ -167,7 +166,7 @@ const Footer = async () => {
       </div>{" "}
       {/* Copyright */}
       <p className="relative border-t border-[#0D0D0D73] pt-4 text-center text-lg text-white">
-        {copyrightText} <BackToTopButton />
+        {copyrightText}
       </p>
     </footer>
   );

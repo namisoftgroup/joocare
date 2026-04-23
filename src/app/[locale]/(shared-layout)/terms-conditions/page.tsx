@@ -6,7 +6,14 @@ export default async function TermsConditions() {
     return (
         <section className="layout-shell py-20">
             <h1>Terms And Conditions</h1>
-            <p>{terms?.terms}</p>
+            <div
+                className="prose prose-sm max-w-none border-b pb-5"
+                dangerouslySetInnerHTML={{
+                    __html:
+                        terms?.terms ||
+                        "<p>No description available.</p>",
+                }}
+            />
         </section>
     )
 }
