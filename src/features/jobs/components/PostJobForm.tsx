@@ -89,9 +89,12 @@ function getJobStatus(job: JobDetails) {
   return job.status;
 }
 
+
 // ─── Map API job → form defaults ────────────────────────
 function mapJobToFormData(job: JobDetails): Partial<JobFormData> {
   const hasSalary = Boolean(job.has_salary);
+  console.log("job destias", job);
+
   return {
     title: job.title ? "__other__" : String(job.job_title_id ?? ""),
     otherJobTitle: job.title ?? "",

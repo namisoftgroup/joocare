@@ -13,7 +13,7 @@ export default function RootLayout({
       <Header />
       <main className="min-h-screen">{children}</main>
       <Footer />
-      <section className="absolute bottom-0 right-0">
+      <section className="fixed right-4 bottom-4 z-50 md:right-6 md:bottom-6">
         <BackToTopButton />
       </section>
     </main>

@@ -186,14 +186,14 @@ const FormEmployerRegister = () => {
             >
               I agree to the{" "}
               <Link
-                href="#"
+                href="/terms-conditions"
                 className="underline-primary text-secondary underline"
               >
                 Terms & Conditions
               </Link>
               and
               <Link
-                href="#"
+                href="/privacy-policy"
                 className="underline-primary text-secondary underline"
               >
                 Privacy Policy.
