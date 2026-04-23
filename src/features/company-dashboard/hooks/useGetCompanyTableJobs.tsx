@@ -19,7 +19,7 @@ export default function useGetCompanyTableJobs({ token, page }: { token: string,
             const params = new URLSearchParams({
                 page: String(page),
                 pagination: "on",
-                limit_per_page: "1",
+                limit_per_page: "10",
             });
 
             const res = await apiFetch(
