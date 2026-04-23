@@ -23,6 +23,7 @@ import {
   ArrowRight,
   Briefcase,
   CheckCheck,
+  CircleDollarSign,
   CircleEllipsis,
   DollarSign,
   Dot,
@@ -120,9 +121,10 @@ export default function JobCard({ resumeMatch,
         <CardHeader className="flex gap-2 max-lg:px-2">
           <Image
             width={52}
-            height={46}
+            height={52}
             src={companyLogo || "/assets/comp-logo.svg"}
             alt={`${company} logo`}
+            className="rounded-2xl w-14 h-12"
           />
           <div className="flex grow flex-col gap-1">
             <h6 className="text-secondary text-lg font-semibold">
@@ -209,7 +211,7 @@ export default function JobCard({ resumeMatch,
                 {category}
               </li>
               <li className="text-secondary flex items-center gap-1 text-sm font-normal">
-                <DollarSign size={14} color="var(--muted-foreground)" />
+                <CircleDollarSign size={14} color="var(--muted-foreground)" />
                 {salary}
               </li>
             </ul>

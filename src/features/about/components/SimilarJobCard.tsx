@@ -8,6 +8,7 @@ import {
 } from "@/shared/components/ui/card";
 import {
   Briefcase,
+  CircleDollarSign,
   DollarSign,
   LocationEdit,
   Sparkles,
@@ -26,6 +27,7 @@ export default function SimilarJobCard({ job }: { job: SimilarJob }) {
           height={46}
           src={job?.company?.image ?? "/assets/comp-logo.svg"}
           alt="company logo"
+          className="rounded-2xl w-14 h-12"
         />
         <div className="flex grow flex-col gap-1">
           <p className="text-foreground text-md font-normal">{job?.title === null ? job?.job_title?.title : job?.title}</p>
@@ -50,7 +52,7 @@ export default function SimilarJobCard({ job }: { job: SimilarJob }) {
               {job?.category?.title}{" "}
             </li>
             <li className="text-secondary flex items-center gap-1 text-sm font-normal">
-              <DollarSign size={14} color="var(--muted-foreground)" />
+              <CircleDollarSign size={14} color="var(--muted-foreground)" />
               {getJobSalary(job)}
             </li>
           </ul>

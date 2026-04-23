@@ -13,6 +13,7 @@ export default function JobDetailsHeader({ job }: { job: JobDetails }) {
           alt={`company logo`}
           width={96}
           height={86}
+          className="rounded-2xl w-24 h-22"
         />
         <div>
           <h6 className="text-foreground flex items-center gap-4 text-2xl font-semibold">

@@ -54,8 +54,6 @@ export function DrawerScrollableContent({
   }, hasMore);
 
   async function handleNotificationClick(item: Notification) {
-    console.log("itemsssssss::::: ", item);
-
     if (!item.is_read) {
       try {
         await markAsReadAsync(item.id);
@@ -64,9 +62,28 @@ export function DrawerScrollableContent({
       }
     }
 
-    if (role === "employer" && item.action === "rejected_profile") {
+    if (role !== "employer") {
+      return;
+    }
+
+    if (
+      item.action === "expired_commercial_registration" ||
+      item.action === "expired_license" ||
+      item.action === "rejected_profile"
+    ) {
       onOpenChange(false);
-      router.push("/company/complete-account");
+      router.push("/company/account-settings/business-verification");
+      return;
+    }
+
+    if (item.action === "received_application" && item.data.job_id) {
+      onOpenChange(false);
+      router.push(`/company/job/candidates/${item.data.job_id}`);
+      return;
+    }
+
+    if (item.action === "approved_profile") {
+      return;
     }
   }
   // console.log('data notify:::', data);

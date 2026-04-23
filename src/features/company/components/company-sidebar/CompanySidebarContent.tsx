@@ -33,14 +33,7 @@ const CompanySidebarContent = () => {
       <div className="order-1 lg:order-2">
         <SidebarLinks links={links} />
       </div>
-      {/* <Link
-        href="/company/post-job"
-        className={`${buttonVariants({ variant: "default", size: "pill" })} 
-        hover:bg-primary/70 mt-auto rounded-full py-6 text-base order-3  
-        ${companyProfileData?.status !== "Approved" ? "pointer-events-none opacity-50" : ""}`}
-      >
-        Post a Job
-      </Link> */}
+
       <div className="relative group mt-auto order-3 ">
         <Link
           href="/company/post-job"

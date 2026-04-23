@@ -22,6 +22,9 @@ export type Notification = {
   is_read: boolean;
   created_at: string;
   updated_at: string;
+  data: {
+    job_id: number
+  }
 };
 
 export type NotificationsResponse = Notification[] &

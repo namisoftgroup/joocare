@@ -185,15 +185,18 @@ export function getJobLocation(job: Pick<JobListItem | JobDetails, "city" | "cou
 export function getJobSalary(
   job: Pick<JobListItem | JobDetails, "min_salary" | "max_salary" | "currency">,
 ) {
-  if (job.min_salary && job.max_salary) {
+  const hasMinSalary = typeof job.min_salary === "number" && job.min_salary > 0;
+  const hasMaxSalary = typeof job.max_salary === "number" && job.max_salary > 0;
+
+  if (hasMinSalary && hasMaxSalary) {
     return `${job.min_salary} - ${job.max_salary} `;
   }
 
-  if (job.min_salary || job.max_salary) {
+  if (hasMinSalary || hasMaxSalary) {
     return `${job.min_salary || job.max_salary} `;
   }
 
-  return "Salary not specified";
+  return "Not specified";
 }
 
 export function normalizeJobStatus(status: string | null | undefined): JobStatus {

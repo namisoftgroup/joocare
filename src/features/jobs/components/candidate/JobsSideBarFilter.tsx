@@ -17,7 +17,7 @@ import FilterAccordion from "./FilterAccordion";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const DEFAULT_OPEN = new Set(["professionalLicense", "roleCategories", "domains"]);
+const DEFAULT_OPEN = new Set([]);
 
 type JobsSidebarFilterProps = {
   actionPath: string;

@@ -66,6 +66,7 @@ export default function JobsFilterSection({
 
             <input type="hidden" name="country" value={location} />
             <SelectInputField
+              withSearchInput
               id="location"
               options={countries}
               placeholder="By country"

@@ -7,7 +7,6 @@ import JobOverviewCard from "@/features/jobs/components/JobOverviewCard";
 import JobShareCard from "@/features/jobs/components/JobShareCard";
 import { getCompanyJobDetails } from "@/features/jobs/services/job-details-service";
 import { normalizeJobStatus } from "@/features/jobs/utils";
-import Breadcrumb from "@/shared/components/Breadcrumb";
 import HttpStatusState from "@/shared/components/HttpStatusState";
 import { getHttpStatusCode } from "@/shared/lib/http-error";
 

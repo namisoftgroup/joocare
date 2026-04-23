@@ -16,6 +16,7 @@ export default function AboutEmployer({ employer }: { employer: CompanyDetails |
           alt="Empoyer provile card"
           width={60}
           height={60}
+          className="rounded-2xl w-15 h-13"
         />
         <div>
           <h3 className="text-lg font-semibold">{employer?.name}</h3>

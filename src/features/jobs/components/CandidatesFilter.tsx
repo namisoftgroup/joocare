@@ -73,6 +73,7 @@ export default function CandidatesFilter({
         />
 
         <SelectInputField
+          withSearchInput
           id="location"
           options={countryOptions}
           placeholder="Country"

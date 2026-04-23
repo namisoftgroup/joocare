@@ -17,14 +17,15 @@ export default function NotificationCard({
   isPending = false,
   onClick,
 }: NotificationCardProps) {
+
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={isPending}
       className={`border-b-border flex w-full items-start gap-3 border-b border-dashed p-4 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${isRead
-          ? "bg-white"
-          : "bg-[#F4F8F6] hover:bg-[#EDF4F1]"
+        ? "bg-white"
+        : "bg-[#F4F8F6] hover:bg-[#EDF4F1]"
         }`}
     >
       <Image
