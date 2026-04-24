@@ -56,7 +56,7 @@ function mapEducation(entry: CandidateProfileApiEducation): CandidateEducationVi
 function mapExperience(entry: CandidateProfileApiExperience): CandidateExperienceViewModel {
   return {
     id: String(entry.id),
-    title: entry.title || "Experience",
+    title: entry.job_title?.title || "Experience",
     organization: entry.company,
     startDate: entry.start_date,
     endDate: entry.end_date,

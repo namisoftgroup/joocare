@@ -19,6 +19,9 @@ export type CandidateProfileApiResponsibility = {
 export type CandidateProfileApiExperience = {
   id: number;
   title: string;
+  job_title: {
+    title: string;
+  }
   job_title_id: number | null;
   company: string | null;
   start_date: string | null;
