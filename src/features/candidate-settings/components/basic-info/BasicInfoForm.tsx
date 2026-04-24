@@ -32,6 +32,7 @@ import {
   type TSettingBasicInfoSchema,
 } from "../../validation/basic-info-schema";
 import ProfileImage from "./ProfileImage";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface BasicInfoFormProps {
   profile: CandidateSettingsProfile;
@@ -79,7 +80,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
       }),
     [profile.cv, showExistingCv],
   );
-
+  const queryClient = useQueryClient()
   const {
     register,
     control,
@@ -238,6 +239,7 @@ const BasicInfoForm = ({ profile }: BasicInfoFormProps) => {
 
       const response = await updateCandidateBasicInfoAction(formData, locale);
       toast.success(response.message ?? "Profile updated successfully.");
+      queryClient.invalidateQueries({ queryKey: ['candidate-profile'] })
       router.push("/candidate/profile");
     } catch (error) {
       const message =

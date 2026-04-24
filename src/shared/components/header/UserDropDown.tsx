@@ -1,5 +1,7 @@
 "use client";
 
+import useGetCandidateProfile from "@/features/candidate-profile/hooks/useGetCandidateProfile";
+import useGetCompanyProfile from "@/features/company-profile/hooks/useGetCompanyProfile";
 import {
   Bookmark,
   ChevronDown,
@@ -35,6 +37,17 @@ export default function UserDropDown({
   const toggleOpen = () => setOpen((prev) => !prev);
 
   const isEmployer = session?.authRole === "employer" || companyHeader;
+  const token = session?.accessToken || "";
+  console.log("token::", token, isEmployer);
+
+  const { data: companyProfileData } = useGetCompanyProfile({
+    token: isEmployer ? token : "",
+  });
+  const { data: candidateProfileData } = useGetCandidateProfile({
+    token: !isEmployer ? token : "",
+  });
+  console.log("candidateProfileData::", candidateProfileData);
+
   const profileHref = isEmployer
     ? "/company/company-profile"
     : "/candidate/profile";
@@ -42,7 +55,10 @@ export default function UserDropDown({
   const subtitle = isEmployer
     ? "Company account"
     : "Candidate account";
-  const imageSrc = session?.user?.image || "/avatar.jpg";
+  const imageSrc =
+    (isEmployer ? companyProfileData?.image : candidateProfileData?.image) ||
+    session?.user?.image ||
+    "/avatar.jpg";
   const itemClass =
     "group cursor-pointer  flex items-center gap-2 text-md font-semibold text-muted-foreground " +
     "bg-transparent hover:bg-transparent focus:bg-transparent data-[highlighted]:bg-transparent " +

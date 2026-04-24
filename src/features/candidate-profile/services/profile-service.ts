@@ -61,7 +61,7 @@ function mapExperience(entry: CandidateProfileApiExperience): CandidateExperienc
       ? "Present"
       : normalizeDateLabel(entry.end_date) ?? "Present",
     isCurrent: entry.is_current,
-    bullets: entry.responsibilities
+    bullets: (entry.responsibilities ?? [])
       .map((responsibility) => responsibility.description)
       .filter(Boolean),
   };
@@ -143,13 +143,17 @@ export async function getCandidateProfile() {
   const jobTitle = resolveJobTitle(user.title);
   const fullPhone =
     user.phone && user.phone_code ? `${user.phone_code}${user.phone}` : user.phone;
-  const skills = user.skills.map((skill) => ({
+  const skills = (user.skills ?? []).map((skill) => ({
     id: String(skill.id),
     label: skill.title,
     deleteId: String(skill.id),
   })) satisfies CandidateSkillViewModel[];
-  const educations = user.educations.map(mapEducation);
-  const experiences = user.experiences.map(mapExperience);
+  const educations = (user.educations ?? []).map(mapEducation);
+  const experiences = (user.experiences ?? []).map(mapExperience);
+  const experienceLabel =
+    typeof user.experience === "string"
+      ? user.experience
+      : user.experience?.title ?? user.experience?.name ?? null;
 
   return {
     id: user.id,
@@ -169,7 +173,7 @@ export async function getCandidateProfile() {
     bio: user.bio ?? null,
     isProfileComplete: user.is_profile_complete ?? null,
     age: normalizeAge(user.age),
-    experience: user.experience?.title ?? null,
+    experience: experienceLabel,
     location: buildLocation(country, city),
     jobTitle,
     skills,
