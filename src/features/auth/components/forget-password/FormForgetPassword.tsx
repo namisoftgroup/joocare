@@ -60,7 +60,8 @@ const FormForgetPassword = ({ btnLabel }: { btnLabel: string }) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 w-full">
       <InputField
-        label={usesOfficialEmail ? "Official Email" : "Email"}
+        // label={usesOfficialEmail ? "Official Email" : "Email"}
+        label={"Email"}
         id="email"
         type="email"
         error={errors.email?.message}
