@@ -53,7 +53,7 @@ const ProfileImage = ({
           )}
         >
           <Image
-            src={preview ? '' + preview : "/avatar.jpg"}
+            src={preview ? '' + preview : "/assets/profile_image.svg"}
             alt="Profile"
             fill
             className="rounded-full object-cover"
