@@ -19,9 +19,9 @@ export default function JobDescriptionCard({ job }: { job: JobDetails }) {
               "<p>No description available.</p>",
           }}
         />
-        <Link href="/" className="block w-full border-b pb-5 text-[#1C7ED6]">
+        {/* <Link href="/" className="block w-full border-b pb-5 text-[#1C7ED6]">
           Learn more about our benefits
-        </Link>
+        </Link> */}
         {/* <ItemList items={qualificationItems} variant="disc" /> */}
       </DescriptionSection>
 

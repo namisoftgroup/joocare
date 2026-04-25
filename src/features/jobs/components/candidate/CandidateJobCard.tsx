@@ -1,12 +1,12 @@
 "use client"
-import { Link } from "@/i18n/navigation";
 import { JobListItem } from "@/features/jobs/types/jobs.types";
 import {
   getJobLocation,
-  getJobSalary,
+  getJobSalaryWithCurrency,
   stripHtml,
-  truncateText,
+  truncateText
 } from "@/features/jobs/utils";
+import { Link } from "@/i18n/navigation";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -19,13 +19,12 @@ import {
   ArrowRight,
   Briefcase,
   CircleDollarSign,
-  DollarSign,
   Dot,
   MapPin,
-  Share,
+  Share
 } from "lucide-react";
-import Image from "next/image";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { useJobShare } from "../../hooks/useJobShare";
 import ToggleSavedJobButton from "./ToggleSavedJobButton";
 
@@ -52,7 +51,7 @@ export default function CandidateJobCard({
   const location = getJobLocation(job);
   const category = job?.category?.title || "Not specified";
   const employmentType = job?.employment_type?.title || "Not specified";
-  const salary = getJobSalary(job);
+  const salary = getJobSalaryWithCurrency(job);
   const experience = job?.experience?.title || "Experience not specified";
   const specialty = job?.specialty?.title || "Healthcare";
   const excerpt =

@@ -93,7 +93,7 @@ export default function JobsFilterSection({
                 maxSalary: "",
                 roleCategories: [],
                 seniorityLevels: [],
-                specialties: [],
+                // specialties: [],
                 experiences: [],
                 availabilities: [],
                 salaryTypes: [],

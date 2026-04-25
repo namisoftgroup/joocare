@@ -81,7 +81,7 @@ export default async function Page({ params, searchParams }: PageProps) {
     roleCategories: normalizedParams.roleCategories,
     seniorityLevels: normalizedParams.seniorityLevels,
     domains: normalizedParams.domain ? [normalizedParams.domain] : [],
-    specialties: normalizedParams.specialties,
+    // specialties: normalizedParams.specialties,
     experiences: normalizedParams.experiences,
     availabilities: normalizedParams.availabilities,
     categories: normalizedParams.categories,
@@ -159,7 +159,7 @@ export default async function Page({ params, searchParams }: PageProps) {
       name: "seniority_levels[]",
       value,
     })),
-    ...normalizedParams.specialties.map((value) => ({ name: "specialties[]", value })),
+    // ...normalizedParams.specialties.map((value) => ({ name: "specialties[]", value })),
     ...normalizedParams.experiences.map((value) => ({ name: "experiences[]", value })),
     ...normalizedParams.availabilities.map((value) => ({
       name: "availabilities[]",

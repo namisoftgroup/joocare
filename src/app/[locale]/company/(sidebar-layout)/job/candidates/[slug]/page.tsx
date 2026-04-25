@@ -4,8 +4,8 @@ import ApplicantsClient from "@/features/jobs/components/ApplicantsClient";
 import CandidatesFilter, { CandidatesFilterValues } from "@/features/jobs/components/CandidatesFilter";
 import PositionCard from "@/features/jobs/components/PositionCard";
 import useGetApplicationsCandidates from "@/features/jobs/hooks/useGetApplicationsCandidates";
+import { useGetCompanyJob } from "@/features/jobs/hooks/useGetCompanyJob";
 import { Applicant } from "@/features/jobs/types/index.types";
-import { CustomPagination } from "@/shared/components/CustomPagination";
 import EmptyDataState from "@/shared/components/EmptyDataState";
 import useGetCountries from "@/shared/hooks/useGetCountries";
 import { useSession } from "next-auth/react";
@@ -33,13 +33,10 @@ export default function Page() {
   const { data: session, status } = useSession();
   const token = session?.accessToken as string;
   const { countries } = useGetCountries();
+  const { data: job } = useGetCompanyJob(Number.isFinite(slug) ? slug : null);
 
   const {
-    data,
     candidates,
-    total,
-    perPage,
-    lastPage,
     isFetching,
   } = useGetApplicationsCandidates({
     token,
@@ -47,11 +44,6 @@ export default function Page() {
     slug,
     filters: submittedFilters,
   });
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage < 1 || newPage > lastPage) return;
-    setPage(newPage);
-  };
 
   const handleSearchChange = (search: string) => {
     setFilters((current) => ({ ...current, search }));
@@ -86,16 +78,18 @@ export default function Page() {
     value: String(country.id),
   }));
 
-  const displayedTotal = data?.total ?? total;
-  const displayedPerPage = data?.per_page ?? perPage;
+  const jobTitle = job?.title ?? job?.job_title?.title ?? "Untitled job";
+  const companyName = job?.company?.name ?? "Your company";
+  const companyLogo = job?.company?.image ?? "/assets/comp-logo.svg";
+  const employmentType = job?.employment_type?.title ?? "Not specified";
 
   return (
     <section className="grid grid-cols-1">
       <PositionCard
-        logoSrc="/assets/comp-logo.svg"
-        title="Senior Specialist Physician"
-        company="Health care"
-        employmentType="FULL-TIME"
+        logoSrc={companyLogo}
+        title={jobTitle}
+        company={companyName}
+        employmentType={employmentType}
       />
       <CandidatesFilter
         values={filters}
@@ -111,12 +105,6 @@ export default function Page() {
           <EmptyDataState />
         </div>
       ) : null}
-      {/* <CustomPagination
-        totalItems={displayedTotal}
-        pageSize={displayedPerPage}
-        currentPage={page}
-        onPageChange={handlePageChange}
-      /> */}
     </section>
   );
 }
