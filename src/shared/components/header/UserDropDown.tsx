@@ -26,7 +26,7 @@ import { useState } from "react";
 import { useLogout } from "@/features/auth/hooks/useLogout";
 import { useSession } from "next-auth/react";
 
-function getSafeImageSrc(value: unknown, fallback = "/avatar.jpg") {
+function getSafeImageSrc(value: unknown, fallback: string) {
   return typeof value === "string" && value.trim() ? value : fallback;
 }
 
@@ -57,9 +57,15 @@ export default function UserDropDown({
   const subtitle = isEmployer
     ? "Company account"
     : "Candidate account";
+
+  const fallbackImage = isEmployer
+    ? "/assets/logo_1.svg"
+    : "/assets/profile_image.svg";
+
   const imageSrc = getSafeImageSrc(
     (isEmployer ? companyProfileData?.image : candidateProfileData?.image) ??
     session?.user?.image,
+    fallbackImage
   );
   const itemClass =
     "group cursor-pointer  flex items-center gap-2 text-md font-semibold text-muted-foreground " +

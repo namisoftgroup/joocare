@@ -132,7 +132,7 @@ export default function JobCard({ resumeMatch,
             </h6>
             <p className="text-foreground text-md font-normal">{company}</p>
             <time className="text-muted-foreground text-xs font-normal">
-              {postedAtLabel}
+              {normalizedStatus !== "draft" && postedAtLabel}
             </time>
           </div>
           {/* Dropdown menu for job actions  or resume match*/}
