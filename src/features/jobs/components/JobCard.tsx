@@ -132,7 +132,9 @@ export default function JobCard({ resumeMatch,
             </h6>
             <p className="text-foreground text-md font-normal">{company}</p>
             <time className="text-muted-foreground text-xs font-normal">
-              {normalizedStatus !== "draft" && postedAtLabel}
+              {!["draft", "open"].includes(normalizedStatus) && postedAtLabel}
+              {(normalizedStatus === "open") && statusDate}
+              { }
             </time>
           </div>
           {/* Dropdown menu for job actions  or resume match*/}
@@ -271,7 +273,7 @@ export default function JobCard({ resumeMatch,
               {statusLabel}
             </span>
             <span className="grow text-end">
-              {statusDate}
+              {normalizedStatus !== "open" && statusDate}
             </span>
           </Badge>
         </CardFooter>
