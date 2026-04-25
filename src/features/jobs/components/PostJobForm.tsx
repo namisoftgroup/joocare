@@ -484,7 +484,7 @@ export default function PostJobForm() {
     }
   };
 
-  // ─── Loading gate ─────────────────────────────────────
+  // ─── Loading gate test ────────────────────
   if (mode === "complete" && isLoadingJob) {
     return (
       <section className="h-min-dvh mx-auto max-w-7xl py-12">
