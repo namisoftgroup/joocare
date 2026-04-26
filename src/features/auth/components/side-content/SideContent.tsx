@@ -38,12 +38,13 @@ const SideContent = () => {
             `
           With smart tools and AI-powered insights, joocare helps you find the
           right opportunity and land the job you deserve with confidence.
+          With smart tools and AI-powered insights, joocare helps you find the right opportunity and land the job you deserve with confidence.
             `}
           {isEmployerRegister &&
             `
             With smart tools and AI-powered insights, joocare helps you find the right opportunity and land the job you deserve with confidence.`}
           {isCandidateRegister &&
-            `With smart tools and AI-powered insights, joocare helps you to find the right opportunity and land the job you deserve with confidence." to "Joocare leverages AI-driven tools and insights to connect you with opportunities that match your skills and career goals, empowering you to succeed with confidence.`}
+            `With smart tools and AI-powered insights, joocare helps you find the right opportunity and land the job you deserve with confidence.`}
         </p>
       </div>
     </aside>
