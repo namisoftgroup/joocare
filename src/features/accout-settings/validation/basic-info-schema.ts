@@ -1,3 +1,4 @@
+import { MIN_PHONE_NUMBER_LENGTH } from "@/shared/lib/phone";
 import { z } from "zod";
 
 export const BasicInfoSchema = z.object({
@@ -18,7 +19,8 @@ export const BasicInfoSchema = z.object({
     .string({
       error: "phone number is required",
     })
-    .min(10, { message: "Phone number is required" }),
+    .trim()
+    .min(MIN_PHONE_NUMBER_LENGTH, { message: "Phone number is required" }),
   orgOfficialPhoneNumber: z
     .string()
     .optional(),

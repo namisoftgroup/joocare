@@ -9,12 +9,16 @@ import { Button } from "@/shared/components/ui/button";
 import { useState, useEffect } from "react";
 
 import { PhoneInputCode } from "@/shared/components/PhoneInputCode";
+import {
+  getCountryCodeByPhoneCode,
+  getNationalPhoneValue,
+  parsePhoneWithCode,
+} from "@/shared/lib/phone";
 import { YearPicker } from "@/shared/components/YearPicker";
 import { BasicInfoSchema, TBasicInfoSchema } from "../../validation/basic-info-schema";
 import { OTPModal } from "@/features/auth/components/forget-password/OtpModal";
 import { useSession } from "next-auth/react";
 import { useUpdateBasicInfo } from "../../hooks/useUpdateBasicInfo";
-import { parsePhoneNumber, getCountries, getCountryCallingCode, Country } from "react-phone-number-input";
 import useGetCountries from "@/shared/hooks/useGetCountries";
 import useGetCitiesByCountryId from "@/shared/hooks/useGetCitiesByCountryId";
 import useGetDomains from "@/shared/hooks/useGetDomains";
@@ -31,30 +35,24 @@ import { UpdateBasicInfoPayload } from "../../types";
 const buildDefaults = (
   user?: TCompanyProfileViewModel
 ): TBasicInfoSchema => {
-  const cleanPhone = (phone?: string | null) => phone?.replace(/[^\d]/g, "") || "";
-
   return {
     companyName: user?.name ?? "",
     officialEmail: user?.email ?? "",
     domain: user?.domain_id?.toString() ?? "",
     personFullName: user?.person_name ?? "",
-    phoneNumber: user?.person_phone
-      ? `${user.person_phone_code ?? ""}${cleanPhone(user.person_phone)}`
-      : "",
-    orgOfficialPhoneNumber: user?.phone
-      ? `${user.phone_code ?? ""}${cleanPhone(user.phone)}`
-      : "",
+    phoneNumber: getNationalPhoneValue(user?.person_phone, user?.person_phone_code),
+    orgOfficialPhoneNumber: getNationalPhoneValue(user?.phone, user?.phone_code),
     country: user?.country_id?.toString() ?? "",
     city: user?.city_id?.toString() ?? "",
     dateOfEstablishment: user?.established_date ?? "",
   };
 };
 
-/** Parse an international phone string into code + national number. */
-const parsePhoneData = (phoneNumber: string) => {
+/** Parse an international or national phone string into code + national number. */
+const parsePhoneData = (phoneNumber: string, phoneCode?: string | null) => {
   if (!phoneNumber) return { phone: "", phone_code: "" };
   try {
-    const parsed = parsePhoneNumber(phoneNumber);
+    const parsed = parsePhoneWithCode(phoneNumber, phoneCode);
     return {
       phone: parsed?.nationalNumber ?? "",
       phone_code: parsed?.countryCallingCode
@@ -64,16 +62,6 @@ const parsePhoneData = (phoneNumber: string) => {
   } catch {
     return { phone: phoneNumber, phone_code: "" };
   }
-};
-
-/** Get default ISO country code based on calling code. */
-const getCountryCodeByPhoneCode = (phoneCode?: string | null): Country => {
-  if (!phoneCode) return "AE";
-  const numericCode = phoneCode.replace(/\D/g, "");
-  const match = getCountries().find(
-    (country) => getCountryCallingCode(country) === numericCode
-  );
-  return match || "EG";
 };
 
 // ---------------------------------------------------------------------------
@@ -145,8 +133,8 @@ const BasicInfoForm = () => {
 
   // ── submit handler ───────────────────────────────────────────────────
   const onSubmit: SubmitHandler<TBasicInfoSchema> = (data) => {
-    const personPhone = parsePhoneData(data.phoneNumber);
-    const orgPhone = parsePhoneData(data.orgOfficialPhoneNumber || "");
+    const personPhone = parsePhoneData(data.phoneNumber, userData?.person_phone_code);
+    const orgPhone = parsePhoneData(data.orgOfficialPhoneNumber || "", userData?.phone_code);
 
     const payload: UpdateBasicInfoPayload = {
       name: data.companyName,
