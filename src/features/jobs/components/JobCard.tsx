@@ -37,7 +37,7 @@ import {
 import Image from "next/image";
 import { useState } from "react";
 import { JobListItem } from "../types/jobs.types";
-import { getJobLocation, getJobSalary, normalizeJobStatus } from "../utils";
+import { getJobLocation, getJobSalaryWithCurrency, normalizeJobStatus } from "../utils";
 import { useQueryClient } from "@tanstack/react-query";
 
 type JobCardProps = {
@@ -99,7 +99,7 @@ export default function JobCard({ resumeMatch,
   const location = getJobLocation(job);
   const category = job?.category?.title || "Not specified";
   const employmentType = job?.employment_type?.title || "Not specified";
-  const salary = getJobSalary(job);
+  const salary = getJobSalaryWithCurrency(job);
   const experience = job?.experience?.title || "Experience not specified";
   const specialty = job?.specialty?.title || "Healthcare";
   const excerpt = job?.description?.slice(0, 150) || "Explore the job details to learn more about the role and employer.";

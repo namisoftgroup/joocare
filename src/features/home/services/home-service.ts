@@ -1,7 +1,6 @@
 import { formatDistanceToNowStrict } from "date-fns";
 import { getBaseApiUrl } from "@/shared/lib/api-endpoints";
-import { formatDate } from "@/shared/util/formateDate";
-import type { HomePageData } from "../types/home.types";
+import type { HomePageData, HomePopularSearchesPage } from "../types/home.types";
 
 type LocaleString = {
   ar?: string | null;
@@ -18,7 +17,6 @@ type HomeApiResponse = {
       countries?: Array<{ id?: number | string; name?: LocaleString | string | null }>;
       categories?: Array<{ id?: number | string; title?: LocaleString | string | null }>;
       domains?: Array<{ id?: number | string; title?: LocaleString | string | null }>;
-      searches?: Array<{ id?: number | string; word?: string | null }>;
     };
     how_it_works_section?: {
       title?: string | null;
@@ -95,6 +93,20 @@ type HomeApiResponse = {
   };
 };
 
+type SearchesApiResponse = {
+  message?: string;
+  code?: number;
+  data?: Array<{
+    id?: number | string;
+    word?: string | null;
+    count?: number | string | null;
+  }>;
+  current_page?: number;
+  last_page?: number;
+  per_page?: number;
+  total?: number;
+};
+
 function resolveLocalizedText(value: LocaleString | string | null | undefined, locale: string) {
   if (!value) {
     return "";
@@ -119,6 +131,51 @@ function buildJobTimeLabel(value: string | null | undefined) {
   }
 
   return formatDistanceToNowStrict(date, { addSuffix: true });
+}
+
+export async function getPopularSearchesPage({
+  page = 1,
+  limitPerPage = 10,
+  locale,
+}: {
+  page?: number;
+  limitPerPage?: number;
+  locale: string;
+}): Promise<HomePopularSearchesPage> {
+  const params = new URLSearchParams({
+    pagination: "on",
+    limit_per_page: String(limitPerPage),
+    page: String(page),
+  });
+
+  const response = await fetch(`${getBaseApiUrl()}/searches?${params.toString()}`, {
+    headers: {
+      Accept: "application/json",
+      "Accept-Language": locale,
+    },
+    next: {
+      revalidate: 300,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to load popular searches.");
+  }
+
+  const payload = (await response.json()) as SearchesApiResponse;
+
+  return {
+    items:
+      payload.data?.map((search, index) => ({
+        id: String(search.id ?? `${page}-${index}`),
+        label: search.word?.trim() ?? "",
+        count: Number(search.count ?? 0),
+      })).filter((search) => Boolean(search.label)) ?? [],
+    currentPage: payload.current_page ?? page,
+    lastPage: payload.last_page ?? page,
+    perPage: payload.per_page ?? limitPerPage,
+    total: payload.total ?? 0,
+  };
 }
 
 export async function getHomePageData(locale: string): Promise<HomePageData> {
@@ -168,11 +225,6 @@ export async function getHomePageData(locale: string): Promise<HomePageData> {
         homeSection?.domains?.map((domain) => ({
           id: String(domain.id ?? ""),
           label: resolveLocalizedText(domain.title, locale),
-        })) ?? [],
-      searches:
-        homeSection?.searches?.map((search) => ({
-          id: String(search.id ?? ""),
-          label: search.word ?? "",
         })) ?? [],
     },
     howItWorks: {

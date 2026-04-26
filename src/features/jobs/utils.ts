@@ -63,7 +63,7 @@ export function normalizeJobsSearchParams(
       "seniority_levels[]",
       "seniority_levels",
     ),
-    specialties: getArrayParam(searchParams, "specialties[]", "specialties"),
+    // specialties: getArrayParam(searchParams, "specialties[]", "specialties"),
     experiences: getArrayParam(searchParams, "experiences[]", "experiences"),
     availabilities: getArrayParam(searchParams, "availabilities[]", "availabilities"),
     salaryTypes: getArrayParam(searchParams, "salary_types[]", "salary_types"),
@@ -81,7 +81,7 @@ export function buildJobsQueryString(filters: JobsSearchFilters) {
   const arrayFilters: Array<[string, string[]]> = [
     ["role_categories[]", filters.roleCategories],
     ["seniority_levels[]", filters.seniorityLevels],
-    ["specialties[]", filters.specialties],
+    // ["specialties[]", filters.specialties],
     ["experiences[]", filters.experiences],
     ["availabilities[]", filters.availabilities],
     ["salary_types[]", filters.salaryTypes],
@@ -206,6 +206,24 @@ function formatSalaryAmount(value: string | number | null | undefined) {
 }
 
 export function getJobSalary(
+  job: Pick<JobListItem | JobDetails, "min_salary" | "max_salary" | "currency">,
+) {
+  const minSalary = formatSalaryAmount(job.min_salary);
+  const maxSalary = formatSalaryAmount(job.max_salary);
+  const hasMinSalary = minSalary !== null;
+  const hasMaxSalary = maxSalary !== null;
+
+  if (hasMinSalary && hasMaxSalary) {
+    return `${minSalary} - ${maxSalary}`;
+  }
+
+  if (hasMinSalary || hasMaxSalary) {
+    return minSalary ?? maxSalary ?? "Not specified";
+  }
+
+  return "Not specified";
+}
+export function getJobSalaryWithCurrency(
   job: Pick<JobListItem | JobDetails, "min_salary" | "max_salary" | "currency">,
 ) {
   const minSalary = formatSalaryAmount(job.min_salary);

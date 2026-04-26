@@ -6,6 +6,15 @@ export type HomeSelectOption = {
 export type HomePopularSearch = {
   id: string;
   label: string;
+  count: number;
+};
+
+export type HomePopularSearchesPage = {
+  items: HomePopularSearch[];
+  currentPage: number;
+  lastPage: number;
+  perPage: number;
+  total: number;
 };
 
 export type HomeStep = {
@@ -62,7 +71,6 @@ export type HomePageData = {
     countries: HomeSelectOption[];
     categories: HomeSelectOption[];
     domains: HomeSelectOption[];
-    searches: HomePopularSearch[];
   };
   howItWorks: {
     title: string;

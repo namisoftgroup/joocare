@@ -7,6 +7,8 @@ type HeroProps = {
   subtitle: string;
   description: string;
   searches: PopularSearchesItem[];
+  popularSearchesCurrentPage: number;
+  popularSearchesLastPage: number;
 };
 
 export default function Hero({
@@ -14,6 +16,8 @@ export default function Hero({
   subtitle,
   description,
   searches,
+  popularSearchesCurrentPage,
+  popularSearchesLastPage,
 }: HeroProps) {
   return (
     <section className="layout-shell   pt-10 pb-10 text-center md:gap-16 md:pt-30 md:pb-20">
@@ -29,7 +33,13 @@ export default function Hero({
 
         <div className=" min-w-full flex flex-col items-center gap-12 md:gap-18">
           <HomeFilter />
-          <PopularSearchesInteractive items={searches} variant="hero" maxVisible={10} />
+          <PopularSearchesInteractive
+            items={searches}
+            variant="hero"
+            maxVisible={5}
+            currentPage={popularSearchesCurrentPage}
+            lastPage={popularSearchesLastPage}
+          />
         </div>
       </section>
     </section>
