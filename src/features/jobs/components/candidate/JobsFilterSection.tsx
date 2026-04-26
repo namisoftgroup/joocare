@@ -2,7 +2,6 @@
 
 import { PopularSearchesItem } from "@/features/home/components/PopularSearches";
 import PopularSearchesInteractive from "@/features/home/components/PopularSearchesInteractive";
-import { buildJobsPagePath } from "@/features/jobs/utils";
 import { InputField } from "@/shared/components/InputField";
 import { Option, SelectInputField } from "@/shared/components/SelectInputField";
 import { Button } from "@/shared/components/ui/button";
@@ -17,18 +16,19 @@ type JobsFilterSectionProps = {
   country: string;
   countries: Option[];
   popularSearches: PopularSearchesItem[];
+  popularSearchesCurrentPage?: number;
+  popularSearchesLastPage?: number;
   hiddenInputs: Array<{ name: string; value: string }>;
 };
 
 export default function JobsFilterSection({
-  locale,
   actionPath,
-  heading,
-  description,
   search,
   country,
   countries,
   popularSearches,
+  popularSearchesCurrentPage = 1,
+  popularSearchesLastPage = 1,
   hiddenInputs,
 }: JobsFilterSectionProps) {
   const [location, setLocation] = useState<string>(country);
@@ -81,28 +81,11 @@ export default function JobsFilterSection({
             </Button>
           </form>
           <PopularSearchesInteractive
-            items={popularSearches.map((item) => ({
-              ...item,
-              href: buildJobsPagePath(locale, {
-                page: 1,
-                search: item.label,
-                country: "",
-                professionalLicense: "",
-                domain: "",
-                minSalary: "",
-                maxSalary: "",
-                roleCategories: [],
-                seniorityLevels: [],
-                // specialties: [],
-                experiences: [],
-                availabilities: [],
-                salaryTypes: [],
-                categories: [],
-                employmentTypes: [],
-              }),
-            }))}
-            variant="hero"
-            maxVisible={10}
+            items={popularSearches}
+            variant="jobs"
+            maxVisible={5}
+            currentPage={popularSearchesCurrentPage}
+            lastPage={popularSearchesLastPage}
           />
         </section>
       </section>

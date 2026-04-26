@@ -1,5 +1,6 @@
 import { SimilarJob } from "@/features/jobs/types/jobs.types";
 import { getJobSalary } from "@/features/jobs/utils";
+import { Link } from "@/i18n/navigation";
 import {
   Card,
   CardContent,
@@ -41,7 +42,7 @@ export default function SimilarJobCard({ job }: { job: SimilarJob }) {
         </span> */}
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col gap-2">
+        <Link href={`/jobs/${job.id}`} className="flex flex-col gap-2 cursor-pointer">
           <ul className="items-cente flex gap-2">
             <li className="text-secondary flex items-center gap-1 text-sm font-normal">
               <LocationEdit size={14} color="var(--muted-foreground)" />
@@ -75,7 +76,7 @@ export default function SimilarJobCard({ job }: { job: SimilarJob }) {
                 "<p>No description available.</p>",
             }}
           />
-        </div>
+        </Link>
       </CardContent>
       <CardFooter className="">
         <p className="text-foreground flex items-center gap-1 text-sm">

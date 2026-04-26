@@ -3,7 +3,10 @@ import Hero from "@/features/home/components/Hero";
 import HowItWorks from "@/features/home/components/HowItWorks";
 import { ImpactSection } from "@/features/home/components/ImpactSection";
 import { LiveJobs } from "@/features/home/components/LiveJobs";
-import { getHomePageData } from "@/features/home/services/home-service";
+import {
+  getHomePageData,
+  getPopularSearchesPage,
+} from "@/features/home/services/home-service";
 import { Testimonials } from "@/features/home/components/Testimonials";
 import TopEmployers from "@/features/home/components/TopEmployers";
 import WhyUs from "@/features/home/components/WhyUs";
@@ -17,9 +20,13 @@ export default async function Home({
 }) {
   const { locale } = await params;
   let homeData;
+  let popularSearches;
 
   try {
-    homeData = await getHomePageData(locale);
+    [homeData, popularSearches] = await Promise.all([
+      getHomePageData(locale),
+      getPopularSearchesPage({ locale }),
+    ]);
   } catch (error) {
     const statusCode = getHttpStatusCode(error);
 
@@ -39,14 +46,15 @@ export default async function Home({
     throw error;
   }
 
-  console.log("Home page data:", homeData);
   return (
     <section className="">
       <Hero
         title={homeData.hero.title}
         subtitle={homeData.hero.subtitle}
         description={homeData.hero.description}
-        searches={homeData.hero.searches}
+        searches={popularSearches.items}
+        popularSearchesCurrentPage={popularSearches.currentPage}
+        popularSearchesLastPage={popularSearches.lastPage}
       />
       <HowItWorks title={homeData.howItWorks.title} steps={homeData.howItWorks.steps} />
       <WhyUs

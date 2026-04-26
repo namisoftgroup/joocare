@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import type { PopularSearchesItem } from "@/features/home/components/PopularSearches";
+import { getPopularSearchesPage } from "@/features/home/services/home-service";
 import type { AccordionSection, FilterState } from "@/features/jobs/types/index.types";
 import JobsFilterSection from "@/features/jobs/components/candidate/JobsFilterSection";
 import JobsList from "@/features/jobs/components/candidate/JobsList";
@@ -71,9 +72,10 @@ export default async function Page({ params, searchParams }: PageProps) {
   const normalizedParams = normalizeJobsSearchParams(await searchParams);
   const actionPath = `/jobs`;
   const copy = getPageCopy(locale, normalizedParams.search);
-  const [filtersData, jobsData] = await Promise.all([
+  const [filtersData, jobsData, popularSearchesPage] = await Promise.all([
     getJobsFiltersData(locale),
     getJobsListing(locale, normalizedParams),
+    getPopularSearchesPage({ locale }),
   ]);
 
   const filterState: FilterState = {
@@ -179,8 +181,8 @@ export default async function Page({ params, searchParams }: PageProps) {
     ...(normalizedParams.maxSalary ? [{ name: "max_salary", value: normalizedParams.maxSalary }] : []),
   ];
 
-  const popularSearches: PopularSearchesItem[] = filtersData.jobTitles.slice(0, 12).map((item) => ({
-    id: item.value,
+  const popularSearches: PopularSearchesItem[] = popularSearchesPage.items.map((item) => ({
+    id: item.id,
     label: item.label,
   }));
 
@@ -246,6 +248,8 @@ export default async function Page({ params, searchParams }: PageProps) {
         country={normalizedParams.country}
         countries={filtersData.countries}
         popularSearches={popularSearches}
+        popularSearchesCurrentPage={popularSearchesPage.currentPage}
+        popularSearchesLastPage={popularSearchesPage.lastPage}
         hiddenInputs={hiddenInputs}
       />
 
