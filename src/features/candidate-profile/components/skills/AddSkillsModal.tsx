@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/shared/components/ui/button";
 import {
   Dialog,
@@ -37,8 +37,11 @@ export function AddSkillsModal({
 }: AddSkillsModalProps) {
   const locale = useLocale();
   const { data: session } = useSession();
+  const queryClient = useQueryClient();
   const [selected, setSelected] = useState<string[]>([]);
+  const [skillsSearch, setSkillsSearch] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const trimmedSkillsSearch = skillsSearch.trim();
 
   const {
     data: skillsPages,
@@ -48,7 +51,7 @@ export function AddSkillsModal({
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["user-skills", locale, jobTitleId],
+    queryKey: ["user-skills", locale, jobTitleId, trimmedSkillsSearch],
     enabled: open && Boolean(session?.accessToken),
     initialPageParam: 1,
     queryFn: async ({ pageParam }) => {
@@ -61,6 +64,7 @@ export function AddSkillsModal({
         token: session.accessToken,
         jobTitleId,
         page: Number(pageParam),
+        search: trimmedSkillsSearch,
       });
     },
     getNextPageParam: (lastPage) => {
@@ -85,9 +89,14 @@ export function AddSkillsModal({
 
   useEffect(() => {
     if (open) {
+      queryClient.removeQueries({
+        queryKey: ["user-skills", locale, jobTitleId],
+        exact: false,
+      });
       setSelected([]);
+      setSkillsSearch("");
     }
-  }, [open]);
+  }, [open, jobTitleId, locale, queryClient]);
 
   const allSkillOptions = useMemo(() => {
     const merged = new Map<string, SkillOption>();
@@ -158,6 +167,7 @@ export function AddSkillsModal({
   const handleClose = (value: boolean) => {
     if (!value) {
       setSelected([]);
+      setSkillsSearch("");
     }
     onOpenChange(value);
   };
@@ -178,6 +188,8 @@ export function AddSkillsModal({
             onSelect={toggle}
             onRemove={remove}
             options={allSkillOptions}
+            searchValue={skillsSearch}
+            onSearchChange={setSkillsSearch}
             onReachEnd={() => fetchNextPage()}
             hasNextPage={Boolean(hasNextPage)}
             isFetchingNextPage={isFetchingNextPage}
