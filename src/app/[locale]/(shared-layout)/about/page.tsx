@@ -12,6 +12,7 @@ export default async function AboutPage({
 }) {
   const { locale } = await params;
   const aboutData = await getAboutPageData(locale);
+  console.log(aboutData);
 
   return (
     <>
